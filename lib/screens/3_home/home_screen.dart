@@ -225,47 +225,87 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(builder: (context) => const MintsScreen()),
           );
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.success.withValues(alpha: 0.3),
-              width: 1,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Logo del mint
+            if (activeMintUrl != null)
+              FutureBuilder(
+                future: walletProvider.fetchMintInfo(activeMintUrl),
+                builder: (context, snapshot) {
+                  final iconUrl = snapshot.data?.iconUrl;
+                  return Container(
+                    width: 36,
+                    height: 36,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryAction.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: iconUrl != null
+                        ? ClipOval(
+                            child: Image.network(
+                              iconUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                LucideIcons.landmark,
+                                color: AppColors.primaryAction,
+                                size: 18,
+                              ),
+                            ),
+                          )
+                        : const Icon(
+                            LucideIcons.landmark,
+                            color: AppColors.primaryAction,
+                            size: 18,
+                          ),
+                  );
+                },
+              ),
+            // Pill del mint
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.success.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppColors.success.withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: walletProvider.isInitialized
+                          ? AppColors.success
+                          : AppColors.warning,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    displayMint,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Icon(
+                    LucideIcons.chevronDown,
+                    color: Colors.white.withValues(alpha: 0.6),
+                    size: 18,
+                  ),
+                ],
+              ),
             ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: walletProvider.isInitialized
-                      ? AppColors.success
-                      : AppColors.warning,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                displayMint,
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Icon(
-                LucideIcons.chevronDown,
-                color: Colors.white.withValues(alpha: 0.6),
-                size: 18,
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );

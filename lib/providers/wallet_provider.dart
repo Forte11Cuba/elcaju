@@ -45,6 +45,9 @@ class WalletProvider extends ChangeNotifier {
   /// Ejemplo: {'00abc123': 'sat', '00def456': 'usd'}
   final Map<String, String> _keysetUnits = {};
 
+  /// Caché de MintInfo por URL (nombre, logo, contactos, etc.)
+  final Map<String, MintInfo> _mintInfoCache = {};
+
   /// Mint activo actualmente
   String? _activeMintUrl;
 
@@ -138,6 +141,61 @@ class WalletProvider extends ChangeNotifier {
     result.addAll(otherMints);
 
     return result;
+  }
+
+  // ============================================================
+  // MINT INFO
+  // ============================================================
+
+  /// Obtiene la info de un mint (nombre, logo, contactos, etc.)
+  /// Usa caché para evitar llamadas repetidas.
+  Future<MintInfo?> fetchMintInfo(String mintUrl) async {
+    // Revisar caché primero
+    if (_mintInfoCache.containsKey(mintUrl)) {
+      return _mintInfoCache[mintUrl];
+    }
+
+    try {
+      final info = await getMintInfo(mintUrl: mintUrl);
+      _mintInfoCache[mintUrl] = info;
+      return info;
+    } catch (e) {
+      debugPrint('Error fetching mint info for $mintUrl: $e');
+      return null;
+    }
+  }
+
+  /// Obtiene MintInfo del caché (sin fetch)
+  MintInfo? getCachedMintInfo(String mintUrl) {
+    return _mintInfoCache[mintUrl];
+  }
+
+  /// Obtiene el nombre del mint (del caché o display name)
+  String getMintName(String mintUrl) {
+    final cached = _mintInfoCache[mintUrl];
+    if (cached?.name != null && cached!.name!.isNotEmpty) {
+      return cached.name!;
+    }
+    // Fallback: extraer nombre del URL
+    return _getMintDisplayName(mintUrl);
+  }
+
+  /// Obtiene el URL del icono del mint (del caché)
+  String? getMintIconUrl(String mintUrl) {
+    return _mintInfoCache[mintUrl]?.iconUrl;
+  }
+
+  /// Helper: extrae nombre legible del URL del mint
+  String _getMintDisplayName(String mintUrl) {
+    try {
+      final uri = Uri.parse(mintUrl);
+      var host = uri.host;
+      host = host.replaceFirst('mint.', '');
+      host = host.replaceFirst('www.', '');
+      return host;
+    } catch (e) {
+      return mintUrl;
+    }
   }
 
   // ============================================================
