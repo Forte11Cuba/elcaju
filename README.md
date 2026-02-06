@@ -69,7 +69,7 @@ Cashu is an ecash protocol that enables Bitcoin transactions with maximum privac
 ## 🔧 Technologies
 
 ### Frontend
-- **Flutter 3.3+**: Cross-platform framework
+- **Flutter 3.27+**: Cross-platform framework
 - **Dart**: Programming language
 - **Provider**: State management
 - **QR Flutter**: QR code generation
@@ -90,10 +90,11 @@ Cashu is an ecash protocol that enables Bitcoin transactions with maximum privac
 
 ### Prerequisites
 
-- Flutter SDK (>=3.3.0)
-- Dart SDK
-- Android Studio / Xcode (for native builds)
-- Rust toolchain (to compile cdk-flutter)
+- Flutter SDK (>=3.27.0)
+- Dart SDK (>=3.6.0)
+- Android Studio with Android SDK
+- Android NDK 26.3+ (install via Android Studio > SDK Manager > SDK Tools)
+- Rust toolchain (>=1.85.0)
 
 ### Clone the Repository
 
@@ -108,19 +109,74 @@ cd elcaju
 flutter pub get
 ```
 
-### Configure Rust (Ubuntu/Linux)
+### Configure Rust for Android (Linux/macOS)
 
 ```bash
-# Install Android targets
-rustup target add armv7-linux-androideabi
-rustup target add aarch64-linux-android
-rustup target add i686-linux-android
-rustup target add x86_64-linux-android
+# Install Rust if not already installed
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-# Create ~/.cargo/config.toml
+# Update to latest stable (requires >= 1.85.0)
+rustup update stable
+
+# Install Android targets
+rustup target add aarch64-linux-android   # arm64-v8a (modern devices)
+rustup target add armv7-linux-androideabi # armeabi-v7a (older devices)
+rustup target add x86_64-linux-android    # x86_64 (emulators)
+```
+
+### Configure Android NDK Linkers
+
+Create or edit `~/.cargo/config.toml` with your NDK path:
+
+```toml
 [target.x86_64-unknown-linux-gnu]
 linker = "gcc"
 rustflags = ["-C", "link-arg=-fuse-ld=bfd"]
+
+[target.aarch64-linux-android]
+linker = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang"
+
+[target.armv7-linux-androideabi]
+linker = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang"
+
+[target.x86_64-linux-android]
+linker = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang"
+
+[env]
+CC_armv7-linux-androideabi = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang"
+AR_armv7-linux-androideabi = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
+CC_x86_64-linux-android = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang"
+AR_x86_64-linux-android = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
+CC_aarch64-linux-android = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang"
+AR_aarch64-linux-android = "/path/to/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
+```
+
+> **Note**: Replace `/path/to/Android/Sdk` with your actual Android SDK path (usually `~/Android/Sdk` on Linux or `~/Library/Android/sdk` on macOS).
+
+### Compile Native Libraries
+
+The cdk_flutter native libraries must be compiled manually:
+
+```bash
+# Navigate to cdk_flutter rust directory
+cd ~/.pub-cache/git/cdk_flutter-*/rust
+
+# Build for each architecture
+cargo build --release --target aarch64-linux-android
+cargo build --release --target armv7-linux-androideabi
+cargo build --release --target x86_64-linux-android
+
+# Copy libraries to project
+mkdir -p /path/to/elcaju/android/app/src/main/jniLibs/{arm64-v8a,armeabi-v7a,x86_64}
+
+cp target/aarch64-linux-android/release/libcdk_flutter.so \
+   /path/to/elcaju/android/app/src/main/jniLibs/arm64-v8a/
+
+cp target/armv7-linux-androideabi/release/libcdk_flutter.so \
+   /path/to/elcaju/android/app/src/main/jniLibs/armeabi-v7a/
+
+cp target/x86_64-linux-android/release/libcdk_flutter.so \
+   /path/to/elcaju/android/app/src/main/jniLibs/x86_64/
 ```
 
 ### Run in Development
@@ -132,11 +188,27 @@ flutter run
 ### Build for Production
 
 ```bash
-# Android APK
+# Android APK (includes all architectures, ~55MB)
 flutter build apk --release
 
-# Android App Bundle
+# Android App Bundle (recommended for Play Store)
 flutter build appbundle --release
+```
+
+### Quick Build (arm64 only)
+
+For faster builds targeting only modern devices:
+
+```bash
+# Build only arm64 library
+cargo build --release --target aarch64-linux-android
+
+# Copy to project
+cp target/aarch64-linux-android/release/libcdk_flutter.so \
+   android/app/src/main/jniLibs/arm64-v8a/
+
+# Build APK (~40MB)
+flutter build apk --release
 ```
 
 ---
