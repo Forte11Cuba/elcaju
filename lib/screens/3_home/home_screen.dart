@@ -136,6 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final walletProvider = context.watch<WalletProvider>();
     final settingsProvider = context.read<SettingsProvider>();
     final activeUnit = walletProvider.activeUnit;
+    // Toggle button: "BTC" para sat (como cashu.me)
+    final toggleLabel = UnitFormatter.getToggleLabel(activeUnit);
+    // Balance label: "sat" minúsculas (como cashu.me)
     final unitLabel = UnitFormatter.getUnitLabel(activeUnit);
 
     return Padding(
@@ -146,84 +149,82 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Ojo encima del saldo (centrado)
-          Center(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isBalanceVisible = !_isBalanceVisible;
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  _isBalanceVisible ? LucideIcons.eye : LucideIcons.eyeOff,
-                  color: AppColors.textSecondary.withValues(alpha: 0.6),
-                  size: 24,
+          // Botón toggle de unidad (arriba, como cashu.me)
+          GestureDetector(
+            onTap: () async {
+              await walletProvider.cycleUnit();
+              await settingsProvider.setActiveUnit(walletProvider.activeUnit);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Text(
+                toggleLabel,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
               ),
             ),
           ),
+
+          const SizedBox(height: 24),
+
+          // Ojo para ocultar/mostrar balance
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isBalanceVisible = !_isBalanceVisible;
+              });
+            },
+            child: Icon(
+              _isBalanceVisible ? LucideIcons.eye : LucideIcons.eyeOff,
+              color: AppColors.textSecondary.withValues(alpha: 0.5),
+              size: 20,
+            ),
+          ),
+
           const SizedBox(height: 8),
 
-          // Balance reactivo del mint activo
+          // Balance con unidad al lado (como cashu.me: "855 sat")
           StreamBuilder<BigInt>(
             stream: walletProvider.streamBalance(),
             builder: (context, snapshot) {
               final balance = snapshot.data ?? BigInt.zero;
               final formattedBalance = UnitFormatter.formatBalance(balance, activeUnit);
 
-              return Text(
-                _isBalanceVisible ? formattedBalance : '••••••',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 48,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 4),
-
-          // Unidad - tap para ciclar
-          GestureDetector(
-            onTap: () async {
-              // Ciclar unidad
-              await walletProvider.cycleUnit();
-              // Guardar en settings
-              await settingsProvider.setActiveUnit(walletProvider.activeUnit);
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.primaryAction.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
                 children: [
                   Text(
-                    unitLabel,
+                    _isBalanceVisible ? formattedBalance : '••••••',
                     style: const TextStyle(
                       fontFamily: 'Inter',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryAction,
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
-                  // Mostrar indicador si hay más de una unidad
-                  if (walletProvider.activeUnits.length > 1) ...[
-                    const SizedBox(width: 4),
-                    Icon(
-                      LucideIcons.refreshCw,
-                      color: AppColors.primaryAction.withValues(alpha: 0.7),
-                      size: 14,
+                  const SizedBox(width: 8),
+                  Text(
+                    _isBalanceVisible ? unitLabel : '',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 32,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
-                  ],
+                  ),
                 ],
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),

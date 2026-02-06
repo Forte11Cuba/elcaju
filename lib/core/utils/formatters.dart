@@ -34,16 +34,34 @@ class UnitFormatter {
   }
 
   /// Formatea un balance con su unidad.
-  /// Ejemplo: 1000 sat → "1,000 BTC", 500 usd → "5.00 USD"
+  /// Ejemplo: 1000 sat → "1,000 sat", 500 usd → "5.00 USD"
   static String formatBalanceWithUnit(BigInt amount, String unit) {
     final formatted = formatBalance(amount, unit);
     final label = getUnitLabel(unit);
     return '$formatted $label';
   }
 
-  /// Obtiene la etiqueta de display para una unidad.
-  /// sat → BTC, usd → USD, eur → EUR, msat → MSAT
+  /// Obtiene la etiqueta de display para una unidad (para balances).
+  /// Siguiendo el estándar de cashu.me: minúsculas para sat/msat
+  /// Ejemplo: "855 sat", "5.00 USD"
   static String getUnitLabel(String unit) {
+    switch (unit.toLowerCase()) {
+      case 'sat':
+        return 'sat';
+      case 'usd':
+        return 'USD';
+      case 'eur':
+        return 'EUR';
+      case 'msat':
+        return 'msat';
+      default:
+        return unit;
+    }
+  }
+
+  /// Obtiene la etiqueta para el botón toggle de unidad.
+  /// sat → "BTC" (indica Bitcoin), otros → mayúsculas
+  static String getToggleLabel(String unit) {
     switch (unit.toLowerCase()) {
       case 'sat':
         return 'BTC';
@@ -52,7 +70,24 @@ class UnitFormatter {
       case 'eur':
         return 'EUR';
       case 'msat':
-        return 'MSAT';
+        return 'mSAT';
+      default:
+        return unit.toUpperCase();
+    }
+  }
+
+  /// Obtiene la etiqueta en mayúsculas (para badges, estados).
+  /// Ejemplo: "PENDING: 536 SAT"
+  static String getUnitLabelUppercase(String unit) {
+    switch (unit.toLowerCase()) {
+      case 'sat':
+        return 'SAT';
+      case 'usd':
+        return 'USD';
+      case 'eur':
+        return 'EUR';
+      case 'msat':
+        return 'mSAT';
       default:
         return unit.toUpperCase();
     }
