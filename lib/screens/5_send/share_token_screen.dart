@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:cdk_flutter/cdk_flutter.dart' as cdk;
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../widgets/common/gradient_background.dart';
@@ -30,61 +31,74 @@ class ShareTokenScreen extends StatefulWidget {
 }
 
 class _ShareTokenScreenState extends State<ShareTokenScreen> {
-  late PageController _pageController;
-  late List<String> _qrParts;
-  int _currentPage = 0;
-  Timer? _timer;
+  List<String> _urFragments = [];
+  int _currentFragment = 0;
+  Timer? _animationTimer;
+
+  // Configuración de velocidad (como cashu.me)
+  static const int _intervalFast = 100;    // ms
+  static const int _intervalMedium = 200;  // ms
+  static const int _intervalSlow = 400;    // ms
+  int _currentInterval = _intervalMedium;
+  String _speedLabel = 'M';
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-    _qrParts = _encodeTokenToQR();
-    _startQRAnimation();
+    _encodeTokenToUR();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _pageController.dispose();
+    _animationTimer?.cancel();
     super.dispose();
   }
 
-  List<String> _encodeTokenToQR() {
-    // TODO: Implementar con cdk-flutter cuando esté disponible
-    // final qrParts = encodeQrToken(token: widget.token);
+  void _encodeTokenToUR() {
+    // Parsear el token string a objeto Token de cdk-flutter
+    final token = cdk.Token.parse(encoded: widget.token);
 
-    // Por ahora, simulamos fragmentos UR para el token
-    if (widget.token.length <= 200) {
-      return [widget.token];
-    }
+    // Codificar a fragmentos UR usando cdk-flutter
+    // maxFragmentLength por defecto es 150 bytes
+    _urFragments = cdk.encodeQrToken(token: token);
 
-    // Simular fragmentación para tokens largos
-    final parts = <String>[];
-    const chunkSize = 200;
-    for (int i = 0; i < widget.token.length; i += chunkSize) {
-      final end = (i + chunkSize < widget.token.length)
-          ? i + chunkSize
-          : widget.token.length;
-      parts.add(widget.token.substring(i, end));
+    // Si hay múltiples fragmentos, iniciar animación
+    if (_urFragments.length > 1) {
+      _startAnimation();
     }
-    return parts;
   }
 
-  void _startQRAnimation() {
-    // Solo animar si hay múltiples fragmentos
-    if (_qrParts.length <= 1) return;
+  void _startAnimation() {
+    _animationTimer?.cancel();
+    _animationTimer = Timer.periodic(
+      Duration(milliseconds: _currentInterval),
+      (timer) {
+        if (mounted) {
+          setState(() {
+            _currentFragment = (_currentFragment + 1) % _urFragments.length;
+          });
+        }
+      },
+    );
+  }
 
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      if (mounted) {
-        final nextPage = (_currentPage + 1) % _qrParts.length;
-        _pageController.animateToPage(
-          nextPage,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
+  void _cycleSpeed() {
+    setState(() {
+      if (_currentInterval == _intervalMedium) {
+        _currentInterval = _intervalSlow;
+        _speedLabel = 'S';
+      } else if (_currentInterval == _intervalSlow) {
+        _currentInterval = _intervalFast;
+        _speedLabel = 'F';
+      } else {
+        _currentInterval = _intervalMedium;
+        _speedLabel = 'M';
       }
     });
+    // Reiniciar timer con nueva velocidad
+    if (_urFragments.length > 1) {
+      _startAnimation();
+    }
   }
 
   @override
@@ -132,11 +146,6 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
 
                 // Token truncado
                 _buildTokenTextDisplay(),
-
-                const SizedBox(height: AppDimensions.paddingSmall),
-
-                // Indicador de página (si hay múltiples fragmentos)
-                if (_qrParts.length > 1) _buildPageIndicator(),
 
                 const SizedBox(height: AppDimensions.paddingMedium),
 
@@ -204,58 +213,111 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
   }
 
   Widget _buildQRDisplay() {
+    if (_urFragments.isEmpty) {
+      return const SizedBox(
+        width: 220,
+        height: 220,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final size = 220.0;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+    final isAnimated = _urFragments.length > 1;
+
+    return Column(
+      children: [
+        // QR Container
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: _qrParts.length > 1
-            ? PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                itemCount: _qrParts.length,
-                itemBuilder: (context, index) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: QrImageView(
-                        data: _qrParts[index],
-                        version: QrVersions.auto,
-                        size: size - 40,
-                        backgroundColor: Colors.white,
-                        errorCorrectionLevel: QrErrorCorrectLevel.M,
-                      ),
-                    ),
-                  );
-                },
-              )
-            : Padding(
-                padding: const EdgeInsets.all(20),
-                child: QrImageView(
-                  data: _qrParts[0],
-                  version: QrVersions.auto,
-                  size: size - 40,
-                  backgroundColor: Colors.white,
-                  errorCorrectionLevel: QrErrorCorrectLevel.M,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: QrImageView(
+                data: _urFragments[_currentFragment],
+                version: QrVersions.auto,
+                size: size - 32,
+                backgroundColor: Colors.white,
+                errorCorrectionLevel: QrErrorCorrectLevel.L,
+              ),
+            ),
+          ),
+        ),
+
+        // Controles de animación (solo si hay múltiples fragmentos)
+        if (isAnimated) ...[
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Indicador de fragmento actual
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${_currentFragment + 1} / ${_urFragments.length}',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-      ),
+              const SizedBox(width: 12),
+              // Botón de velocidad
+              GestureDetector(
+                onTap: _cycleSpeed,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryAction.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppColors.primaryAction.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        LucideIcons.gauge,
+                        color: AppColors.primaryAction,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _speedLabel,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryAction,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
     );
   }
 
@@ -263,6 +325,8 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
     final displayToken = widget.token.length > 50
         ? '${widget.token.substring(0, 25)}...${widget.token.substring(widget.token.length - 20)}'
         : widget.token;
+
+    final isAnimated = _urFragments.length > 1;
 
     return GlassCard(
       padding: const EdgeInsets.all(AppDimensions.paddingSmall),
@@ -274,7 +338,9 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
               Icon(LucideIcons.bean, color: AppColors.primaryAction, size: 16),
               const SizedBox(width: 6),
               Text(
-                'Token Cashu (${_qrParts.length} ${_qrParts.length == 1 ? "parte" : "partes"})',
+                isAnimated
+                    ? 'Token Cashu (QR animado - ${_urFragments.length} fragmentos UR)'
+                    : 'Token Cashu',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 12,
@@ -294,27 +360,6 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildPageIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        _qrParts.length,
-        (index) => AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: index == _currentPage ? 24 : 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: index == _currentPage
-                ? AppColors.primaryAction
-                : AppColors.textSecondary.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
       ),
     );
   }
