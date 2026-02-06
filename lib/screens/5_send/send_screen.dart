@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -21,24 +22,24 @@ class _SendScreenState extends State<SendScreen> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
 
-  final String _unit = 'sats';
-
   bool _isProcessing = false;
   String? _errorMessage;
-  int _availableBalance = 0;
+  BigInt _availableBalance = BigInt.zero;
+  late String _activeUnit;
 
   @override
   void initState() {
     super.initState();
+    _activeUnit = context.read<WalletProvider>().activeUnit;
     _loadBalance();
   }
 
   Future<void> _loadBalance() async {
     final walletProvider = context.read<WalletProvider>();
-    final balance = await walletProvider.getTotalBalance();
+    final balance = await walletProvider.getBalance();
     if (mounted) {
       setState(() {
-        _availableBalance = balance.toInt();
+        _availableBalance = balance;
       });
     }
   }
@@ -50,8 +51,13 @@ class _SendScreenState extends State<SendScreen> {
     super.dispose();
   }
 
-  int get _amount => int.tryParse(_amountController.text) ?? 0;
-  bool get _isValidAmount => _amount > 0 && _amount <= _availableBalance;
+  /// Obtiene la etiqueta de la unidad para display
+  String get _unitLabel => UnitFormatter.getUnitLabel(_activeUnit);
+
+  /// Parsea el input del usuario a BigInt según la unidad
+  BigInt get _amount => UnitFormatter.parseUserInput(_amountController.text, _activeUnit);
+
+  bool get _isValidAmount => _amount > BigInt.zero && _amount <= _availableBalance;
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +160,7 @@ class _SendScreenState extends State<SendScreen> {
                 ),
               ),
               Text(
-                _unit,
+                _unitLabel,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 18,
@@ -185,7 +191,7 @@ class _SendScreenState extends State<SendScreen> {
               child: Row(
                 children: [
                   Text(
-                    '$_availableBalance $_unit',
+                    '${UnitFormatter.formatBalance(_availableBalance, _activeUnit)} $_unitLabel',
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 14,
@@ -300,7 +306,8 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   void _setMaxAmount() {
-    _amountController.text = _availableBalance.toString();
+    // Formatear el balance para el input (sin separadores de miles)
+    _amountController.text = UnitFormatter.formatBalance(_availableBalance, _activeUnit).replaceAll(',', '');
     setState(() {
       _errorMessage = null;
     });
@@ -312,7 +319,7 @@ class _SendScreenState extends State<SendScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => _ConfirmationModal(
         amount: _amount,
-        unit: _unit,
+        unit: _activeUnit,
         memo: _memoController.text.isNotEmpty ? _memoController.text : null,
         onConfirm: () {
           Navigator.pop(context);
@@ -334,10 +341,8 @@ class _SendScreenState extends State<SendScreen> {
 
       // Crear token real con cdk-flutter
       final memo = _memoController.text.isNotEmpty ? _memoController.text : null;
-      final token = await walletProvider.sendTokens(
-        BigInt.from(_amount),
-        memo,
-      );
+      final amount = _amount;
+      final token = await walletProvider.sendTokens(amount, memo);
 
       if (mounted) {
         Navigator.pushReplacement(
@@ -345,8 +350,8 @@ class _SendScreenState extends State<SendScreen> {
           MaterialPageRoute(
             builder: (context) => ShareTokenScreen(
               token: token,
-              amount: _amount,
-              unit: _unit,
+              amount: amount,
+              unit: _activeUnit,
               memo: memo,
             ),
           ),
@@ -373,7 +378,7 @@ class _SendScreenState extends State<SendScreen> {
 
 /// Modal de confirmacion
 class _ConfirmationModal extends StatelessWidget {
-  final int amount;
+  final BigInt amount;
   final String unit;
   final String? memo;
   final VoidCallback onConfirm;
@@ -443,7 +448,7 @@ class _ConfirmationModal extends StatelessWidget {
 
           // Monto
           Text(
-            '$amount $unit',
+            '${UnitFormatter.formatBalance(amount, unit)} ${UnitFormatter.getUnitLabel(unit)}',
             style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 32,

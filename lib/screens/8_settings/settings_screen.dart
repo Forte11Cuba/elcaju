@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../../widgets/common/gradient_background.dart';
@@ -1227,10 +1228,9 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
 
   Future<void> _loadMints() async {
     final walletProvider = context.read<WalletProvider>();
-    final mints = await walletProvider.listMints();
     if (mounted) {
       setState(() {
-        _availableMints = mints.map((m) => m.url).toList();
+        _availableMints = walletProvider.mintUrls;
         _isLoadingMints = false;
         if (_availableMints.isNotEmpty) {
           _selectedMintUrl = _availableMints.first;
@@ -1749,27 +1749,46 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
       if (_useCurrentMnemonic) {
         // Usar mnemonic actual
         if (_scanAllMints) {
-          // Escanear todos los mints
+          // Escanear todos los mints (retorna Map<String, Map<String, BigInt>>)
           final results = await walletProvider.restoreAllMints();
 
           BigInt totalRecovered = BigInt.zero;
           int mintsScanned = 0;
           int mintsWithError = 0;
+          final recoveredDetails = <String>[];
 
-          for (final entry in results.entries) {
-            if (entry.value >= BigInt.zero) {
-              totalRecovered += entry.value;
-              mintsScanned++;
-            } else {
+          for (final mintEntry in results.entries) {
+            final mintUrl = mintEntry.key;
+            final unitBalances = mintEntry.value;
+            bool hasError = false;
+            BigInt mintTotal = BigInt.zero;
+
+            for (final unitEntry in unitBalances.entries) {
+              final unit = unitEntry.key;
+              final balance = unitEntry.value;
+              if (balance < BigInt.zero) {
+                hasError = true;
+              } else if (balance > BigInt.zero) {
+                mintTotal += balance;
+                final formatted = UnitFormatter.formatBalance(balance, unit);
+                final label = UnitFormatter.getUnitLabel(unit);
+                recoveredDetails.add('$formatted $label');
+              }
+            }
+
+            if (hasError) {
               mintsWithError++;
+            } else {
+              mintsScanned++;
+              totalRecovered += mintTotal;
             }
           }
 
           if (!mounted) return;
           setState(() {
             _isSuccess = true;
-            if (totalRecovered > BigInt.zero) {
-              _result = '¡Recuperados ${totalRecovered.toInt()} sats de $mintsScanned mint(s)!';
+            if (recoveredDetails.isNotEmpty) {
+              _result = '¡Recuperados ${recoveredDetails.join(", ")} de $mintsScanned mint(s)!';
             } else {
               _result = 'Escaneo completado. No se encontraron tokens nuevos.';
             }
@@ -1778,7 +1797,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
             }
           });
         } else {
-          // Escanear mint específico
+          // Escanear mint específico (retorna Map<String, BigInt>)
           if (_selectedMintUrl == null) {
             if (!mounted) return;
             setState(() {
@@ -1788,14 +1807,25 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
             return;
           }
 
-          final recovered = await walletProvider.restoreFromMint(_selectedMintUrl!);
-          final mintHost = Uri.parse(_selectedMintUrl!).host;
+          final unitBalances = await walletProvider.restoreFromMint(_selectedMintUrl!);
+          final mintHost = UnitFormatter.getMintDisplayName(_selectedMintUrl!);
+
+          final recoveredDetails = <String>[];
+          for (final entry in unitBalances.entries) {
+            final unit = entry.key;
+            final balance = entry.value;
+            if (balance > BigInt.zero) {
+              final formatted = UnitFormatter.formatBalance(balance, unit);
+              final label = UnitFormatter.getUnitLabel(unit);
+              recoveredDetails.add('$formatted $label');
+            }
+          }
 
           if (!mounted) return;
           setState(() {
             _isSuccess = true;
-            if (recovered > BigInt.zero) {
-              _result = '¡Recuperados ${recovered.toInt()} sats de $mintHost!';
+            if (recoveredDetails.isNotEmpty) {
+              _result = '¡Recuperados ${recoveredDetails.join(", ")} de $mintHost!';
             } else {
               _result = 'No se encontraron tokens en $mintHost.';
             }
@@ -1816,8 +1846,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
         }
 
         // Obtener lista de mints actuales para escanear
-        final mints = await walletProvider.listMints();
-        final mintUrls = mints.map((m) => m.url).toList();
+        final mintUrls = walletProvider.mintUrls;
 
         if (mintUrls.isEmpty) {
           if (!mounted) return;
@@ -1837,7 +1866,11 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
         setState(() {
           _isSuccess = true;
           if (recovered > BigInt.zero) {
-            _result = '¡Recuperados y transferidos ${recovered.toInt()} sats a tu wallet!';
+            // Usamos la unidad activa como aproximación para el formato
+            final activeUnit = walletProvider.activeUnit;
+            final formatted = UnitFormatter.formatBalance(recovered, activeUnit);
+            final label = UnitFormatter.getUnitLabel(activeUnit);
+            _result = '¡Recuperados y transferidos $formatted $label a tu wallet!';
           } else {
             _result = 'No se encontraron tokens asociados a ese mnemonic.';
           }

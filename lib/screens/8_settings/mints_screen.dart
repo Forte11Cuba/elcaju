@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:cdk_flutter/cdk_flutter.dart' hide WalletProvider;
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../providers/wallet_provider.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
@@ -42,51 +42,38 @@ class _MintsScreenState extends State<MintsScreen> {
         body: SafeArea(
           child: Consumer<WalletProvider>(
             builder: (context, walletProvider, child) {
-              return FutureBuilder<List<Mint>>(
-                future: walletProvider.listMints(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primaryAction,
-                      ),
-                    );
-                  }
+              final mintUrls = walletProvider.mintUrls;
 
-                  final mints = snapshot.data ?? [];
-
-                  return Padding(
-                    padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Lista de mints
-                        Expanded(
-                          child: mints.isEmpty
-                              ? _buildEmptyState()
-                              : ListView.builder(
-                                  itemCount: mints.length,
-                                  itemBuilder: (context, index) {
-                                    final mint = mints[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: AppDimensions.paddingMedium,
-                                      ),
-                                      child: _buildMintCard(
-                                        mint,
-                                        walletProvider,
-                                      ),
-                                    );
-                                  },
-                                ),
-                        ),
-
-                        // Botón agregar mint
-                        _buildAddMintButton(walletProvider),
-                      ],
+              return Padding(
+                padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Lista de mints
+                    Expanded(
+                      child: mintUrls.isEmpty
+                          ? _buildEmptyState()
+                          : ListView.builder(
+                              itemCount: mintUrls.length,
+                              itemBuilder: (context, index) {
+                                final mintUrl = mintUrls[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: AppDimensions.paddingMedium,
+                                  ),
+                                  child: _buildMintCard(
+                                    mintUrl,
+                                    walletProvider,
+                                  ),
+                                );
+                              },
+                            ),
                     ),
-                  );
-                },
+
+                    // Botón agregar mint
+                    _buildAddMintButton(walletProvider),
+                  ],
+                ),
               );
             },
           ),
@@ -129,20 +116,21 @@ class _MintsScreenState extends State<MintsScreen> {
     );
   }
 
-  Widget _buildMintCard(Mint mint, WalletProvider walletProvider) {
-    final isActive = walletProvider.activeMintUrl == mint.url;
+  Widget _buildMintCard(String mintUrl, WalletProvider walletProvider) {
+    final isActive = walletProvider.activeMintUrl == mintUrl;
+    final units = walletProvider.getUnitsForMint(mintUrl);
 
-    return FutureBuilder<BigInt>(
-      future: walletProvider.getBalanceForMint(mint.url),
+    return FutureBuilder<Map<String, BigInt>>(
+      future: walletProvider.getBalancesForMint(mintUrl),
       builder: (context, balanceSnapshot) {
-        final balance = balanceSnapshot.data ?? BigInt.zero;
+        final balances = balanceSnapshot.data ?? {};
 
         return GlassCard(
           padding: const EdgeInsets.all(AppDimensions.paddingMedium),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header: URL + estado
+              // Header: URL + estado + refresh
               Row(
                 children: [
                   // Icono estado conexión (verde si es el activo)
@@ -156,10 +144,10 @@ class _MintsScreenState extends State<MintsScreen> {
                   ),
                   const SizedBox(width: 8),
 
-                  // URL del mint (solo el host)
+                  // URL del mint (display name)
                   Expanded(
                     child: Text(
-                      _extractHost(mint.url),
+                      UnitFormatter.getMintDisplayName(mintUrl),
                       style: const TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 16,
@@ -169,6 +157,21 @@ class _MintsScreenState extends State<MintsScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+
+                  // Botón refresh
+                  GestureDetector(
+                    onTap: () => _refreshMint(mintUrl, walletProvider),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Icon(
+                        LucideIcons.refreshCw,
+                        color: AppColors.textSecondary,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
 
                   // Badge activo
                   if (isActive)
@@ -198,7 +201,7 @@ class _MintsScreenState extends State<MintsScreen> {
 
               // URL completa (más pequeña)
               Text(
-                mint.url,
+                mintUrl,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 12,
@@ -209,19 +212,19 @@ class _MintsScreenState extends State<MintsScreen> {
 
               const SizedBox(height: AppDimensions.paddingSmall),
 
-              // Balance
-              Row(
-                children: [
-                  Text(
-                    'Balance:',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      color: AppColors.textSecondary.withValues(alpha: 0.7),
+              // Balances por unidad
+              if (balanceSnapshot.connectionState == ConnectionState.waiting)
+                Row(
+                  children: [
+                    Text(
+                      'Balance:',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        color: AppColors.textSecondary.withValues(alpha: 0.7),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  if (balanceSnapshot.connectionState == ConnectionState.waiting)
+                    const SizedBox(width: 8),
                     SizedBox(
                       width: 14,
                       height: 14,
@@ -229,19 +232,11 @@ class _MintsScreenState extends State<MintsScreen> {
                         strokeWidth: 2,
                         color: AppColors.textSecondary,
                       ),
-                    )
-                  else
-                    Text(
-                      '${_formatBalance(balance)} sats',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
                     ),
-                ],
-              ),
+                  ],
+                )
+              else
+                _buildBalancesList(units, balances),
 
               const SizedBox(height: AppDimensions.paddingMedium),
 
@@ -252,7 +247,7 @@ class _MintsScreenState extends State<MintsScreen> {
                   if (!isActive)
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => _setActiveMint(mint.url, walletProvider),
+                        onTap: () => _setActiveMint(mintUrl, walletProvider),
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
@@ -288,7 +283,7 @@ class _MintsScreenState extends State<MintsScreen> {
                   // Eliminar
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => _showDeleteDialog(mint, balance, walletProvider),
+                      onTap: () => _showDeleteDialog(mintUrl, balances, walletProvider),
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
@@ -327,29 +322,93 @@ class _MintsScreenState extends State<MintsScreen> {
     );
   }
 
+  /// Construye la lista de balances por unidad.
+  Widget _buildBalancesList(List<String> units, Map<String, BigInt> balances) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Balances:',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            color: AppColors.textSecondary.withValues(alpha: 0.7),
+          ),
+        ),
+        const SizedBox(height: 4),
+        ...units.map((unit) {
+          final balance = balances[unit] ?? BigInt.zero;
+          final formattedBalance = UnitFormatter.formatBalance(balance, unit);
+          final unitLabel = UnitFormatter.getUnitLabel(unit);
+
+          return Padding(
+            padding: const EdgeInsets.only(left: 8, top: 2),
+            child: Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: balance > BigInt.zero
+                        ? AppColors.success
+                        : AppColors.textSecondary.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '$formattedBalance $unitLabel',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    fontWeight: balance > BigInt.zero ? FontWeight.w600 : FontWeight.normal,
+                    color: balance > BigInt.zero
+                        ? Colors.white
+                        : AppColors.textSecondary.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  /// Refresca la información del mint (detecta nuevas unidades).
+  Future<void> _refreshMint(String mintUrl, WalletProvider walletProvider) async {
+    try {
+      final units = await walletProvider.refreshMint(mintUrl);
+
+      if (mounted) {
+        setState(() {}); // Rebuild para actualizar UI
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Unidades detectadas: ${units.join(", ")}'),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildAddMintButton(WalletProvider walletProvider) {
     return PrimaryButton(
       text: 'Agregar mint',
       icon: LucideIcons.plus,
       onPressed: () => _showAddMintDialog(walletProvider),
     );
-  }
-
-  String _extractHost(String url) {
-    try {
-      final uri = Uri.parse(url);
-      return uri.host;
-    } catch (e) {
-      return url;
-    }
-  }
-
-  String _formatBalance(BigInt balance) {
-    final value = balance.toInt();
-    if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(value % 1000 == 0 ? 0 : 1)}k';
-    }
-    return value.toString();
   }
 
   Future<void> _setActiveMint(String mintUrl, WalletProvider walletProvider) async {
@@ -379,19 +438,26 @@ class _MintsScreenState extends State<MintsScreen> {
     }
   }
 
-  void _showDeleteDialog(Mint mint, BigInt balance, WalletProvider walletProvider) {
-    final hasBalance = balance > BigInt.zero;
+  void _showDeleteDialog(String mintUrl, Map<String, BigInt> balances, WalletProvider walletProvider) {
+    // Verificar si hay balance en alguna unidad
+    final hasBalance = balances.values.any((b) => b > BigInt.zero);
+
+    // Calcular balance total para mostrar (simplificado)
+    final balanceStrings = balances.entries
+        .where((e) => e.value > BigInt.zero)
+        .map((e) => '${UnitFormatter.formatBalance(e.value, e.key)} ${UnitFormatter.getUnitLabel(e.key)}')
+        .toList();
 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => _DeleteMintModal(
-        mintUrl: mint.url,
+        mintUrl: mintUrl,
         hasBalance: hasBalance,
-        balance: balance.toInt(),
+        balanceDescription: balanceStrings.isEmpty ? '' : balanceStrings.join(', '),
         onConfirm: () async {
           Navigator.pop(context);
-          await _deleteMint(mint.url, walletProvider);
+          await _deleteMint(mintUrl, walletProvider);
         },
         onCancel: () => Navigator.pop(context),
       ),
@@ -443,14 +509,14 @@ class _MintsScreenState extends State<MintsScreen> {
 class _DeleteMintModal extends StatelessWidget {
   final String mintUrl;
   final bool hasBalance;
-  final int balance;
+  final String balanceDescription;
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
 
   const _DeleteMintModal({
     required this.mintUrl,
     required this.hasBalance,
-    required this.balance,
+    required this.balanceDescription,
     required this.onConfirm,
     required this.onCancel,
   });
@@ -547,7 +613,7 @@ class _DeleteMintModal extends StatelessWidget {
                 Expanded(
                   child: Text(
                     hasBalance
-                        ? 'Este mint tiene $balance sats. Puedes recuperarlos después agregando el mint de nuevo.'
+                        ? 'Este mint tiene $balanceDescription. Puedes recuperarlos después agregando el mint de nuevo.'
                         : 'Perderás acceso a este mint',
                     style: TextStyle(
                       fontFamily: 'Inter',

@@ -4,10 +4,12 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' hide WalletProvider;
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/effects/cashu_confetti.dart';
 import '../../providers/wallet_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../4_receive/receive_screen.dart';
 import '../5_send/send_screen.dart';
 import '../6_mint/mint_screen.dart';
@@ -131,6 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBalanceSection() {
     final walletProvider = context.watch<WalletProvider>();
+    final settingsProvider = context.read<SettingsProvider>();
+    final activeUnit = walletProvider.activeUnit;
+    final unitLabel = UnitFormatter.getUnitLabel(activeUnit);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -165,10 +170,10 @@ class _HomeScreenState extends State<HomeScreen> {
             stream: walletProvider.streamBalance(),
             builder: (context, snapshot) {
               final balance = snapshot.data ?? BigInt.zero;
-              final balanceInt = balance.toInt();
+              final formattedBalance = UnitFormatter.formatBalance(balance, activeUnit);
 
               return Text(
-                _isBalanceVisible ? _formatBalance(balanceInt) : '••••••',
+                _isBalanceVisible ? formattedBalance : '••••••',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 48,
@@ -180,20 +185,42 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 4),
 
-          // Unidad (siempre sats por ahora)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.primaryAction.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Text(
-              'sats',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryAction,
+          // Unidad - tap para ciclar
+          GestureDetector(
+            onTap: () async {
+              // Ciclar unidad
+              await walletProvider.cycleUnit();
+              // Guardar en settings
+              await settingsProvider.setActiveUnit(walletProvider.activeUnit);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.primaryAction.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    unitLabel,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryAction,
+                    ),
+                  ),
+                  // Mostrar indicador si hay más de una unidad
+                  if (walletProvider.activeUnits.length > 1) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      LucideIcons.refreshCw,
+                      color: AppColors.primaryAction.withValues(alpha: 0.7),
+                      size: 14,
+                    ),
+                  ],
+                ],
               ),
             ),
           ),
@@ -206,16 +233,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final walletProvider = context.watch<WalletProvider>();
     final activeMintUrl = walletProvider.activeMintUrl;
 
-    // Extraer solo el host del URL para mostrar
-    String displayMint = 'Sin mint';
-    if (activeMintUrl != null) {
-      try {
-        final uri = Uri.parse(activeMintUrl);
-        displayMint = uri.host;
-      } catch (_) {
-        displayMint = activeMintUrl;
-      }
-    }
+    // Extraer nombre del mint para mostrar
+    final displayMint = activeMintUrl != null
+        ? UnitFormatter.getMintDisplayName(activeMintUrl)
+        : 'Sin mint';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingSmall),
@@ -405,17 +426,6 @@ class _HomeScreenState extends State<HomeScreen> {
       isScrollControlled: true,
       builder: (context) => const _HistoryModal(),
     );
-  }
-
-  String _formatBalance(int amount) {
-    if (amount >= 1000) {
-      final formatted = amount.toString().replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-        (Match m) => '${m[1]},',
-      );
-      return formatted;
-    }
-    return amount.toString();
   }
 }
 

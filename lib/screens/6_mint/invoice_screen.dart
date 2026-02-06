@@ -7,6 +7,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' hide WalletProvider;
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/effects/cashu_confetti.dart';
@@ -17,7 +18,7 @@ enum MintStatus { loading, unpaid, paid, issued, error }
 
 /// Pantalla para mostrar el invoice generado y esperar el pago
 class InvoiceScreen extends StatefulWidget {
-  final int amount;
+  final BigInt amount;
   final String unit;
   final String? description;
 
@@ -57,7 +58,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
     try {
       final mintStream = walletProvider.mintTokens(
-        BigInt.from(widget.amount),
+        widget.amount,
         widget.description,
       );
 
@@ -116,7 +117,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '+${widget.amount} ${widget.unit} depositados',
+              '+${UnitFormatter.formatBalance(widget.amount, widget.unit)} ${UnitFormatter.getUnitLabel(widget.unit)} depositados',
             ),
             backgroundColor: AppColors.success,
             duration: const Duration(seconds: 3),
@@ -320,10 +321,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   Widget _buildHeader() {
+    final formattedAmount = UnitFormatter.formatBalance(widget.amount, widget.unit);
+    final unitLabel = UnitFormatter.getUnitLabel(widget.unit);
+
     return Column(
       children: [
         Text(
-          'Depositar ${widget.amount} ${widget.unit}',
+          'Depositar $formattedAmount $unitLabel',
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 24,

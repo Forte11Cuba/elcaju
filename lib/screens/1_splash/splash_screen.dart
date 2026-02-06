@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -65,6 +66,12 @@ class _SplashScreenState extends State<SplashScreen>
 
           if (!mounted) return;
 
+          // Restaurar mint y unidad activa desde settings
+          await _restoreActiveState(settingsProvider, walletProvider);
+
+          // Verificar proofs en background (no bloquea navegación)
+          unawaited(_checkPendingTransactions(walletProvider));
+
           // Ir al Home
           _navigateTo(const HomeScreen());
         } else {
@@ -88,6 +95,41 @@ class _SplashScreenState extends State<SplashScreen>
       if (mounted) {
         _navigateTo(const WelcomeScreen());
       }
+    }
+  }
+
+  /// Restaura el mint y unidad activa desde SettingsProvider.
+  Future<void> _restoreActiveState(
+    SettingsProvider settings,
+    WalletProvider wallet,
+  ) async {
+    try {
+      // Restaurar mint activo si está guardado
+      final savedMintUrl = settings.activeMintUrl;
+      if (savedMintUrl != null && wallet.mintUrls.contains(savedMintUrl)) {
+        await wallet.setActiveMint(savedMintUrl);
+      }
+
+      // Restaurar unidad activa si está guardada y es soportada
+      final savedUnit = settings.activeUnit;
+      if (wallet.activeUnits.contains(savedUnit)) {
+        await wallet.setActiveUnit(savedUnit);
+      }
+    } catch (e) {
+      debugPrint('Error restaurando estado activo: $e');
+      // No bloquear si falla, usar defaults
+    }
+  }
+
+  /// Verifica proofs pendientes en background.
+  /// Se ejecuta sin bloquear la navegación.
+  Future<void> _checkPendingTransactions(WalletProvider wallet) async {
+    try {
+      await wallet.checkPendingTransactions();
+      debugPrint('Verificación de proofs completada');
+    } catch (e) {
+      debugPrint('Error verificando proofs: $e');
+      // Silencioso - no mostrar error al usuario
     }
   }
 

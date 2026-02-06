@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -26,7 +27,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   bool _isValidToken = false;
   bool _isProcessing = false;
   bool _showSuccess = false;
-  int _receivedAmount = 0;
+  BigInt _receivedAmount = BigInt.zero;
+  String? _receivedUnit; // Se asigna al reclamar desde walletProvider.activeUnit
   TokenInfo? _tokenInfo;
   String? _errorMessage;
 
@@ -132,14 +134,19 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         const SizedBox(height: AppDimensions.paddingLarge),
 
         // Monto recibido
-        Text(
-          '+$_receivedAmount sats',
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        Builder(
+          builder: (context) {
+            final unit = _receivedUnit ?? context.read<WalletProvider>().activeUnit;
+            return Text(
+              '+${UnitFormatter.formatBalance(_receivedAmount, unit)} ${UnitFormatter.getUnitLabel(unit)}',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 36,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            );
+          },
         ),
         const SizedBox(height: AppDimensions.paddingSmall),
 
@@ -229,14 +236,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Widget _buildTokenPreview() {
-    final amount = _tokenInfo!.amount.toInt();
-
-    // Extraer solo el host del mint URL
-    String mintDisplay = _tokenInfo!.mintUrl;
-    try {
-      final uri = Uri.parse(_tokenInfo!.mintUrl);
-      mintDisplay = uri.host;
-    } catch (_) {}
+    final walletProvider = context.read<WalletProvider>();
+    final amount = _tokenInfo!.amount;
+    final activeUnit = walletProvider.activeUnit;
+    final mintDisplay = UnitFormatter.getMintDisplayName(_tokenInfo!.mintUrl);
 
     return GlassCard(
       padding: const EdgeInsets.all(AppDimensions.paddingMedium),
@@ -271,7 +274,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           ),
           const SizedBox(height: AppDimensions.paddingMedium),
 
-          // Monto
+          // Monto (nota: el token no incluye unidad, se usa la activa)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -284,7 +287,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                 ),
               ),
               Text(
-                '$amount sats',
+                '${UnitFormatter.formatBalance(amount, activeUnit)} ${UnitFormatter.getUnitLabel(activeUnit)}',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 18,
@@ -417,7 +420,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
       if (mounted) {
         setState(() {
-          _receivedAmount = amountReceived.toInt();
+          _receivedAmount = amountReceived;
+          _receivedUnit = walletProvider.activeUnit; // Guardar unidad usada
           _showSuccess = true;
           _isProcessing = false;
         });

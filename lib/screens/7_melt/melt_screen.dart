@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' hide WalletProvider;
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -21,30 +22,34 @@ class MeltScreen extends StatefulWidget {
 class _MeltScreenState extends State<MeltScreen> {
   final TextEditingController _invoiceController = TextEditingController();
 
-  final String _unit = 'sats';
+  late String _activeUnit;
 
   bool _isValidInvoice = false;
   bool _isLoadingQuote = false;
   bool _isProcessing = false;
   MeltQuote? _quote;
-  int _invoiceAmount = 0;
-  int _feeReserve = 0;
-  int _total = 0;
-  int _availableBalance = 0;
+  BigInt _invoiceAmount = BigInt.zero;
+  BigInt _feeReserve = BigInt.zero;
+  BigInt _total = BigInt.zero;
+  BigInt _availableBalance = BigInt.zero;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
+    _activeUnit = context.read<WalletProvider>().activeUnit;
     _loadBalance();
   }
 
+  /// Obtiene la etiqueta de la unidad para display
+  String get _unitLabel => UnitFormatter.getUnitLabel(_activeUnit);
+
   Future<void> _loadBalance() async {
     final walletProvider = context.read<WalletProvider>();
-    final balance = await walletProvider.getTotalBalance();
+    final balance = await walletProvider.getBalance();
     if (mounted) {
       setState(() {
-        _availableBalance = balance.toInt();
+        _availableBalance = balance;
       });
     }
   }
@@ -274,7 +279,7 @@ class _MeltScreenState extends State<MeltScreen> {
                 ),
               ),
               Text(
-                '$_invoiceAmount $_unit',
+                '${UnitFormatter.formatBalance(_invoiceAmount, _activeUnit)} $_unitLabel',
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 18,
@@ -299,7 +304,7 @@ class _MeltScreenState extends State<MeltScreen> {
                 ),
               ),
               Text(
-                '~$_feeReserve $_unit',
+                '~${UnitFormatter.formatBalance(_feeReserve, _activeUnit)} $_unitLabel',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
@@ -328,7 +333,7 @@ class _MeltScreenState extends State<MeltScreen> {
                 ),
               ),
               Text(
-                '$_total $_unit',
+                '${UnitFormatter.formatBalance(_total, _activeUnit)} $_unitLabel',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 20,
@@ -400,7 +405,7 @@ class _MeltScreenState extends State<MeltScreen> {
           ),
         ),
         Text(
-          '$_availableBalance $_unit',
+          '${UnitFormatter.formatBalance(_availableBalance, _activeUnit)} $_unitLabel',
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
@@ -440,9 +445,9 @@ class _MeltScreenState extends State<MeltScreen> {
       _isValidInvoice = false;
 
       if (value.isEmpty) {
-        _invoiceAmount = 0;
-        _feeReserve = 0;
-        _total = 0;
+        _invoiceAmount = BigInt.zero;
+        _feeReserve = BigInt.zero;
+        _total = BigInt.zero;
         return;
       }
     });
@@ -475,8 +480,8 @@ class _MeltScreenState extends State<MeltScreen> {
       if (mounted) {
         setState(() {
           _quote = quote;
-          _invoiceAmount = quote.amount.toInt();
-          _feeReserve = quote.feeReserve.toInt();
+          _invoiceAmount = quote.amount;
+          _feeReserve = quote.feeReserve;
           _total = _invoiceAmount + _feeReserve;
           _isValidInvoice = true;
           _isLoadingQuote = false;
@@ -507,7 +512,7 @@ class _MeltScreenState extends State<MeltScreen> {
         amount: _invoiceAmount,
         fee: _feeReserve,
         total: _total,
-        unit: _unit,
+        unit: _activeUnit,
         onConfirm: () {
           Navigator.pop(context);
           _payInvoice();
@@ -535,7 +540,7 @@ class _MeltScreenState extends State<MeltScreen> {
         // Mostrar éxito y volver
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('-${totalPaid.toInt()} $_unit enviados'),
+            content: Text('-${UnitFormatter.formatBalance(totalPaid, _activeUnit)} $_unitLabel enviados'),
             backgroundColor: AppColors.success,
             duration: const Duration(seconds: 3),
           ),
@@ -567,9 +572,9 @@ class _MeltScreenState extends State<MeltScreen> {
 
 /// Modal de confirmación
 class _ConfirmationModal extends StatelessWidget {
-  final int amount;
-  final int fee;
-  final int total;
+  final BigInt amount;
+  final BigInt fee;
+  final BigInt total;
   final String unit;
   final VoidCallback onConfirm;
   final VoidCallback onCancel;
@@ -639,7 +644,7 @@ class _ConfirmationModal extends StatelessWidget {
 
           // Detalles
           Text(
-            '$amount $unit',
+            '${UnitFormatter.formatBalance(amount, unit)} ${UnitFormatter.getUnitLabel(unit)}',
             style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 28,
@@ -648,7 +653,7 @@ class _ConfirmationModal extends StatelessWidget {
             ),
           ),
           Text(
-            '+ ~$fee $unit fee',
+            '+ ~${UnitFormatter.formatBalance(fee, unit)} ${UnitFormatter.getUnitLabel(unit)} fee',
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
@@ -657,7 +662,7 @@ class _ConfirmationModal extends StatelessWidget {
           ),
           const SizedBox(height: AppDimensions.paddingSmall),
           Text(
-            'Total: $total $unit',
+            'Total: ${UnitFormatter.formatBalance(total, unit)} ${UnitFormatter.getUnitLabel(unit)}',
             style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 16,

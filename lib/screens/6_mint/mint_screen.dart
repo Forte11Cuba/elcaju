@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -21,10 +22,16 @@ class _MintScreenState extends State<MintScreen> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  final String _unit = 'sats';
+  late String _activeUnit;
 
   bool _isProcessing = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeUnit = context.read<WalletProvider>().activeUnit;
+  }
 
   @override
   void dispose() {
@@ -33,8 +40,13 @@ class _MintScreenState extends State<MintScreen> {
     super.dispose();
   }
 
-  int get _amount => int.tryParse(_amountController.text) ?? 0;
-  bool get _isValidAmount => _amount > 0;
+  /// Obtiene la etiqueta de la unidad para display
+  String get _unitLabel => UnitFormatter.getUnitLabel(_activeUnit);
+
+  /// Parsea el input del usuario a BigInt según la unidad
+  BigInt get _amount => UnitFormatter.parseUserInput(_amountController.text, _activeUnit);
+
+  bool get _isValidAmount => _amount > BigInt.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +149,7 @@ class _MintScreenState extends State<MintScreen> {
                 ),
               ),
               Text(
-                _unit,
+                _unitLabel,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 18,
@@ -242,7 +254,7 @@ class _MintScreenState extends State<MintScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => _ConfirmationModal(
         amount: _amount,
-        unit: _unit,
+        unit: _activeUnit,
         description: _descriptionController.text.isNotEmpty
             ? _descriptionController.text
             : null,
@@ -262,7 +274,7 @@ class _MintScreenState extends State<MintScreen> {
       MaterialPageRoute(
         builder: (context) => InvoiceScreen(
           amount: _amount,
-          unit: _unit,
+          unit: _activeUnit,
           description: _descriptionController.text.isNotEmpty
               ? _descriptionController.text
               : null,
@@ -274,7 +286,7 @@ class _MintScreenState extends State<MintScreen> {
 
 /// Modal de confirmación
 class _ConfirmationModal extends StatelessWidget {
-  final int amount;
+  final BigInt amount;
   final String unit;
   final String? description;
   final VoidCallback onConfirm;
@@ -344,7 +356,7 @@ class _ConfirmationModal extends StatelessWidget {
 
           // Monto
           Text(
-            '$amount $unit',
+            '${UnitFormatter.formatBalance(amount, unit)} ${UnitFormatter.getUnitLabel(unit)}',
             style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 32,

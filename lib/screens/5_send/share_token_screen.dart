@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' as cdk;
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
+import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -14,7 +15,7 @@ import '../../widgets/common/primary_button.dart';
 /// Pantalla para compartir el token Cashu generado
 class ShareTokenScreen extends StatefulWidget {
   final String token;
-  final int amount;
+  final BigInt amount;
   final String unit;
   final String? memo;
 
@@ -185,10 +186,13 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
   }
 
   Widget _buildAmountDisplay() {
+    final formattedAmount = UnitFormatter.formatBalance(widget.amount, widget.unit);
+    final unitLabel = UnitFormatter.getUnitLabel(widget.unit);
+
     return Column(
       children: [
         Text(
-          '${widget.amount} ${widget.unit}',
+          '$formattedAmount $unitLabel',
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 36,
@@ -483,10 +487,13 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
         ? '\n"${widget.memo}"'
         : '';
 
+    final formattedAmount = UnitFormatter.formatBalance(widget.amount, widget.unit);
+    final unitLabel = UnitFormatter.getUnitLabel(widget.unit);
+
     await SharePlus.instance.share(
       ShareParams(
-        text: '${widget.amount} ${widget.unit}$memo\n\n${widget.token}',
-        subject: 'Token Cashu - ${widget.amount} ${widget.unit}',
+        text: '$formattedAmount $unitLabel$memo\n\n${widget.token}',
+        subject: 'Token Cashu - $formattedAmount $unitLabel',
       ),
     );
   }

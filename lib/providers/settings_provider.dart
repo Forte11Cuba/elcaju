@@ -16,6 +16,8 @@ class SettingsProvider extends ChangeNotifier {
   static const _defaultMintKey = 'default_mint';
   static const _localeKey = 'locale';
   static const _pinEnabledKey = 'pin_enabled';
+  static const _activeUnitKey = 'active_unit';
+  static const _activeMintUrlKey = 'active_mint_url';
 
   // Estado interno
   bool _isInitialized = false;
@@ -24,6 +26,8 @@ class SettingsProvider extends ChangeNotifier {
   String? _pin;
   String _locale = 'es';
   String _defaultMint = 'https://mint.cubabitcoin.org';
+  String _activeUnit = 'sat';
+  String? _activeMintUrl;
 
   // Getters
   bool get isInitialized => _isInitialized;
@@ -32,6 +36,8 @@ class SettingsProvider extends ChangeNotifier {
   bool get hasPin => _pin != null && _pin!.isNotEmpty;
   String get locale => _locale;
   String get defaultMint => _defaultMint;
+  String get activeUnit => _activeUnit;
+  String? get activeMintUrl => _activeMintUrl;
 
   // ============================================================
   // INICIALIZACION
@@ -49,6 +55,8 @@ class SettingsProvider extends ChangeNotifier {
     _locale = _prefs?.getString(_localeKey) ?? 'es';
     _defaultMint = _prefs?.getString(_defaultMintKey) ?? 'https://mint.cubabitcoin.org';
     _pinEnabled = _prefs?.getBool(_pinEnabledKey) ?? false;
+    _activeUnit = _prefs?.getString(_activeUnitKey) ?? 'sat';
+    _activeMintUrl = _prefs?.getString(_activeMintUrlKey);
 
     // Cargar PIN si existe
     if (_pinEnabled) {
@@ -143,6 +151,28 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   // ============================================================
+  // UNIDAD Y MINT ACTIVO
+  // ============================================================
+
+  /// Guarda la unidad activa (sat, usd, eur, etc.).
+  Future<void> setActiveUnit(String unit) async {
+    await _prefs?.setString(_activeUnitKey, unit);
+    _activeUnit = unit;
+    notifyListeners();
+  }
+
+  /// Guarda el mint activo.
+  Future<void> setActiveMintUrl(String? mintUrl) async {
+    if (mintUrl != null) {
+      await _prefs?.setString(_activeMintUrlKey, mintUrl);
+    } else {
+      await _prefs?.remove(_activeMintUrlKey);
+    }
+    _activeMintUrl = mintUrl;
+    notifyListeners();
+  }
+
+  // ============================================================
   // BORRAR WALLET
   // ============================================================
 
@@ -156,12 +186,16 @@ class SettingsProvider extends ChangeNotifier {
     // Resetear preferencias
     await _prefs?.setBool(_hasWalletKey, false);
     await _prefs?.setBool(_pinEnabledKey, false);
+    await _prefs?.remove(_activeUnitKey);
+    await _prefs?.remove(_activeMintUrlKey);
     // Mantener locale y defaultMint (preferencias de app, no de wallet)
 
     // Resetear estado
     _hasWallet = false;
     _pinEnabled = false;
     _pin = null;
+    _activeUnit = 'sat';
+    _activeMintUrl = null;
 
     notifyListeners();
   }
@@ -180,6 +214,8 @@ class SettingsProvider extends ChangeNotifier {
     _pin = null;
     _locale = 'es';
     _defaultMint = 'https://mint.cubabitcoin.org';
+    _activeUnit = 'sat';
+    _activeMintUrl = null;
 
     notifyListeners();
   }
