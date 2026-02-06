@@ -27,7 +27,7 @@
 
 ## 📱 About ElCaju
 
-**ElCaju** is a [Cashu](https://cashu.space) wallet (ecash on Bitcoin) with Cuban identity, sister of [LaChispa](https://github.com/lachispame/lachispa) (Lightning). Designed to offer privacy, offline transactions, and a warm tropical experience.
+**ElCaju** is a [Cashu](https://cashu.space) wallet (ecash on Bitcoin) with Cuban identity, brother of [LaChispa](https://github.com/lachispame/) (Lightning). Designed to offer privacy, offline transactions, and a warm tropical experience.
 
 ### What is Cashu?
 
