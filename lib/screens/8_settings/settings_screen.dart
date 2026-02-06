@@ -59,7 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: () => _showBackupSeed(context, settingsProvider),
                     ),
                     _buildSettingTile(
-                      icon: LucideIcons.building2,
+                      icon: LucideIcons.landmark,
                       title: 'Mints conectados',
                       subtitle: 'Gestionar tus mints Cashu',
                       onTap: () {
@@ -83,6 +83,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             _togglePin(context, settingsProvider, value),
                         activeColor: AppColors.primaryAction,
                       ),
+                    ),
+                    _buildSettingTile(
+                      icon: LucideIcons.refreshCw,
+                      title: 'Recuperar tokens',
+                      subtitle: 'Escanear mints con seed phrase',
+                      onTap: () => _showRecoverTokensDialog(context, settingsProvider),
                     ),
 
                     const SizedBox(height: AppDimensions.paddingLarge),
@@ -684,7 +690,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   /// 5. Abrir GitHub
   Future<void> _openGitHub() async {
-    final url = Uri.parse('https://github.com/cubaBitcoin/elcaju');
+    final url = Uri.parse('https://github.com/Forte11Cuba/elcaju');
     try {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (e) {
@@ -699,7 +705,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  /// 6. Borrar wallet
+  /// 6. Recuperar tokens
+  void _showRecoverTokensDialog(
+      BuildContext context, SettingsProvider settingsProvider) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => _RecoverTokensModal(
+        settingsProvider: settingsProvider,
+      ),
+    );
+  }
+
+  /// 7. Borrar wallet
   void _showDeleteWalletDialog(
       BuildContext context, SettingsProvider settingsProvider) {
     showModalBottomSheet(
@@ -1174,5 +1193,668 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
         ),
       ),
     );
+  }
+}
+
+/// Modal para recuperar tokens usando NUT-13
+class _RecoverTokensModal extends StatefulWidget {
+  final SettingsProvider settingsProvider;
+
+  const _RecoverTokensModal({
+    required this.settingsProvider,
+  });
+
+  @override
+  State<_RecoverTokensModal> createState() => _RecoverTokensModalState();
+}
+
+class _RecoverTokensModalState extends State<_RecoverTokensModal> {
+  final TextEditingController _mnemonicController = TextEditingController();
+  bool _useCurrentMnemonic = true;
+  bool _scanAllMints = true;
+  String? _selectedMintUrl;
+  List<String> _availableMints = [];
+  bool _isLoading = false;
+  bool _isLoadingMints = true;
+  String? _result;
+  bool _isSuccess = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMints();
+  }
+
+  Future<void> _loadMints() async {
+    final walletProvider = context.read<WalletProvider>();
+    final mints = await walletProvider.listMints();
+    if (mounted) {
+      setState(() {
+        _availableMints = mints.map((m) => m.url).toList();
+        _isLoadingMints = false;
+        if (_availableMints.isNotEmpty) {
+          _selectedMintUrl = _availableMints.first;
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _mnemonicController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+        decoration: BoxDecoration(
+          color: AppColors.deepVoidPurple,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              // Icono
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryAction.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  LucideIcons.refreshCw,
+                  color: AppColors.primaryAction,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.paddingMedium),
+
+              // Título
+              const Text(
+                'Recuperar tokens',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: AppDimensions.paddingSmall),
+
+              // Descripción
+              Text(
+                'Escanea los mints para recuperar tokens asociados a tu seed phrase (NUT-13)',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: AppDimensions.paddingLarge),
+
+              // Opciones de mnemonic
+              _buildMnemonicOptions(),
+
+              const SizedBox(height: AppDimensions.paddingMedium),
+
+              // Selector de mint (solo si usa mnemonic actual)
+              if (_useCurrentMnemonic) _buildMintSelector(),
+
+              // Input para mnemonic personalizado
+              if (!_useCurrentMnemonic) _buildMnemonicInput(),
+
+              // Resultado
+              if (_result != null) _buildResult(),
+
+              const SizedBox(height: AppDimensions.paddingMedium),
+
+              // Botón de acción
+              _buildActionButton(),
+
+              const SizedBox(height: AppDimensions.paddingSmall),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMnemonicOptions() {
+    return Column(
+      children: [
+        // Opción: Usar mnemonic actual
+        GestureDetector(
+          onTap: () => setState(() => _useCurrentMnemonic = true),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: _useCurrentMnemonic
+                  ? AppColors.primaryAction.withValues(alpha: 0.2)
+                  : Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _useCurrentMnemonic
+                    ? AppColors.primaryAction.withValues(alpha: 0.5)
+                    : Colors.transparent,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _useCurrentMnemonic
+                      ? LucideIcons.checkCircle
+                      : LucideIcons.circle,
+                  color: _useCurrentMnemonic
+                      ? AppColors.primaryAction
+                      : AppColors.textSecondary,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Usar mi seed phrase actual',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'Escanear mints con las 12 palabras guardadas',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // Opción: Usar otro mnemonic
+        GestureDetector(
+          onTap: () => setState(() => _useCurrentMnemonic = false),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: !_useCurrentMnemonic
+                  ? AppColors.primaryAction.withValues(alpha: 0.2)
+                  : Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: !_useCurrentMnemonic
+                    ? AppColors.primaryAction.withValues(alpha: 0.5)
+                    : Colors.transparent,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  !_useCurrentMnemonic
+                      ? LucideIcons.checkCircle
+                      : LucideIcons.circle,
+                  color: !_useCurrentMnemonic
+                      ? AppColors.primaryAction
+                      : AppColors.textSecondary,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Usar otra seed phrase',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'Recuperar tokens de otras 12 palabras',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMintSelector() {
+    if (_isLoadingMints) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              color: AppColors.primaryAction,
+              strokeWidth: 2,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Mints a escanear:',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Opción: Escanear todos
+        GestureDetector(
+          onTap: () => setState(() => _scanAllMints = true),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _scanAllMints
+                  ? AppColors.primaryAction.withValues(alpha: 0.2)
+                  : Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: _scanAllMints
+                    ? AppColors.primaryAction.withValues(alpha: 0.5)
+                    : Colors.transparent,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _scanAllMints ? LucideIcons.checkCircle : LucideIcons.circle,
+                  color: _scanAllMints
+                      ? AppColors.primaryAction
+                      : AppColors.textSecondary,
+                  size: 18,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  'Todos los mints (${_availableMints.length})',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: _scanAllMints ? FontWeight.w500 : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // Opción: Mint específico
+        GestureDetector(
+          onTap: () => setState(() => _scanAllMints = false),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: !_scanAllMints
+                  ? AppColors.primaryAction.withValues(alpha: 0.2)
+                  : Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: !_scanAllMints
+                    ? AppColors.primaryAction.withValues(alpha: 0.5)
+                    : Colors.transparent,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  !_scanAllMints ? LucideIcons.checkCircle : LucideIcons.circle,
+                  color: !_scanAllMints
+                      ? AppColors.primaryAction
+                      : AppColors.textSecondary,
+                  size: 18,
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  'Un mint específico',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Dropdown de mints (solo si selecciona específico)
+        if (!_scanAllMints && _availableMints.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                ),
+              ),
+              child: DropdownButton<String>(
+                value: _selectedMintUrl,
+                isExpanded: true,
+                dropdownColor: AppColors.deepVoidPurple,
+                underline: const SizedBox(),
+                icon: Icon(
+                  LucideIcons.chevronDown,
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
+                items: _availableMints.map((url) {
+                  final host = Uri.parse(url).host;
+                  return DropdownMenuItem(
+                    value: url,
+                    child: Text(
+                      host,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _selectedMintUrl = value);
+                  }
+                },
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildMnemonicInput() {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppDimensions.paddingMedium),
+      child: TextField(
+        controller: _mnemonicController,
+        maxLines: 3,
+        style: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          color: Colors.white,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Ingresa las 12 palabras separadas por espacios...',
+          hintStyle: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            color: Colors.white.withValues(alpha: 0.3),
+          ),
+          filled: true,
+          fillColor: Colors.white.withValues(alpha: 0.05),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.all(16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResult() {
+    return Container(
+      margin: const EdgeInsets.only(top: AppDimensions.paddingMedium),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _isSuccess
+            ? AppColors.success.withValues(alpha: 0.1)
+            : AppColors.error.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: _isSuccess
+              ? AppColors.success.withValues(alpha: 0.3)
+              : AppColors.error.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            _isSuccess ? LucideIcons.checkCircle : LucideIcons.alertCircle,
+            color: _isSuccess ? AppColors.success : AppColors.error,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              _result!,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                color: _isSuccess ? AppColors.success : AppColors.error,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: GestureDetector(
+        onTap: _isLoading ? null : _startRecover,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            gradient: _isLoading
+                ? null
+                : const LinearGradient(
+                    colors: [AppColors.primaryAction, Color(0xFFFF9100)],
+                  ),
+            color: _isLoading ? Colors.grey : null,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Center(
+            child: _isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text(
+                    'Escanear mints',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _startRecover() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+      _result = null;
+    });
+
+    try {
+      final walletProvider = context.read<WalletProvider>();
+
+      if (_useCurrentMnemonic) {
+        // Usar mnemonic actual
+        if (_scanAllMints) {
+          // Escanear todos los mints
+          final results = await walletProvider.restoreAllMints();
+
+          BigInt totalRecovered = BigInt.zero;
+          int mintsScanned = 0;
+          int mintsWithError = 0;
+
+          for (final entry in results.entries) {
+            if (entry.value >= BigInt.zero) {
+              totalRecovered += entry.value;
+              mintsScanned++;
+            } else {
+              mintsWithError++;
+            }
+          }
+
+          if (!mounted) return;
+          setState(() {
+            _isSuccess = true;
+            if (totalRecovered > BigInt.zero) {
+              _result = '¡Recuperados ${totalRecovered.toInt()} sats de $mintsScanned mint(s)!';
+            } else {
+              _result = 'Escaneo completado. No se encontraron tokens nuevos.';
+            }
+            if (mintsWithError > 0) {
+              _result = '$_result ($mintsWithError mint(s) con error)';
+            }
+          });
+        } else {
+          // Escanear mint específico
+          if (_selectedMintUrl == null) {
+            if (!mounted) return;
+            setState(() {
+              _isSuccess = false;
+              _result = 'Selecciona un mint para escanear';
+            });
+            return;
+          }
+
+          final recovered = await walletProvider.restoreFromMint(_selectedMintUrl!);
+          final mintHost = Uri.parse(_selectedMintUrl!).host;
+
+          if (!mounted) return;
+          setState(() {
+            _isSuccess = true;
+            if (recovered > BigInt.zero) {
+              _result = '¡Recuperados ${recovered.toInt()} sats de $mintHost!';
+            } else {
+              _result = 'No se encontraron tokens en $mintHost.';
+            }
+          });
+        }
+      } else {
+        // Usar otro mnemonic
+        final mnemonic = _mnemonicController.text.trim().toLowerCase();
+        final words = mnemonic.split(RegExp(r'\s+'));
+
+        if (words.length != 12 && words.length != 24) {
+          if (!mounted) return;
+          setState(() {
+            _isSuccess = false;
+            _result = 'El mnemonic debe tener 12 o 24 palabras';
+          });
+          return;
+        }
+
+        // Obtener lista de mints actuales para escanear
+        final mints = await walletProvider.listMints();
+        final mintUrls = mints.map((m) => m.url).toList();
+
+        if (mintUrls.isEmpty) {
+          if (!mounted) return;
+          setState(() {
+            _isSuccess = false;
+            _result = 'No hay mints conectados para escanear';
+          });
+          return;
+        }
+
+        final recovered = await walletProvider.restoreWithMnemonic(
+          mnemonic,
+          mintUrls,
+        );
+
+        if (!mounted) return;
+        setState(() {
+          _isSuccess = true;
+          if (recovered > BigInt.zero) {
+            _result = '¡Recuperados y transferidos ${recovered.toInt()} sats a tu wallet!';
+          } else {
+            _result = 'No se encontraron tokens asociados a ese mnemonic.';
+          }
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isSuccess = false;
+        _result = 'Error: $e';
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }

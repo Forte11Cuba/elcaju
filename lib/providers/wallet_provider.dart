@@ -354,6 +354,144 @@ class WalletProvider extends ChangeNotifier {
   }
 
   // ============================================================
+  // RESTORE (NUT-13 + NUT-09)
+  // ============================================================
+
+  /// Escanea un mint específico para recuperar tokens usando NUT-13.
+  /// Retorna el balance encontrado.
+  Future<BigInt> restoreFromMint(String mintUrl) async {
+    if (_multiWallet == null) {
+      throw Exception('Wallet no inicializado');
+    }
+
+    // Obtener o crear wallet para este mint
+    final wallet = await _multiWallet!.createOrGetWallet(mintUrl: mintUrl);
+
+    // Obtener balance antes del restore
+    final balanceBefore = await wallet.balance();
+
+    // Ejecutar restore (NUT-13 + NUT-09)
+    await wallet.restore();
+
+    // Obtener balance después
+    final balanceAfter = await wallet.balance();
+
+    // Calcular tokens recuperados
+    final recovered = balanceAfter - balanceBefore;
+
+    notifyListeners();
+    return recovered;
+  }
+
+  /// Escanea todos los mints conectados para recuperar tokens.
+  /// Retorna mapa de mint -> balance recuperado.
+  Future<Map<String, BigInt>> restoreAllMints() async {
+    if (_multiWallet == null) {
+      throw Exception('Wallet no inicializado');
+    }
+
+    final results = <String, BigInt>{};
+    final mints = await _multiWallet!.listMints();
+
+    for (final mint in mints) {
+      try {
+        final recovered = await restoreFromMint(mint.url);
+        results[mint.url] = recovered;
+      } catch (e) {
+        // Si falla un mint, continuar con los demás
+        debugPrint('Error restaurando ${mint.url}: $e');
+        results[mint.url] = BigInt.from(-1); // Indica error
+      }
+    }
+
+    return results;
+  }
+
+  /// Restaura tokens usando un mnemonic diferente y los transfiere al wallet actual.
+  /// Útil para recuperar tokens de otra semilla.
+  ///
+  /// Flujo:
+  /// 1. Crear wallet temporal con el mnemonic proporcionado
+  /// 2. Escanear cada mint para recuperar tokens
+  /// 3. Si encuentra tokens, enviarlos como token Cashu
+  /// 4. Reclamar esos tokens en el wallet actual
+  /// 5. Retornar total recuperado
+  Future<BigInt> restoreWithMnemonic(String mnemonic, List<String> mintUrls) async {
+    if (_multiWallet == null || _activeWallet == null) {
+      throw Exception('Wallet no inicializado');
+    }
+
+    BigInt totalRecovered = BigInt.zero;
+
+    // Normalizar mnemonic (espacios simples, minúsculas)
+    final normalizedMnemonic = mnemonic.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
+    // Crear DB temporal para el wallet de recuperación
+    final dir = await getApplicationDocumentsDirectory();
+    final tempDbPath = '${dir.path}/temp_restore_${DateTime.now().millisecondsSinceEpoch}.sqlite';
+
+    WalletDatabase? tempDb;
+
+    try {
+      // Crear base de datos temporal
+      tempDb = await WalletDatabase.newInstance(path: tempDbPath);
+
+      for (final mintUrl in mintUrls) {
+        try {
+          // Crear wallet temporal para este mint
+          final tempWallet = Wallet(
+            mintUrl: mintUrl,
+            unit: 'sat',
+            mnemonic: normalizedMnemonic,
+            db: tempDb,
+          );
+
+          // Escanear el mint (NUT-13 + NUT-09)
+          await tempWallet.restore();
+
+          // Verificar si encontró balance
+          final tempBalance = await tempWallet.balance();
+
+          if (tempBalance > BigInt.zero) {
+            // Preparar envío de todo el balance
+            final prepared = await tempWallet.prepareSend(amount: tempBalance);
+
+            // Crear token
+            final token = await tempWallet.send(
+              send: prepared,
+              memo: 'Recuperación El Caju',
+              includeMemo: true,
+            );
+
+            // Asegurar que tenemos wallet para este mint en nuestro wallet actual
+            final ourWallet = await _multiWallet!.createOrGetWallet(mintUrl: mintUrl);
+
+            // Reclamar el token en nuestro wallet
+            final received = await ourWallet.receive(token: token);
+            totalRecovered += received;
+          }
+        } catch (e) {
+          debugPrint('Error restaurando desde $mintUrl: $e');
+          // Continuar con el siguiente mint
+        }
+      }
+    } finally {
+      // Limpiar: cerrar y borrar DB temporal
+      tempDb = null;
+      try {
+        final tempFile = File(tempDbPath);
+        if (await tempFile.exists()) {
+          await tempFile.delete();
+        }
+      } catch (e) {
+        debugPrint('Error limpiando DB temporal: $e');
+      }
+    }
+    notifyListeners();
+    return totalRecovered;
+  }
+
+  // ============================================================
   // BORRAR WALLET
   // ============================================================
 
