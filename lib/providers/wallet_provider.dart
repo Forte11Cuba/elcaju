@@ -6,6 +6,7 @@ import 'package:cdk_flutter/cdk_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../data/transaction_meta_storage.dart';
 
 /// Helper class para info de token parseado
 class TokenInfo {
@@ -28,6 +29,9 @@ class TokenInfo {
 class WalletProvider extends ChangeNotifier {
   WalletDatabase? _db;
   String? _mnemonic;
+
+  /// Storage para metadata de transacciones (tipo, token, invoice)
+  final TransactionMetaStorage _txMetaStorage = TransactionMetaStorage();
 
   /// Mints conocidos con sus unidades soportadas.
   /// Ejemplo: {'mint.cubabitcoin.org': ['sat', 'usd']}
@@ -209,6 +213,9 @@ class WalletProvider extends ChangeNotifier {
   /// Carga mints y unidades desde SharedPreferences.
   Future<void> initialize(String mnemonic) async {
     _mnemonic = mnemonic;
+
+    // Inicializar storage de metadata de transacciones
+    await _txMetaStorage.init();
 
     // Obtener directorio de documentos (path absoluto requerido)
     final dir = await getApplicationDocumentsDirectory();
@@ -720,6 +727,7 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Recibe un token con una unidad específica.
+  /// Guarda metadata type=cashu para identificar en historial.
   Future<BigInt> _receiveWithUnit(
     String encodedToken,
     String mintUrl,
@@ -729,9 +737,36 @@ class WalletProvider extends ChangeNotifier {
     final token = Token.parse(encoded: encodedToken);
     final amount = await wallet.receive(token: token);
 
+    // Guardar metadata para la transacción recién creada
+    await _saveMetaForRecentReceive(wallet, encodedToken);
+
     debugPrint('Token recibido: $amount $unit en $mintUrl');
     notifyListeners();
     return amount;
+  }
+
+  /// Guarda metadata para la transacción de receive más reciente.
+  Future<void> _saveMetaForRecentReceive(Wallet wallet, String tokenEncoded) async {
+    try {
+      final txs = await wallet.listTransactions(
+        direction: TransactionDirection.incoming,
+      );
+
+      if (txs.isNotEmpty) {
+        final recentTx = txs.first;
+
+        await _txMetaStorage.save(
+          recentTx.id,
+          TransactionMeta(
+            type: TransactionType.cashu,
+            token: tokenEncoded,
+          ),
+        );
+        debugPrint('Receive metadata guardada para tx ${recentTx.id}');
+      }
+    } catch (e) {
+      debugPrint('Error guardando receive metadata: $e');
+    }
   }
 
   /// Reclama un token P2PK (bloqueado a una clave pública).
@@ -789,6 +824,7 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Confirma un envío preparado y retorna el token encoded.
+  /// Guarda metadata type=cashu para identificar en historial.
   Future<String> confirmSend(PreparedSend prepared, String? memo) async {
     final wallet = await getActiveWallet();
 
@@ -798,8 +834,39 @@ class WalletProvider extends ChangeNotifier {
       includeMemo: memo != null && memo.isNotEmpty,
     );
 
+    // Guardar token en storage local para mostrar en detalles del historial.
+    // Usamos hash del token como key temporal; después buscaremos la transacción.
+    await _saveTokenForRecentTransaction(token.encoded);
+
     notifyListeners();
     return token.encoded;
+  }
+
+  /// Guarda el token para la transacción más reciente de tipo send.
+  Future<void> _saveTokenForRecentTransaction(String tokenEncoded) async {
+    try {
+      // Obtener transacciones outgoing más recientes
+      final wallet = await getActiveWallet();
+      final txs = await wallet.listTransactions(
+        direction: TransactionDirection.outgoing,
+      );
+
+      if (txs.isNotEmpty) {
+        // La más reciente debería ser la que acabamos de crear
+        final recentTx = txs.first;
+
+        await _txMetaStorage.save(
+          recentTx.id,
+          TransactionMeta(
+            type: TransactionType.cashu,
+            token: tokenEncoded,
+          ),
+        );
+        debugPrint('Token guardado para tx ${recentTx.id}');
+      }
+    } catch (e) {
+      debugPrint('Error guardando token metadata: $e');
+    }
   }
 
   /// Cancela un envío preparado (libera proofs reservados).
@@ -830,34 +897,111 @@ class WalletProvider extends ChangeNotifier {
 
   /// Inicia un depósito via Lightning.
   /// Retorna Stream con estados: unpaid -> paid -> issued.
+  /// Guarda metadata type=lightning cuando se completa.
   Stream<MintQuote> mintTokens(BigInt amount, String? description) {
     final wallet = activeWallet;
     if (wallet == null) {
       throw Exception('No hay wallet activo');
     }
 
+    String? invoiceBolt11;
+
+    // Wrapper del stream para capturar el invoice y guardar metadata
     return wallet.mint(
       amount: amount,
       description: description,
-    );
+    ).map((quote) {
+      // Capturar el invoice cuando está en estado unpaid
+      if (quote.state == MintQuoteState.unpaid) {
+        invoiceBolt11 = quote.request;
+      }
+
+      // Cuando se completa, guardar metadata
+      if (quote.state == MintQuoteState.issued && invoiceBolt11 != null) {
+        _saveMintMetadata(wallet, invoiceBolt11!);
+      }
+
+      return quote;
+    });
+  }
+
+  /// Guarda metadata para una transacción de mint (Lightning deposit).
+  Future<void> _saveMintMetadata(Wallet wallet, String invoice) async {
+    try {
+      final txs = await wallet.listTransactions(
+        direction: TransactionDirection.incoming,
+      );
+
+      if (txs.isNotEmpty) {
+        final recentTx = txs.first;
+
+        await _txMetaStorage.save(
+          recentTx.id,
+          TransactionMeta(
+            type: TransactionType.lightning,
+            invoice: invoice,
+          ),
+        );
+        debugPrint('Mint metadata guardada para tx ${recentTx.id}');
+      }
+    } catch (e) {
+      debugPrint('Error guardando mint metadata: $e');
+    }
   }
 
   // ============================================================
   // MELT (Retirar a Lightning)
   // ============================================================
 
+  /// Invoice temporal para guardar metadata después de melt
+  String? _pendingMeltInvoice;
+
   /// Obtiene quote para pagar un invoice BOLT11.
+  /// Guarda el invoice temporalmente para asociarlo a la transacción después.
   Future<MeltQuote> getMeltQuote(String bolt11Invoice) async {
+    _pendingMeltInvoice = bolt11Invoice;
     final wallet = await getActiveWallet();
     return await wallet.meltQuote(request: bolt11Invoice);
   }
 
   /// Ejecuta el pago del invoice.
+  /// Guarda metadata type=lightning para identificar en historial.
   Future<BigInt> melt(MeltQuote quote) async {
     final wallet = await getActiveWallet();
     final totalPaid = await wallet.melt(quote: quote);
+
+    // Guardar metadata con el invoice
+    if (_pendingMeltInvoice != null) {
+      await _saveMeltMetadata(wallet, _pendingMeltInvoice!);
+      _pendingMeltInvoice = null;
+    }
+
     notifyListeners();
     return totalPaid;
+  }
+
+  /// Guarda metadata para una transacción de melt (Lightning withdrawal).
+  Future<void> _saveMeltMetadata(Wallet wallet, String invoice) async {
+    try {
+      final txs = await wallet.listTransactions(
+        direction: TransactionDirection.outgoing,
+      );
+
+      if (txs.isNotEmpty) {
+        final recentTx = txs.first;
+
+        await _txMetaStorage.save(
+          recentTx.id,
+          TransactionMeta(
+            type: TransactionType.lightning,
+            invoice: invoice,
+          ),
+        );
+        debugPrint('Melt metadata guardada para tx ${recentTx.id}');
+      }
+    } catch (e) {
+      debugPrint('Error guardando melt metadata: $e');
+    }
   }
 
   // ============================================================
@@ -892,6 +1036,22 @@ class WalletProvider extends ChangeNotifier {
     allTransactions.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
     return allTransactions;
+  }
+
+  /// Obtiene el tipo de una transacción (cashu o lightning).
+  /// Busca primero en metadata del CDK, luego en storage local.
+  TransactionType getTransactionType(Transaction tx) {
+    return _txMetaStorage.getType(tx.id, tx.metadata);
+  }
+
+  /// Obtiene metadata adicional de una transacción.
+  TransactionMeta? getTransactionMeta(String transactionId) {
+    return _txMetaStorage.get(transactionId);
+  }
+
+  /// Verifica si una transacción tiene metadata guardada.
+  bool hasTransactionMeta(String transactionId) {
+    return _txMetaStorage.has(transactionId);
   }
 
   // ============================================================
@@ -1059,6 +1219,9 @@ class WalletProvider extends ChangeNotifier {
       _activeUnit = 'sat';
       _mnemonic = null;
       _db = null;
+
+      // Limpiar metadata de transacciones
+      await _txMetaStorage.clear();
 
       // Borrar archivo
       final dir = await getApplicationDocumentsDirectory();
