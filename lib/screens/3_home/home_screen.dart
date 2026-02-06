@@ -149,80 +149,56 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Botón toggle de unidad (arriba, como cashu.me)
-          GestureDetector(
+          // Botón toggle de unidad con efecto de hundirse
+          _UnitToggleButton(
+            label: toggleLabel,
             onTap: () async {
               await walletProvider.cycleUnit();
               await settingsProvider.setActiveUnit(walletProvider.activeUnit);
             },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Text(
-                toggleLabel,
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
-          // Ojo para ocultar/mostrar balance
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isBalanceVisible = !_isBalanceVisible;
-              });
-            },
-            child: Icon(
-              _isBalanceVisible ? LucideIcons.eye : LucideIcons.eyeOff,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
-              size: 20,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Balance con unidad al lado (como cashu.me: "855 sat")
+          // Balance tocable para ocultar/mostrar (sin ojito)
           StreamBuilder<BigInt>(
             stream: walletProvider.streamBalance(),
             builder: (context, snapshot) {
               final balance = snapshot.data ?? BigInt.zero;
               final formattedBalance = UnitFormatter.formatBalance(balance, activeUnit);
 
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                children: [
-                  Text(
-                    _isBalanceVisible ? formattedBalance : '••••••',
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isBalanceVisible = !_isBalanceVisible;
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      _isBalanceVisible ? formattedBalance : '••••••',
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _isBalanceVisible ? unitLabel : '',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 32,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white.withValues(alpha: 0.7),
+                    const SizedBox(width: 8),
+                    Text(
+                      _isBalanceVisible ? unitLabel : '',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 32,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withValues(alpha: 0.7),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               );
             },
           ),
@@ -560,6 +536,94 @@ class _MethodOptionTile extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Botón de toggle de unidad con efecto de hundirse
+class _UnitToggleButton extends StatefulWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _UnitToggleButton({
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  State<_UnitToggleButton> createState() => _UnitToggleButtonState();
+}
+
+class _UnitToggleButtonState extends State<_UnitToggleButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 100),
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    _controller.reverse();
+    widget.onTap();
+  }
+
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: _handleTapDown,
+      onTapUp: _handleTapUp,
+      onTapCancel: _handleTapCancel,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Text(
+                widget.label,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
