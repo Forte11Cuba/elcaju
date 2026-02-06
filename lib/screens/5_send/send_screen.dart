@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/colors.dart';
@@ -9,6 +10,7 @@ import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
 import '../../providers/wallet_provider.dart';
 import 'share_token_screen.dart';
+import 'offline_send_screen.dart';
 
 /// Pantalla para enviar tokens Cashu
 class SendScreen extends StatefulWidget {
@@ -79,6 +81,14 @@ class _SendScreenState extends State<SendScreen> {
               color: Colors.white,
             ),
           ),
+          actions: [
+            // Botón para modo offline (selección manual de proofs)
+            IconButton(
+              icon: const Icon(LucideIcons.coins, color: AppColors.primaryAction),
+              tooltip: 'Seleccionar notas manualmente',
+              onPressed: _goToOfflineMode,
+            ),
+          ],
         ),
         body: SafeArea(
           child: Padding(
@@ -313,7 +323,60 @@ class _SendScreenState extends State<SendScreen> {
     });
   }
 
-  void _showConfirmation() {
+  /// Navegar al modo offline para seleccionar proofs manualmente.
+  void _goToOfflineMode() {
+    final walletProvider = context.read<WalletProvider>();
+    final mintUrl = walletProvider.activeMintUrl;
+
+    if (mintUrl == null) {
+      setState(() {
+        _errorMessage = 'No hay mint activo';
+      });
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OfflineSendScreen(
+          mintUrl: mintUrl,
+          unit: _activeUnit,
+        ),
+      ),
+    );
+  }
+
+  void _showConfirmation() async {
+    // Verificar conectividad antes de mostrar confirmación
+    final walletProvider = context.read<WalletProvider>();
+    final mintUrl = walletProvider.activeMintUrl;
+
+    if (mintUrl == null) {
+      setState(() {
+        _errorMessage = 'No hay mint activo';
+      });
+      return;
+    }
+
+    setState(() {
+      _isProcessing = true;
+    });
+
+    final isOnline = await _checkConnectivity(mintUrl);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isProcessing = false;
+    });
+
+    if (!isOnline) {
+      // Offline: ir directo a selección de monedas
+      _goToOfflineModeWithMessage();
+      return;
+    }
+
+    // Online: mostrar modal de confirmación normal
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -328,6 +391,18 @@ class _SendScreenState extends State<SendScreen> {
         onCancel: () => Navigator.pop(context),
       ),
     );
+  }
+
+  /// Verifica conectividad haciendo petición HTTP real al mint.
+  Future<bool> _checkConnectivity(String mintUrl) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$mintUrl/v1/info'),
+      ).timeout(const Duration(seconds: 3));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<void> _createToken() async {
@@ -358,8 +433,20 @@ class _SendScreenState extends State<SendScreen> {
         );
       }
     } catch (e) {
+      final errorStr = e.toString().toLowerCase();
+
+      // Detectar errores de red y redirigir a modo offline
+      if (_isNetworkError(errorStr)) {
+        if (mounted) {
+          setState(() {
+            _isProcessing = false;
+          });
+          _goToOfflineModeWithMessage();
+        }
+        return;
+      }
+
       setState(() {
-        final errorStr = e.toString().toLowerCase();
         if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
           _errorMessage = 'Balance insuficiente';
         } else {
@@ -373,6 +460,51 @@ class _SendScreenState extends State<SendScreen> {
         });
       }
     }
+  }
+
+  /// Detecta si el error es de conexión/red.
+  bool _isNetworkError(String errorStr) {
+    return errorStr.contains('transport error') ||
+        errorStr.contains('network') ||
+        errorStr.contains('connection') ||
+        errorStr.contains('socket') ||
+        errorStr.contains('timeout') ||
+        errorStr.contains('unreachable') ||
+        errorStr.contains('no route') ||
+        errorStr.contains('error sending request');
+  }
+
+  /// Navegar al modo offline mostrando mensaje informativo.
+  void _goToOfflineModeWithMessage() {
+    final walletProvider = context.read<WalletProvider>();
+    final mintUrl = walletProvider.activeMintUrl;
+
+    if (mintUrl == null) {
+      setState(() {
+        _errorMessage = 'No hay mint activo';
+      });
+      return;
+    }
+
+    // Mostrar snackbar informativo
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Sin conexion. Usando modo offline...'),
+        backgroundColor: AppColors.primaryAction,
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    // Navegar a modo offline
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OfflineSendScreen(
+          mintUrl: mintUrl,
+          unit: _activeUnit,
+        ),
+      ),
+    );
   }
 }
 
