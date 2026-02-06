@@ -41,6 +41,12 @@ dependencies:
   # URL Launcher
   url_launcher: ^6.2.0
 
+  # HTTP client for mint API calls
+  http: ^1.2.0
+
+  # CBOR decoder for V4 tokens
+  cbor: ^6.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

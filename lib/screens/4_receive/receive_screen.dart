@@ -238,8 +238,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   Widget _buildTokenPreview() {
     final walletProvider = context.read<WalletProvider>();
     final amount = _tokenInfo!.amount;
-    final activeUnit = walletProvider.activeUnit;
+    // Usar unidad detectada del token, o fallback a unidad activa
+    final tokenUnit = _tokenInfo!.unit ?? walletProvider.activeUnit;
     final mintDisplay = UnitFormatter.getMintDisplayName(_tokenInfo!.mintUrl);
+    final unitDetected = _tokenInfo!.unit != null;
 
     return GlassCard(
       padding: const EdgeInsets.all(AppDimensions.paddingMedium),
@@ -274,7 +276,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           ),
           const SizedBox(height: AppDimensions.paddingMedium),
 
-          // Monto (nota: el token no incluye unidad, se usa la activa)
+          // Monto con unidad detectada
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -286,14 +288,27 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
                   color: AppColors.textSecondary.withValues(alpha: 0.7),
                 ),
               ),
-              Text(
-                '${UnitFormatter.formatBalance(amount, activeUnit)} ${UnitFormatter.getUnitLabel(activeUnit)}',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              Row(
+                children: [
+                  Text(
+                    '${UnitFormatter.formatBalance(amount, tokenUnit)} ${UnitFormatter.getUnitLabel(tokenUnit)}',
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  // Indicador si la unidad fue detectada automáticamente
+                  if (!unitDetected) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      LucideIcons.helpCircle,
+                      color: AppColors.textSecondary.withValues(alpha: 0.5),
+                      size: 14,
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
@@ -413,7 +428,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     try {
       final walletProvider = context.read<WalletProvider>();
 
-      // Reclamar token real
+      // Guardar unidad detectada del token ANTES de reclamar
+      final detectedUnit = _tokenInfo?.unit ?? walletProvider.activeUnit;
+
+      // Reclamar token (usa unidad detectada internamente)
       final amountReceived = await walletProvider.receiveToken(
         _tokenController.text.trim(),
       );
@@ -421,7 +439,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       if (mounted) {
         setState(() {
           _receivedAmount = amountReceived;
-          _receivedUnit = walletProvider.activeUnit; // Guardar unidad usada
+          _receivedUnit = detectedUnit; // Usar unidad del token
           _showSuccess = true;
           _isProcessing = false;
         });

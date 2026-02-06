@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
+import 'package:cbor/cbor.dart';
 import 'package:cdk_flutter/cdk_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 /// Helper class para info de token parseado
@@ -8,11 +12,13 @@ class TokenInfo {
   final BigInt amount;
   final String mintUrl;
   final String encoded;
+  final String? unit; // Unidad detectada del token (sat, usd, eur, etc.)
 
   TokenInfo({
     required this.amount,
     required this.mintUrl,
     required this.encoded,
+    this.unit,
   });
 }
 
@@ -30,6 +36,10 @@ class WalletProvider extends ChangeNotifier {
   /// Wallets por mint:unidad (lazy loading).
   /// Clave: 'mintUrl:unit', Ejemplo: 'https://mint.cubabitcoin.org:sat'
   final Map<String, Wallet> _wallets = {};
+
+  /// Caché de keyset_id → unit para detectar unidad de tokens.
+  /// Ejemplo: {'00abc123': 'sat', '00def456': 'usd'}
+  final Map<String, String> _keysetUnits = {};
 
   /// Mint activo actualmente
   String? _activeMintUrl;
@@ -187,12 +197,48 @@ class WalletProvider extends ChangeNotifier {
       });
 
       _mintUnits[mintUrl] = unitList;
+
+      // Obtener keysets para mapear keyset_id → unit
+      await _fetchKeysets(mintUrl);
+
       return unitList;
     } catch (e) {
       debugPrint('Error detectando unidades de $mintUrl: $e');
       // Fallback a sat
       _mintUnits[mintUrl] = ['sat'];
       return ['sat'];
+    }
+  }
+
+  /// Obtiene los keysets de un mint y los agrega al caché _keysetUnits.
+  /// Llama a GET {mintUrl}/v1/keysets para obtener el mapping keyset_id → unit.
+  Future<void> _fetchKeysets(String mintUrl) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$mintUrl/v1/keysets'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final keysets = data['keysets'] as List<dynamic>?;
+
+        if (keysets != null) {
+          for (final ks in keysets) {
+            final id = ks['id'] as String?;
+            final unit = ks['unit'] as String?;
+            if (id != null && unit != null) {
+              _keysetUnits[id] = unit;
+            }
+          }
+          debugPrint('Keysets cargados para $mintUrl: ${keysets.length}');
+        }
+      } else {
+        debugPrint('Error HTTP ${response.statusCode} al obtener keysets de $mintUrl');
+      }
+    } catch (e) {
+      debugPrint('Error obteniendo keysets de $mintUrl: $e');
+      // No lanzamos excepción, el caché simplemente no tendrá estos keysets
     }
   }
 
@@ -365,25 +411,142 @@ class WalletProvider extends ChangeNotifier {
   // ============================================================
 
   /// Parsea un token sin reclamarlo. Retorna null si inválido.
-  /// Nota: Token no contiene información de unidad.
+  /// Incluye detección de unidad si es posible.
   TokenInfo? parseToken(String encodedToken) {
     try {
       final token = Token.parse(encoded: encodedToken);
+      final unit = detectTokenUnit(encodedToken);
       return TokenInfo(
         amount: token.amount,
         mintUrl: token.mintUrl,
         encoded: token.encoded,
+        unit: unit,
       );
     } catch (e) {
       return null;
     }
   }
 
-  /// Reclama un token Cashu usando la unidad activa.
-  /// Si el mint del token es diferente al activo, lo agrega y cambia a él.
+  /// Detecta la unidad de un token decodificando su keyset_id.
+  /// Soporta tokens V3 (cashuA) y V4 (cashuB con fallback).
+  /// Retorna null si no puede detectar la unidad.
+  String? detectTokenUnit(String encodedToken) {
+    try {
+      // Limpiar prefijo "cashu:" si existe
+      String token = encodedToken.trim();
+      if (token.startsWith('cashu:')) {
+        token = token.substring(6);
+      }
+
+      // Detectar versión por prefijo
+      if (token.startsWith('cashuA')) {
+        // Token V3: base64 JSON
+        return _detectUnitFromV3(token);
+      } else if (token.startsWith('cashuB')) {
+        // Token V4: CBOR - intentar fallback
+        return _detectUnitFromV4(token);
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('Error detectando unidad del token: $e');
+      return null;
+    }
+  }
+
+  /// Extrae keyset_id de un token V3 (cashuA + base64 JSON).
+  String? _detectUnitFromV3(String token) {
+    try {
+      // Remover prefijo "cashuA"
+      final base64Part = token.substring(6);
+
+      // Decodificar base64
+      final decoded = utf8.decode(base64.decode(base64Part));
+      final json = jsonDecode(decoded) as Map<String, dynamic>;
+
+      // Estructura V3: {"token": [{"mint": "...", "proofs": [{"id": "...", ...}]}]}
+      final tokenList = json['token'] as List<dynamic>?;
+      if (tokenList == null || tokenList.isEmpty) return null;
+
+      final firstToken = tokenList[0] as Map<String, dynamic>?;
+      if (firstToken == null) return null;
+
+      final proofs = firstToken['proofs'] as List<dynamic>?;
+      if (proofs == null || proofs.isEmpty) return null;
+
+      final firstProof = proofs[0] as Map<String, dynamic>?;
+      final keysetId = firstProof?['id'] as String?;
+
+      if (keysetId != null) {
+        // Lookup en caché
+        final unit = _keysetUnits[keysetId];
+        if (unit != null) {
+          debugPrint('Token V3 detectado: keyset=$keysetId, unit=$unit');
+          return unit;
+        }
+        debugPrint('Keyset $keysetId no encontrado en caché');
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint('Error decodificando token V3: $e');
+      return null;
+    }
+  }
+
+  /// Intenta detectar unidad de un token V4 (cashuB + CBOR).
+  /// Por ahora hace fallback a probar las unidades conocidas del mint.
+  /// Detecta unidad de un token V4 (cashuB + base64url CBOR).
+  /// V4 incluye la unidad directamente en el campo 'u'.
+  String? _detectUnitFromV4(String token) {
+    try {
+      // Remover prefijo "cashuB"
+      final base64Part = token.substring(6);
+
+      // Decodificar base64url (V4 usa base64url, no base64 estándar)
+      final normalized = base64Part
+          .replaceAll('-', '+')
+          .replaceAll('_', '/');
+      // Agregar padding si es necesario
+      final padded = normalized.padRight(
+        (normalized.length + 3) & ~3,
+        '=',
+      );
+      final bytes = base64.decode(padded);
+
+      // Decodificar CBOR usando la API simple
+      final decoded = cbor.decode(bytes);
+
+      // V4 format: {m: mint_url, u: unit, t: [...]}
+      if (decoded is CborMap) {
+        // Buscar el campo 'u' (unit)
+        for (final entry in decoded.entries) {
+          final key = entry.key;
+          if (key is CborString && key.toString() == 'u') {
+            final value = entry.value;
+            if (value is CborString) {
+              final unit = value.toString();
+              debugPrint('Token V4 detectado: unit=$unit');
+              return unit;
+            }
+          }
+        }
+      }
+
+      debugPrint('Token V4: no se encontró campo "u"');
+      return null;
+    } catch (e) {
+      debugPrint('Error decodificando token V4: $e');
+      return null;
+    }
+  }
+
+  /// Reclama un token Cashu detectando automáticamente su unidad.
+  /// Si el mint del token es diferente al activo, lo agrega.
+  /// NO cambia la unidad activa (comportamiento similar a cashu.me).
   /// Retorna monto recibido.
   Future<BigInt> receiveToken(String encodedToken) async {
-    // Parsear token
+    // Parsear token (incluye detección de unidad)
     final tokenInfo = parseToken(encodedToken);
     if (tokenInfo == null) {
       throw Exception('Token inválido');
@@ -393,27 +556,50 @@ class WalletProvider extends ChangeNotifier {
 
     // Verificar si conocemos este mint
     if (!_mintUnits.containsKey(tokenMint)) {
-      // Agregar el mint automáticamente
+      // Agregar el mint automáticamente (esto también carga keysets)
       await addMint(tokenMint);
+
+      // Intentar detectar unidad de nuevo ahora que tenemos keysets
+      final detectedUnit = detectTokenUnit(encodedToken);
+      if (detectedUnit != null) {
+        return await _receiveWithUnit(encodedToken, tokenMint, detectedUnit);
+      }
     }
 
-    // Cambiar al mint del token (mantener unidad activa si es soportada)
-    _activeMintUrl = tokenMint;
-
-    // Verificar si la unidad activa es soportada por este mint
-    final units = _mintUnits[tokenMint]!;
-    if (!units.contains(_activeUnit)) {
-      // Cambiar a la primera unidad soportada
-      _activeUnit = units.first;
+    // Si tenemos unidad detectada, usarla
+    if (tokenInfo.unit != null) {
+      return await _receiveWithUnit(encodedToken, tokenMint, tokenInfo.unit!);
     }
 
-    // Obtener wallet correcto
-    final wallet = await getWallet(tokenMint, _activeUnit);
+    // Fallback: intentar con cada unidad del mint hasta que funcione
+    final units = _mintUnits[tokenMint] ?? ['sat'];
+    Exception? lastError;
 
-    // Parsear y reclamar
+    for (final unit in units) {
+      try {
+        return await _receiveWithUnit(encodedToken, tokenMint, unit);
+      } catch (e) {
+        lastError = e as Exception;
+        debugPrint('Receive falló con unidad $unit: $e');
+        continue;
+      }
+    }
+
+    // Si ninguna unidad funcionó, lanzar el último error
+    throw lastError ?? Exception('No se pudo reclamar el token');
+  }
+
+  /// Recibe un token con una unidad específica.
+  Future<BigInt> _receiveWithUnit(
+    String encodedToken,
+    String mintUrl,
+    String unit,
+  ) async {
+    final wallet = await getWallet(mintUrl, unit);
     final token = Token.parse(encoded: encodedToken);
     final amount = await wallet.receive(token: token);
 
+    debugPrint('Token recibido: $amount $unit en $mintUrl');
     notifyListeners();
     return amount;
   }
