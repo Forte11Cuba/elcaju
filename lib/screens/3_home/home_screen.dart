@@ -160,9 +160,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 8),
 
-          // Balance reactivo con StreamBuilder
+          // Balance reactivo del mint activo
           StreamBuilder<BigInt>(
-            stream: walletProvider.streamTotalBalance(),
+            stream: walletProvider.streamBalance(),
             builder: (context, snapshot) {
               final balance = snapshot.data ?? BigInt.zero;
               final balanceInt = balance.toInt();
