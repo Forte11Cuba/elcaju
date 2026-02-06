@@ -7,6 +7,7 @@ import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
+import '../../widgets/common/animated_action_button.dart';
 import '../../widgets/effects/cashu_confetti.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/settings_provider.dart';
@@ -298,15 +299,20 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(AppDimensions.paddingMedium),
       child: Row(
         children: [
-          // Enviar (primero) - flecha diagonal arriba derecha
+          // Enviar (primero) - acción crítica que mueve dinero
           Expanded(
-            child: _ActionButton(label: 'Enviar ↗', onTap: _showSendOptions),
+            child: AnimatedActionButton(
+              label: 'Enviar ↗',
+              type: ButtonType.criticalAction,
+              onTap: _showSendOptions,
+            ),
           ),
           const SizedBox(width: AppDimensions.paddingMedium),
-          // Recibir (segundo) - flecha diagonal abajo derecha
+          // Recibir (segundo) - acción importante pero segura
           Expanded(
-            child: _ActionButton(
+            child: AnimatedActionButton(
               label: '↘ Recibir',
+              type: ButtonType.primaryAction,
               onTap: _showReceiveOptions,
             ),
           ),
@@ -390,31 +396,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHistoryButton() {
     return Padding(
       padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-      child: SizedBox(
-        width: double.infinity,
-        child: GlassCard(
-          onTap: _showHistoryModal,
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.paddingLarge,
-            vertical: AppDimensions.paddingMedium + 4,
-          ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(LucideIcons.history, color: Colors.white, size: 28),
-              SizedBox(width: AppDimensions.paddingSmall),
-              Text(
-                'Historial',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
+      child: AnimatedActionButton(
+        label: 'Historial',
+        type: ButtonType.navigation,
+        icon: LucideIcons.history,
+        showIcon: true,
+        onTap: _showHistoryModal,
       ),
     );
   }
@@ -425,53 +412,6 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => const _HistoryModal(),
-    );
-  }
-}
-
-/// Botón de acción para el home
-class _ActionButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _ActionButton({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppDimensions.paddingMedium,
-          horizontal: AppDimensions.paddingSmall,
-        ),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: AppColors.buttonGradient,
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(AppDimensions.cardBorderRadius),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primaryAction.withValues(alpha: 0.4),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
