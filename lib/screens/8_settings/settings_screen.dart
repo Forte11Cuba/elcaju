@@ -96,7 +96,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     const SizedBox(height: AppDimensions.paddingLarge),
 
-                    // Sección APARIENCIA
+                    // Sección IDIOMA
                     _buildSectionHeader(l10n.appearanceSection),
                     const SizedBox(height: AppDimensions.paddingSmall),
                     _buildSettingTile(
@@ -513,7 +513,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               settingsProvider,
               'en',
               l10n.english,
-              '🇺🇸',
+              '🇬🇧',
             ),
             const SizedBox(height: AppDimensions.paddingSmall),
           ],

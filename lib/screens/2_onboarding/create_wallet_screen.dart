@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
@@ -87,7 +88,7 @@ class _CreateWalletScreenState extends State<CreateWalletScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -114,101 +115,111 @@ class _CreateWalletScreenState extends State<CreateWalletScreen> {
   Widget _buildCreateView(L10n l10n) {
     return Column(
       children: [
-        const Spacer(),
-
-        Container(
-          width: 120,
-          height: 120,
-          decoration: BoxDecoration(
-            color: AppColors.primaryAction.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            _isCreating ? Icons.hourglass_top : Icons.account_balance_wallet,
-            size: 60,
-            color: AppColors.secondaryAction,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.paddingLarge),
-
-        Text(
-          _isCreating ? l10n.creatingWallet : l10n.createWalletTitle,
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppDimensions.paddingMedium),
-
-        Text(
-          _isCreating ? l10n.generatingSeed : l10n.createWalletDescription,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            color: AppColors.textSecondary.withValues(alpha: 0.8),
-            height: 1.5,
-          ),
-          textAlign: TextAlign.center,
-        ),
-
-        // Mensaje de error si existe
-        if (_errorMessage != null) ...[
-          const SizedBox(height: AppDimensions.paddingLarge),
-          Container(
-            padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-            decoration: BoxDecoration(
-              color: AppColors.error.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: AppColors.error.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
+        // Contenido principal centrado
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.error_outline,
-                  color: AppColors.error,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _errorMessage!,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      color: AppColors.error,
-                    ),
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryAction.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    _isCreating ? LucideIcons.hourglass : LucideIcons.wallet,
+                    size: 60,
+                    color: AppColors.secondaryAction,
                   ),
                 ),
+                const SizedBox(height: AppDimensions.paddingLarge),
+
+                Text(
+                  _isCreating ? l10n.creatingWallet : l10n.createWalletTitle,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppDimensions.paddingMedium),
+
+                Text(
+                  _isCreating ? l10n.generatingSeed : l10n.createWalletDescription,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16,
+                    color: AppColors.textSecondary.withValues(alpha: 0.8),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                // Mensaje de error si existe
+                if (_errorMessage != null) ...[
+                  const SizedBox(height: AppDimensions.paddingLarge),
+                  Container(
+                    padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: AppColors.error.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          LucideIcons.alertCircle,
+                          color: AppColors.error,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 14,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                // Spinner cuando está creando (integrado en el contenido centrado)
+                if (_isCreating) ...[
+                  const SizedBox(height: AppDimensions.paddingXLarge),
+                  const SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryAction),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
-        ],
+        ),
 
-        const Spacer(),
-
-        if (!_isCreating)
+        // Botón solo cuando no está creando
+        if (!_isCreating) ...[
           PrimaryButton(
             text: l10n.generateWallet,
-            icon: Icons.auto_awesome,
+            icon: LucideIcons.sparkles,
             onPressed: _createWallet,
           ),
-
-        if (_isCreating)
-          const SizedBox(
-            width: 48,
-            height: 48,
-            child: CircularProgressIndicator(
-              strokeWidth: 3,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.secondaryAction),
-            ),
-          ),
-
-        const SizedBox(height: AppDimensions.paddingXLarge),
+          const SizedBox(height: AppDimensions.paddingXLarge),
+        ],
       ],
     );
   }
@@ -226,7 +237,7 @@ class _CreateWalletScreenState extends State<CreateWalletScreen> {
             shape: BoxShape.circle,
           ),
           child: const Icon(
-            Icons.check_circle,
+            LucideIcons.checkCircle,
             size: 60,
             color: AppColors.success,
           ),
@@ -261,7 +272,7 @@ class _CreateWalletScreenState extends State<CreateWalletScreen> {
           child: Row(
             children: [
               const Icon(
-                Icons.warning_amber_rounded,
+                LucideIcons.alertTriangle,
                 color: AppColors.warning,
                 size: 32,
               ),
@@ -285,7 +296,7 @@ class _CreateWalletScreenState extends State<CreateWalletScreen> {
 
         PrimaryButton(
           text: l10n.backupNow,
-          icon: Icons.shield,
+          icon: LucideIcons.shield,
           onPressed: _goToBackup,
         ),
         const SizedBox(height: AppDimensions.paddingMedium),
