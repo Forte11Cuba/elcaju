@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
@@ -53,7 +54,7 @@ class _BackupSeedScreenState extends State<BackupSeedScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -111,7 +112,7 @@ class _BackupSeedScreenState extends State<BackupSeedScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Icon(
-                                  Icons.copy,
+                                  LucideIcons.copy,
                                   color: AppColors.textSecondary,
                                   size: 18,
                                 ),
@@ -140,7 +141,7 @@ class _BackupSeedScreenState extends State<BackupSeedScreen> {
                     child: Row(
                       children: [
                         const Icon(
-                          Icons.warning_amber_rounded,
+                          LucideIcons.alertTriangle,
                           color: AppColors.warning,
                           size: 24,
                         ),
@@ -182,7 +183,7 @@ class _BackupSeedScreenState extends State<BackupSeedScreen> {
                             ),
                           ),
                           child: _confirmed
-                              ? const Icon(Icons.check, size: 16, color: Colors.white)
+                              ? const Icon(LucideIcons.check, size: 16, color: Colors.white)
                               : null,
                         ),
                         const SizedBox(width: AppDimensions.paddingSmall),
@@ -205,7 +206,7 @@ class _BackupSeedScreenState extends State<BackupSeedScreen> {
                 if (!_revealed)
                   PrimaryButton(
                     text: l10n.revealSeedPhrase,
-                    icon: Icons.visibility,
+                    icon: LucideIcons.eye,
                     onPressed: () => setState(() => _revealed = true),
                   )
                 else
@@ -229,7 +230,7 @@ class _BackupSeedScreenState extends State<BackupSeedScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.visibility_off,
+            LucideIcons.eyeOff,
             size: 48,
             color: AppColors.textSecondary.withValues(alpha: 0.5),
           ),

@@ -186,7 +186,7 @@
   "protectWithPin": "Protect the app with PIN",
   "recoverTokens": "Recover tokens",
   "scanMintsWithSeed": "Scan mints with seed phrase",
-  "appearanceSection": "APPEARANCE",
+  "appearanceSection": "LANGUAGE",
   "language": "Language",
   "informationSection": "INFORMATION",
   "version": "Version",

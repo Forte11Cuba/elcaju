@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
@@ -96,7 +97,7 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -174,8 +175,8 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
                   children: [
                     Icon(
                       _isValidWordCount
-                          ? Icons.check_circle
-                          : Icons.info_outline,
+                          ? LucideIcons.checkCircle
+                          : LucideIcons.info,
                       size: 18,
                       color: _isValidWordCount
                           ? AppColors.success
@@ -220,7 +221,7 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
                     child: Row(
                       children: [
                         const Icon(
-                          Icons.error_outline,
+                          LucideIcons.alertCircle,
                           color: AppColors.error,
                           size: 20,
                         ),
@@ -244,7 +245,7 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
 
                 PrimaryButton(
                   text: l10n.restoreWallet,
-                  icon: Icons.restore,
+                  icon: LucideIcons.rotateCcw,
                   isLoading: _isRestoring,
                   onPressed: _isValidWordCount && !_isRestoring
                       ? _restoreWallet

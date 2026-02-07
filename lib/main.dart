@@ -46,6 +46,8 @@ class ElCajuApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = context.watch<SettingsProvider>();
+
     return MaterialApp(
       title: 'ElCaju',
       debugShowCheckedModeBanner: false,
@@ -62,7 +64,7 @@ class ElCajuApp extends StatelessWidget {
         Locale('es'), // Español (por defecto)
         Locale('en'), // English
       ],
-      locale: null, // null = detectar del sistema
+      locale: Locale(settingsProvider.locale),
 
       home: const SplashScreen(),
     );
