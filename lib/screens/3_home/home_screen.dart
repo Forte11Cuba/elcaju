@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -212,9 +213,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final activeMintUrl = walletProvider.activeMintUrl;
 
     // Extraer nombre del mint para mostrar
+    final l10n = L10n.of(context)!;
     final displayMint = activeMintUrl != null
         ? UnitFormatter.getMintDisplayName(activeMintUrl)
-        : 'Sin mint';
+        : l10n.noMint;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppDimensions.paddingSmall),
@@ -312,6 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildActions() {
+    final l10n = L10n.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(AppDimensions.paddingMedium),
       child: Row(
@@ -319,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Enviar (primero) - acción crítica que mueve dinero
           Expanded(
             child: AnimatedActionButton(
-              label: 'Enviar ↗',
+              label: l10n.sendAction,
               type: ButtonType.criticalAction,
               onTap: _showSendOptions,
             ),
@@ -328,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Recibir (segundo) - acción importante pero segura
           Expanded(
             child: AnimatedActionButton(
-              label: '↘ Recibir',
+              label: l10n.receiveAction,
               type: ButtonType.primaryAction,
               onTap: _showReceiveOptions,
             ),
@@ -339,16 +342,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showReceiveOptions() {
+    final l10n = L10n.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => _MethodSelectorModal(
-        title: 'Recibir',
+        title: l10n.receive,
         options: [
           _MethodOption(
             icon: LucideIcons.bean,
-            label: 'Cashu',
-            description: 'Pegar token ecash',
+            label: l10n.cashu,
+            description: l10n.pasteEcashToken,
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -359,8 +363,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           _MethodOption(
             icon: LucideIcons.zap,
-            label: 'Lightning',
-            description: 'Generar invoice para depositar',
+            label: l10n.lightning,
+            description: l10n.generateInvoiceToDeposit,
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -375,16 +379,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showSendOptions() {
+    final l10n = L10n.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => _MethodSelectorModal(
-        title: 'Enviar',
+        title: l10n.send,
         options: [
           _MethodOption(
             icon: LucideIcons.bean,
-            label: 'Cashu',
-            description: 'Crear token ecash',
+            label: l10n.cashu,
+            description: l10n.createEcashToken,
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -395,8 +400,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           _MethodOption(
             icon: LucideIcons.zap,
-            label: 'Lightning',
-            description: 'Pagar invoice Lightning',
+            label: l10n.lightning,
+            description: l10n.payLightningInvoice,
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -411,10 +416,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHistoryButton() {
+    final l10n = L10n.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(AppDimensions.paddingMedium),
       child: AnimatedActionButton(
-        label: 'Historial',
+        label: l10n.history,
         type: ButtonType.navigation,
         icon: LucideIcons.history,
         showIcon: true,

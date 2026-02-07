@@ -40,49 +40,370 @@
   "wordCount": "{count} palabras",
   "@wordCount": {
     "placeholders": {
-      "count": {
-        "type": "int"
-      }
+      "count": { "type": "int" }
     }
   },
   "needWords": "(necesitas 12 o 24)",
   "restoreError": "Error al restaurar: {error}",
   "@restoreError": {
     "placeholders": {
-      "error": {
-        "type": "String"
-      }
+      "error": { "type": "String" }
     }
   },
 
   "homeTitle": "Inicio",
   "receive": "Recibir",
   "send": "Enviar",
+  "sendAction": "Enviar ↗",
+  "receiveAction": "↘ Recibir",
   "deposit": "Depositar",
   "withdraw": "Retirar",
   "lightning": "Lightning",
+  "cashu": "Cashu",
+  "ecash": "Ecash",
   "history": "Historial",
   "noTransactions": "Sin transacciones aún",
   "depositOrReceive": "Deposita o recibe sats para empezar",
+  "noMint": "Sin mint",
 
   "balance": "Balance",
   "sats": "sats",
 
+  "pasteEcashToken": "Pegar token ecash",
+  "generateInvoiceToDeposit": "Generar invoice para depositar",
+  "createEcashToken": "Crear token ecash",
+  "payLightningInvoice": "Pagar invoice Lightning",
+
+  "receiveCashu": "Recibir Cashu",
+  "pasteTheCashuToken": "Pega el token Cashu:",
+  "pasteFromClipboard": "Pegar del portapapeles",
+  "validToken": "Token válido",
+  "invalidToken": "Token inválido o malformado",
+  "amount": "Monto:",
+  "mint": "Mint:",
+  "claiming": "Reclamando...",
+  "claimTokens": "Reclamar tokens",
+  "tokensReceived": "Tokens recibidos",
+  "backToHome": "Volver al inicio",
+  "tokenAlreadyClaimed": "Este token ya fue reclamado",
+  "unknownMint": "Token de un mint desconocido",
+  "claimError": "Error al reclamar: {error}",
+  "@claimError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "sendCashu": "Enviar Cashu",
+  "selectNotesManually": "Seleccionar notas manualmente",
+  "amountToSend": "Monto a enviar:",
+  "available": "Disponible:",
+  "max": "(Max)",
+  "memoOptional": "Memo (opcional):",
+  "memoPlaceholder": "Ej: Para el cafe",
+  "creatingToken": "Creando token...",
+  "createToken": "Crear token",
+  "noActiveMint": "No hay mint activo",
+  "offlineModeMessage": "Sin conexion. Usando modo offline...",
+  "confirmSend": "Confirmar envio",
+  "confirm": "Confirmar",
+  "cancel": "Cancelar",
+  "insufficientBalance": "Balance insuficiente",
+  "tokenCreationError": "Error al crear token: {error}",
+  "@tokenCreationError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "tokenCreated": "Token creado",
+  "copy": "Copiar",
+  "share": "Compartir",
+  "tokenCashu": "Token Cashu",
+  "tokenCashuAnimatedQr": "Token Cashu (QR animado - {fragments} fragmentos UR)",
+  "@tokenCashuAnimatedQr": {
+    "placeholders": {
+      "fragments": { "type": "int" }
+    }
+  },
+  "keepTokenWarning": "Guarda este token hasta que el receptor lo reclame. Si lo pierdes, perderas los fondos.",
+  "tokenCopiedToClipboard": "Token copiado al portapapeles",
+
+  "amountToDeposit": "Monto a depositar:",
+  "descriptionOptional": "Descripcion (opcional):",
+  "depositPlaceholder": "Ej: Deposito El Caju",
+  "generating": "Generando...",
+  "generateInvoice": "Generar invoice",
+  "depositLightning": "Depositar Lightning",
+
+  "payInvoiceTitle": "Pagar invoice",
+  "generatingInvoice": "Generando invoice...",
+  "waitingForPayment": "Esperando pago...",
+  "paymentReceived": "Pago recibido",
+  "tokensIssued": "Tokens emitidos!",
+  "error": "Error",
+  "unknownError": "Error desconocido",
+  "back": "Volver",
+  "copyInvoice": "Copiar invoice",
+  "description": "Descripcion:",
+  "invoiceCopiedToClipboard": "Invoice copiado al portapapeles",
+  "deposited": "{amount} {unit} depositados",
+  "@deposited": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "pasteLightningInvoice": "Pega el invoice Lightning:",
+  "gettingQuote": "Obteniendo quote...",
+  "validInvoice": "Invoice válido",
+  "invalidInvoice": "Invoice inválido",
+  "invalidInvoiceMalformed": "Invoice inválido o malformado",
+  "feeReserved": "Fee reservado:",
+  "total": "Total:",
+  "paying": "Pagando...",
+  "payInvoice": "Pagar invoice",
+  "confirmPayment": "Confirmar pago",
+  "pay": "Pagar",
+  "fee": "fee",
+  "invoiceExpired": "Invoice expirado",
+  "invoiceAlreadyPaid": "Invoice ya fue pagado",
+  "paymentError": "Error al pagar: {error}",
+  "@paymentError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "sent": "{amount} {unit} enviados",
+  "@sent": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "filterAll": "Todos",
+  "filterPending": "Pendientes",
+  "filterEcash": "Ecash",
+  "filterLightning": "Lightning",
+  "receiveTokensToStart": "Recibe tokens Cashu para empezar",
+  "noPendingTransactions": "Sin transacciones pendientes",
+  "allTransactionsCompleted": "Todas tus transacciones están completadas",
+  "noEcashTransactions": "Sin transacciones Ecash",
+  "sendOrReceiveTokens": "Envía o recibe tokens Cashu",
+  "noLightningTransactions": "Sin transacciones Lightning",
+  "depositOrWithdrawLightning": "Deposita o retira via Lightning",
+  "pendingStatus": "Pendiente",
+  "receivedStatus": "Recibido",
+  "sentStatus": "Enviado",
+  "now": "Ahora",
+  "agoMinutes": "Hace {minutes} min",
+  "@agoMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "agoHours": "Hace {hours} h",
+  "@agoHours": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "agoDays": "Hace {days} días",
+  "@agoDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "lightningInvoice": "Lightning Invoice",
+  "receivedEcash": "Received Ecash",
+  "sentEcash": "Sent Ecash",
+  "outgoingLightningPayment": "Pago Lightning Saliente",
+  "invoiceNotAvailable": "Invoice no disponible",
+  "tokenNotAvailable": "Token no disponible",
+  "unit": "Unit",
+  "status": "Status",
+  "pending": "Pending",
+  "memo": "Memo",
+  "copyInvoiceButton": "COPY INVOICE",
+  "copyButton": "COPY",
+  "invoiceCopied": "Invoice copiado",
+  "tokenCopied": "Token copiado",
+  "speed": "SPEED:",
+
   "settings": "Configuración",
+  "walletSection": "WALLET",
   "backupSeedPhrase": "Backup seed phrase",
+  "viewRecoveryWords": "Ver tus palabras de recuperación",
   "connectedMints": "Mints conectados",
+  "manageCashuMints": "Gestionar tus mints Cashu",
   "pinAccess": "PIN de acceso",
+  "pinEnabled": "Activado",
+  "protectWithPin": "Proteger la app con PIN",
+  "recoverTokens": "Recuperar tokens",
+  "scanMintsWithSeed": "Escanear mints con seed phrase",
+  "appearanceSection": "APARIENCIA",
   "language": "Idioma",
-  "spanish": "Español",
-  "english": "English",
+  "informationSection": "INFORMACIÓN",
   "version": "Versión",
   "about": "Acerca de",
   "deleteWallet": "Borrar wallet",
+  "spanish": "Español",
+  "english": "English",
 
-  "confirm": "Confirmar",
-  "cancel": "Cancelar",
-  "error": "Error",
+  "mnemonicNotFound": "No se encontró el mnemonic",
+  "createPin": "Crear PIN",
+  "enterPinDigits": "Ingresa un PIN de 4 dígitos",
+  "confirmPin": "Confirmar PIN",
+  "enterPinAgain": "Ingresa el PIN nuevamente",
+  "pinMismatch": "Los PIN no coinciden",
+  "pinActivated": "PIN activado",
+  "pinDeactivated": "PIN desactivado",
+  "verifyPin": "Verificar PIN",
+  "enterCurrentPin": "Ingresa tu PIN actual",
+  "incorrectPin": "PIN incorrecto",
+  "selectLanguage": "Seleccionar idioma",
+  "languageChanged": "Idioma cambiado a {language}",
+  "@languageChanged": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "close": "Cerrar",
+  "aboutDescription": "Cashu wallet con identidad cubana, hermana de La Chispa.",
+  "couldNotOpenLink": "No se pudo abrir el enlace",
+
+  "deleteWalletQuestion": "¿Borrar wallet?",
+  "actionIrreversible": "Esta acción es irreversible",
+  "deleteWalletWarning": "Se eliminarán todos los datos incluyendo tu seed phrase y tokens. Asegúrate de tener un backup.",
+  "typeDeleteToConfirm": "Escribe \"BORRAR\" para confirmar:",
+  "deleteConfirmWord": "BORRAR",
+  "deleteError": "Error al borrar: {error}",
+  "@deleteError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "recoverTokensTitle": "Recuperar tokens",
+  "recoverTokensDescription": "Escanea los mints para recuperar tokens asociados a tu seed phrase (NUT-13)",
+  "useCurrentSeedPhrase": "Usar mi seed phrase actual",
+  "scanWithSavedWords": "Escanear mints con las 12 palabras guardadas",
+  "useOtherSeedPhrase": "Usar otra seed phrase",
+  "recoverFromOtherWords": "Recuperar tokens de otras 12 palabras",
+  "mintsToScan": "Mints a escanear:",
+  "allMints": "Todos los mints ({count})",
+  "@allMints": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "specificMint": "Un mint específico",
+  "enterMnemonicWords": "Ingresa las 12 palabras separadas por espacios...",
+  "scanMints": "Escanear mints",
+  "selectMintToScan": "Selecciona un mint para escanear",
+  "mnemonicMustHaveWords": "El mnemonic debe tener 12 o 24 palabras",
+  "noConnectedMintsToScan": "No hay mints conectados para escanear",
+  "recoveredTokens": "¡Recuperados {tokens} de {mints} mint(s)!",
+  "@recoveredTokens": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mints": { "type": "int" }
+    }
+  },
+  "scanCompleteNoTokens": "Escaneo completado. No se encontraron tokens nuevos.",
+  "mintsWithError": "({count} mint(s) con error)",
+  "@mintsWithError": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "recoveredFromMint": "¡Recuperados {tokens} de {mint}!",
+  "@recoveredFromMint": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mint": { "type": "String" }
+    }
+  },
+  "noTokensFoundInMint": "No se encontraron tokens en {mint}.",
+  "@noTokensFoundInMint": {
+    "placeholders": {
+      "mint": { "type": "String" }
+    }
+  },
+  "recoveredAndTransferred": "¡Recuperados y transferidos {amount} {unit} a tu wallet!",
+  "@recoveredAndTransferred": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "noTokensForMnemonic": "No se encontraron tokens asociados a ese mnemonic.",
+
+  "noConnectedMints": "No hay mints conectados",
+  "addMintToStart": "Agrega un mint para comenzar",
+  "addMint": "Agregar mint",
+  "mintDeleted": "Mint eliminado",
+  "activeMintUpdated": "Mint activo actualizado",
+  "mintUrl": "URL del mint:",
+  "mintUrlPlaceholder": "https://mint.example.com",
+  "urlMustStartWithHttps": "La URL debe comenzar con https://",
+  "connectingToMint": "Conectando al mint...",
+  "mintAddedSuccessfully": "Mint agregado correctamente",
+  "couldNotConnectToMint": "No se pudo conectar al mint",
+  "add": "Agregar",
+
   "success": "Éxito",
   "loading": "Cargando...",
-  "retry": "Reintentar"
+  "retry": "Reintentar",
+
+  "activeMint": "Mint activo",
+  "mintMessage": "Mensaje del Mint",
+  "url": "URL",
+  "currency": "Moneda",
+  "unknown": "Desconocido",
+  "useThisMint": "Usar este mint",
+  "copyMintUrl": "Copiar URL del mint",
+  "deleteMint": "Eliminar mint",
+  "copied": "{label} copiado",
+  "@copied": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "deleteMintConfirmTitle": "Eliminar mint",
+  "deleteMintConfirmMessage": "Si tienes balance en este mint, se perderá. ¿Estás seguro?",
+  "delete": "Eliminar",
+
+  "offlineSend": "Envío Offline",
+  "selectNotesToSend": "Selecciona las notas que deseas enviar:",
+  "totalToSend": "Total a enviar",
+  "notesSelected": "{count} notas seleccionadas",
+  "@notesSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "loadingProofsError": "Error cargando proofs: {error}",
+  "@loadingProofsError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "creatingTokenError": "Error creando token: {error}",
+  "@creatingTokenError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "unknownState": "Estado desconocido",
+  "depositAmountTitle": "Depositar {amount} {unit}",
+  "@depositAmountTitle": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  }
 }

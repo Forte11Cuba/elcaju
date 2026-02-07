@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' hide WalletProvider;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -72,9 +73,9 @@ class _MeltScreenState extends State<MeltScreen> {
             icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            'Retirar',
-            style: TextStyle(
+          title: Text(
+            L10n.of(context)!.withdraw,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -93,7 +94,7 @@ class _MeltScreenState extends State<MeltScreen> {
                     children: [
                       // Instrucciones
                       Text(
-                        'Pega el invoice Lightning:',
+                        L10n.of(context)!.pasteLightningInvoice,
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
@@ -201,7 +202,7 @@ class _MeltScreenState extends State<MeltScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Pegar del portapapeles',
+              L10n.of(context)!.pasteFromClipboard,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
@@ -231,7 +232,7 @@ class _MeltScreenState extends State<MeltScreen> {
           ),
           const SizedBox(width: 12),
           Text(
-            'Obteniendo quote...',
+            L10n.of(context)!.gettingQuote,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
@@ -267,7 +268,7 @@ class _MeltScreenState extends State<MeltScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Invoice válido',
+                L10n.of(context)!.validInvoice,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
@@ -284,7 +285,7 @@ class _MeltScreenState extends State<MeltScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Monto:',
+                L10n.of(context)!.amount,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
@@ -309,7 +310,7 @@ class _MeltScreenState extends State<MeltScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Fee reservado:',
+                L10n.of(context)!.feeReserved,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
@@ -336,9 +337,9 @@ class _MeltScreenState extends State<MeltScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total:',
-                style: TextStyle(
+              Text(
+                L10n.of(context)!.total,
+                style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -362,7 +363,7 @@ class _MeltScreenState extends State<MeltScreen> {
           if (!hasEnoughBalance) ...[
             const SizedBox(height: 8),
             Text(
-              'Balance insuficiente',
+              L10n.of(context)!.insufficientBalance,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 12,
@@ -410,7 +411,7 @@ class _MeltScreenState extends State<MeltScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Disponible: ',
+          '${L10n.of(context)!.available} ',
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
@@ -431,6 +432,7 @@ class _MeltScreenState extends State<MeltScreen> {
   }
 
   Widget _buildPayButton() {
+    final l10n = L10n.of(context)!;
     final canPay = _isValidInvoice &&
         _quote != null &&
         !_isProcessing &&
@@ -438,7 +440,7 @@ class _MeltScreenState extends State<MeltScreen> {
         _total <= _availableBalance;
 
     return PrimaryButton(
-      text: _isProcessing ? 'Pagando...' : 'Pagar invoice',
+      text: _isProcessing ? l10n.paying : l10n.payInvoice,
       onPressed: canPay ? _showConfirmation : null,
     );
   }
@@ -471,7 +473,7 @@ class _MeltScreenState extends State<MeltScreen> {
         !trimmed.startsWith('lntb') &&
         !trimmed.startsWith('lnbcrt')) {
       setState(() {
-        _errorMessage = 'Invoice inválido';
+        _errorMessage = L10n.of(context)!.invalidInvoice;
       });
       return;
     }
@@ -502,15 +504,16 @@ class _MeltScreenState extends State<MeltScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final l10n = L10n.of(context)!;
         setState(() {
           _isLoadingQuote = false;
           final errorStr = e.toString().toLowerCase();
           if (errorStr.contains('expired')) {
-            _errorMessage = 'Invoice expirado';
+            _errorMessage = l10n.invoiceExpired;
           } else if (errorStr.contains('invalid') || errorStr.contains('decode')) {
-            _errorMessage = 'Invoice inválido o malformado';
+            _errorMessage = l10n.invalidInvoiceMalformed;
           } else {
-            _errorMessage = 'Error al obtener quote: $e';
+            _errorMessage = l10n.paymentError(e.toString());
           }
         });
       }
@@ -550,10 +553,11 @@ class _MeltScreenState extends State<MeltScreen> {
       final totalPaid = await walletProvider.melt(_quote!);
 
       if (mounted) {
+        final l10n = L10n.of(context)!;
         // Mostrar éxito y volver
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('-${UnitFormatter.formatBalance(totalPaid, _activeUnit)} $_unitLabel enviados'),
+            content: Text(l10n.sent('-${UnitFormatter.formatBalance(totalPaid, _activeUnit)}', _unitLabel)),
             backgroundColor: AppColors.success,
             duration: const Duration(seconds: 3),
           ),
@@ -561,16 +565,17 @@ class _MeltScreenState extends State<MeltScreen> {
         Navigator.pop(context);
       }
     } catch (e) {
+      final l10n = L10n.of(context)!;
       setState(() {
         final errorStr = e.toString().toLowerCase();
         if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
-          _errorMessage = 'Balance insuficiente';
+          _errorMessage = l10n.insufficientBalance;
         } else if (errorStr.contains('expired')) {
-          _errorMessage = 'Invoice expirado';
+          _errorMessage = l10n.invoiceExpired;
         } else if (errorStr.contains('already paid')) {
-          _errorMessage = 'Invoice ya fue pagado';
+          _errorMessage = l10n.invoiceAlreadyPaid;
         } else {
-          _errorMessage = 'Error al pagar: $e';
+          _errorMessage = l10n.paymentError(e.toString());
         }
       });
     } finally {
@@ -644,9 +649,9 @@ class _ConfirmationModal extends StatelessWidget {
           const SizedBox(height: AppDimensions.paddingMedium),
 
           // Título
-          const Text(
-            'Confirmar pago',
-            style: TextStyle(
+          Text(
+            L10n.of(context)!.confirmPayment,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -698,10 +703,10 @@ class _ConfirmationModal extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'Cancelar',
-                        style: TextStyle(
+                        L10n.of(context)!.cancel,
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -715,7 +720,7 @@ class _ConfirmationModal extends StatelessWidget {
               const SizedBox(width: AppDimensions.paddingMedium),
               Expanded(
                 child: PrimaryButton(
-                  text: 'Pagar',
+                  text: L10n.of(context)!.pay,
                   onPressed: onConfirm,
                   height: 52,
                 ),

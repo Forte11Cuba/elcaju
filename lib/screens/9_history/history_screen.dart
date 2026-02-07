@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' as cdk;
 import 'package:cdk_flutter/cdk_flutter.dart' show Transaction, TransactionDirection, TransactionStatus;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -46,9 +47,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
             icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            'Historial',
-            style: TextStyle(
+          title: Text(
+            L10n.of(context)!.history,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -89,6 +90,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildFilters() {
+    final l10n = L10n.of(context)!;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(
@@ -98,28 +100,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Row(
         children: [
           _FilterChip(
-            label: 'Todos',
+            label: l10n.filterAll,
             icon: LucideIcons.list,
             isSelected: _currentFilter == HistoryFilter.all,
             onTap: () => _setFilter(HistoryFilter.all),
           ),
           const SizedBox(width: 8),
           _FilterChip(
-            label: 'Pendientes',
+            label: l10n.filterPending,
             icon: LucideIcons.clock,
             isSelected: _currentFilter == HistoryFilter.pending,
             onTap: () => _setFilter(HistoryFilter.pending),
           ),
           const SizedBox(width: 8),
           _FilterChip(
-            label: 'Ecash',
+            label: l10n.filterEcash,
             icon: LucideIcons.coins,
             isSelected: _currentFilter == HistoryFilter.cashu,
             onTap: () => _setFilter(HistoryFilter.cashu),
           ),
           const SizedBox(width: 8),
           _FilterChip(
-            label: 'Lightning',
+            label: l10n.filterLightning,
             icon: LucideIcons.zap,
             isSelected: _currentFilter == HistoryFilter.lightning,
             onTap: () => _setFilter(HistoryFilter.lightning),
@@ -194,25 +196,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = L10n.of(context)!;
     String message;
     String submessage;
 
     switch (_currentFilter) {
       case HistoryFilter.all:
-        message = 'Sin transacciones aún';
-        submessage = 'Recibe tokens Cashu para empezar';
+        message = l10n.noTransactions;
+        submessage = l10n.receiveTokensToStart;
         break;
       case HistoryFilter.pending:
-        message = 'Sin transacciones pendientes';
-        submessage = 'Todas tus transacciones están completadas';
+        message = l10n.noPendingTransactions;
+        submessage = l10n.allTransactionsCompleted;
         break;
       case HistoryFilter.cashu:
-        message = 'Sin transacciones Ecash';
-        submessage = 'Envía o recibe tokens Cashu';
+        message = l10n.noEcashTransactions;
+        submessage = l10n.sendOrReceiveTokens;
         break;
       case HistoryFilter.lightning:
-        message = 'Sin transacciones Lightning';
-        submessage = 'Deposita o retira via Lightning';
+        message = l10n.noLightningTransactions;
+        submessage = l10n.depositOrWithdrawLightning;
         break;
     }
 
@@ -351,7 +354,7 @@ class _HistoryTransactionTile extends StatelessWidget {
     );
 
     // Formatear fecha
-    final dateStr = _formatDate(timestamp);
+    final dateStr = _formatDate(timestamp, context);
 
     // Estado (pending o settled)
     final isPending = transaction.status == TransactionStatus.pending;
@@ -425,9 +428,9 @@ class _HistoryTransactionTile extends StatelessWidget {
                             color: AppColors.warning.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text(
-                            'Pendiente',
-                            style: TextStyle(
+                          child: Text(
+                            L10n.of(context)!.pendingStatus,
+                            style: const TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
@@ -449,7 +452,7 @@ class _HistoryTransactionTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        isIncoming ? 'Recibido' : 'Enviado',
+                        isIncoming ? L10n.of(context)!.receivedStatus : L10n.of(context)!.sentStatus,
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 12,
@@ -543,18 +546,19 @@ class _HistoryTransactionTile extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, BuildContext context) {
+    final l10n = L10n.of(context)!;
     final now = DateTime.now();
     final diff = now.difference(date);
 
     if (diff.inMinutes < 1) {
-      return 'Ahora';
+      return l10n.now;
     } else if (diff.inHours < 1) {
-      return 'Hace ${diff.inMinutes} min';
+      return l10n.agoMinutes(diff.inMinutes);
     } else if (diff.inDays < 1) {
-      return 'Hace ${diff.inHours} h';
+      return l10n.agoHours(diff.inHours);
     } else if (diff.inDays < 7) {
-      return 'Hace ${diff.inDays} días';
+      return l10n.agoDays(diff.inDays);
     } else {
       return '${date.day}/${date.month}/${date.year}';
     }
@@ -677,9 +681,10 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
     final isPending = widget.transaction.status == TransactionStatus.pending;
 
     // Título del estado (como cashu.me)
+    final l10n = L10n.of(context)!;
     final statusTitle = _isLightning
-        ? 'Lightning Invoice'
-        : (_isIncoming ? 'Received Ecash' : 'Sent Ecash');
+        ? l10n.lightningInvoice
+        : (_isIncoming ? l10n.receivedEcash : l10n.sentEcash);
 
     return GradientBackground(
       child: Scaffold(
@@ -738,7 +743,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Pago Lightning Saliente',
+                          l10n.outgoingLightningPayment,
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 16,
@@ -768,7 +773,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _isLightning ? 'Invoice no disponible' : 'Token no disponible',
+                          _isLightning ? l10n.invoiceNotAvailable : l10n.tokenNotAvailable,
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 14,
@@ -878,7 +883,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'SPEED: $_speedLabel',
+                  '${L10n.of(context)!.speed} $_speedLabel',
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 13,
@@ -898,6 +903,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
     required String mintDisplay,
     required bool isPending,
   }) {
+    final l10n = L10n.of(context)!;
     final fee = widget.transaction.fee;
     final feeFormatted = fee > BigInt.zero
         ? UnitFormatter.formatBalance(fee, widget.transaction.unit)
@@ -909,34 +915,34 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
         if (feeFormatted != null)
           _MinimalDetailRow(
             icon: LucideIcons.arrowUpDown,
-            label: 'Fee',
+            label: l10n.fee,
             value: feeFormatted,
           ),
         // Unit
         _MinimalDetailRow(
           icon: LucideIcons.coins,
-          label: 'Unit',
+          label: l10n.unit,
           value: widget.transaction.unit.toUpperCase(),
         ),
         // Mint
         _MinimalDetailRow(
           icon: LucideIcons.landmark,
-          label: 'Mint',
+          label: l10n.mint,
           value: mintDisplay,
         ),
         // Estado (si pendiente)
         if (isPending)
           _MinimalDetailRow(
             icon: LucideIcons.clock,
-            label: 'Status',
-            value: 'Pending',
+            label: l10n.status,
+            value: l10n.pending,
             valueColor: AppColors.warning,
           ),
         // Memo (si existe)
         if (widget.transaction.memo != null && widget.transaction.memo!.isNotEmpty)
           _MinimalDetailRow(
             icon: LucideIcons.messageSquare,
-            label: 'Memo',
+            label: l10n.memo,
             value: widget.transaction.memo!,
           ),
       ],
@@ -944,7 +950,8 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
   }
 
   Widget _buildCopyButton() {
-    final label = _isLightning ? 'COPY INVOICE' : 'COPY';
+    final l10n = L10n.of(context)!;
+    final label = _isLightning ? l10n.copyInvoiceButton : l10n.copyButton;
 
     return SizedBox(
       width: double.infinity,
@@ -953,7 +960,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
           Clipboard.setData(ClipboardData(text: _tokenOrInvoice!));
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_isLightning ? 'Invoice copiado' : 'Token copiado'),
+              content: Text(_isLightning ? l10n.invoiceCopied : l10n.tokenCopied),
               backgroundColor: AppColors.success,
               duration: const Duration(seconds: 2),
             ),

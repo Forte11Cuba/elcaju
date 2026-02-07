@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' show MintInfo;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -32,9 +33,9 @@ class _MintsScreenState extends State<MintsScreen> {
             icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            'Mints conectados',
-            style: TextStyle(
+          title: Text(
+            L10n.of(context)!.connectedMints,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -100,6 +101,7 @@ class _MintsScreenState extends State<MintsScreen> {
   }
 
   Widget _buildEmptyState() {
+    final l10n = L10n.of(context)!;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +113,7 @@ class _MintsScreenState extends State<MintsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'No hay mints conectados',
+            l10n.noConnectedMints,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 18,
@@ -121,7 +123,7 @@ class _MintsScreenState extends State<MintsScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Agrega un mint para comenzar',
+            l10n.addMintToStart,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
@@ -356,13 +358,14 @@ class _MintsScreenState extends State<MintsScreen> {
 
   /// Elimina un mint (llamado desde pantalla de detalles)
   Future<void> _deleteMint(String mintUrl, WalletProvider walletProvider) async {
+    final l10n = L10n.of(context)!;
     try {
       await walletProvider.removeMint(mintUrl);
       if (mounted) {
         setState(() {});
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Mint eliminado'),
+          SnackBar(
+            content: Text(l10n.mintDeleted),
             backgroundColor: AppColors.success,
           ),
         );
@@ -371,7 +374,7 @@ class _MintsScreenState extends State<MintsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('${l10n.error}: $e'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -380,24 +383,26 @@ class _MintsScreenState extends State<MintsScreen> {
   }
 
   Widget _buildAddMintButton(WalletProvider walletProvider) {
+    final l10n = L10n.of(context)!;
     return PrimaryButton(
-      text: 'Agregar mint',
+      text: l10n.addMint,
       icon: LucideIcons.plus,
       onPressed: () => _showAddMintDialog(walletProvider),
     );
   }
 
   Future<void> _setActiveMint(String mintUrl, WalletProvider walletProvider) async {
+    final l10n = L10n.of(context)!;
     try {
       await walletProvider.setActiveMint(mintUrl);
 
       if (mounted) {
         setState(() {}); // Rebuild para actualizar UI
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Mint activo actualizado'),
+          SnackBar(
+            content: Text(l10n.activeMintUpdated),
             backgroundColor: AppColors.success,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -405,7 +410,7 @@ class _MintsScreenState extends State<MintsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('${l10n.error}: $e'),
             backgroundColor: AppColors.error,
             duration: const Duration(seconds: 3),
           ),
@@ -456,12 +461,13 @@ class _AddMintDialogState extends State<_AddMintDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = L10n.of(context)!;
     return AlertDialog(
       backgroundColor: AppColors.deepVoidPurple,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      title: const Text(
-        'Agregar mint',
-        style: TextStyle(
+      title: Text(
+        l10n.addMint,
+        style: const TextStyle(
           fontFamily: 'Inter',
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -472,9 +478,9 @@ class _AddMintDialogState extends State<_AddMintDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'URL del mint:',
-            style: TextStyle(
+          Text(
+            l10n.mintUrl,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -491,7 +497,7 @@ class _AddMintDialogState extends State<_AddMintDialog> {
               color: Colors.white,
             ),
             decoration: InputDecoration(
-              hintText: 'https://mint.example.com',
+              hintText: l10n.mintUrlPlaceholder,
               hintStyle: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
@@ -527,7 +533,7 @@ class _AddMintDialogState extends State<_AddMintDialog> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Conectando al mint...',
+                  l10n.connectingToMint,
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 14,
@@ -543,7 +549,7 @@ class _AddMintDialogState extends State<_AddMintDialog> {
         TextButton(
           onPressed: _isAdding ? null : () => Navigator.pop(context),
           child: Text(
-            'Cancelar',
+            l10n.cancel,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 16,
@@ -563,9 +569,9 @@ class _AddMintDialogState extends State<_AddMintDialog> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: const Text(
-            'Agregar',
-            style: TextStyle(
+          child: Text(
+            l10n.add,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -577,6 +583,7 @@ class _AddMintDialogState extends State<_AddMintDialog> {
   }
 
   void _validateUrl(String value) {
+    final l10n = L10n.of(context)!;
     setState(() {
       _errorMessage = null;
     });
@@ -595,7 +602,7 @@ class _AddMintDialogState extends State<_AddMintDialog> {
     if (!isValidBasic) {
       setState(() {
         _isValid = false;
-        _errorMessage = 'La URL debe comenzar con https://';
+        _errorMessage = l10n.urlMustStartWithHttps;
       });
       return;
     }
@@ -606,6 +613,7 @@ class _AddMintDialogState extends State<_AddMintDialog> {
   }
 
   Future<void> _addMint() async {
+    final l10n = L10n.of(context)!;
     final url = _controller.text.trim();
     if (url.isEmpty) return;
 
@@ -623,10 +631,10 @@ class _AddMintDialogState extends State<_AddMintDialog> {
         widget.onSuccess();
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Mint agregado correctamente'),
+          SnackBar(
+            content: Text(l10n.mintAddedSuccessfully),
             backgroundColor: AppColors.success,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -634,7 +642,7 @@ class _AddMintDialogState extends State<_AddMintDialog> {
       if (mounted) {
         setState(() {
           _isAdding = false;
-          _errorMessage = 'No se pudo conectar al mint';
+          _errorMessage = l10n.couldNotConnectToMint;
         });
       }
     }

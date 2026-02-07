@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' hide WalletProvider;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -85,7 +86,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
               default:
                 // Cualquier otro estado se trata como error
                 _status = MintStatus.error;
-                _errorMessage = 'Estado desconocido';
+                _errorMessage = L10n.of(context)!.unknownState;
             }
           });
         },
@@ -112,12 +113,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     // Esperar a que termine el confetti antes de navegar
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
+        final l10n = L10n.of(context)!;
+        final formattedAmount = '+${UnitFormatter.formatBalance(widget.amount, widget.unit)}';
+        final unitLabel = UnitFormatter.getUnitLabel(widget.unit);
         // Volver al home con mensaje de éxito
         Navigator.popUntil(context, (route) => route.isFirst);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '+${UnitFormatter.formatBalance(widget.amount, widget.unit)} ${UnitFormatter.getUnitLabel(widget.unit)} depositados',
+              l10n.deposited(formattedAmount, unitLabel),
             ),
             backgroundColor: AppColors.success,
             duration: const Duration(seconds: 3),
@@ -148,9 +152,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       onPressed: () => Navigator.pop(context),
                     )
                   : null,
-              title: const Text(
-                'Pagar invoice',
-                style: TextStyle(
+              title: Text(
+                L10n.of(context)!.payInvoiceTitle,
+                style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
@@ -160,9 +164,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 if (_status == MintStatus.unpaid)
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      'Cancelar',
-                      style: TextStyle(
+                    child: Text(
+                      L10n.of(context)!.cancel,
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 14,
                         color: AppColors.textSecondary,
@@ -197,17 +201,17 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   Widget _buildLoading() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             color: AppColors.primaryAction,
           ),
-          SizedBox(height: AppDimensions.paddingMedium),
+          const SizedBox(height: AppDimensions.paddingMedium),
           Text(
-            'Generando invoice...',
-            style: TextStyle(
+            L10n.of(context)!.generatingInvoice,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 16,
               color: AppColors.textSecondary,
@@ -285,9 +289,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             ),
           ),
           const SizedBox(height: AppDimensions.paddingMedium),
-          const Text(
-            'Error',
-            style: TextStyle(
+          Text(
+            L10n.of(context)!.error,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -298,7 +302,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: Text(
-              _errorMessage ?? 'Error desconocido',
+              _errorMessage ?? L10n.of(context)!.unknownError,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
@@ -316,9 +320,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text(
-                'Volver',
-                style: TextStyle(
+              child: Text(
+                L10n.of(context)!.back,
+                style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -333,13 +337,14 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   Widget _buildHeader() {
+    final l10n = L10n.of(context)!;
     final formattedAmount = UnitFormatter.formatBalance(widget.amount, widget.unit);
     final unitLabel = UnitFormatter.getUnitLabel(widget.unit);
 
     return Column(
       children: [
         Text(
-          'Depositar $formattedAmount $unitLabel',
+          l10n.depositAmountTitle(formattedAmount, unitLabel),
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 24,
@@ -404,7 +409,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             Icon(LucideIcons.copy, color: AppColors.textSecondary, size: 20),
             const SizedBox(width: 8),
             Text(
-              'Copiar invoice',
+              L10n.of(context)!.copyInvoice,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
@@ -419,6 +424,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   Widget _buildStatus() {
+    final l10n = L10n.of(context)!;
     IconData icon;
     String text;
     Color color;
@@ -426,27 +432,27 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     switch (_status) {
       case MintStatus.loading:
         icon = LucideIcons.clock;
-        text = 'Generando...';
+        text = l10n.generating;
         color = AppColors.textSecondary;
         break;
       case MintStatus.unpaid:
         icon = LucideIcons.clock;
-        text = 'Esperando pago...';
+        text = l10n.waitingForPayment;
         color = AppColors.textSecondary;
         break;
       case MintStatus.paid:
         icon = LucideIcons.checkCircle;
-        text = 'Pago recibido';
+        text = l10n.paymentReceived;
         color = AppColors.success;
         break;
       case MintStatus.issued:
         icon = LucideIcons.checkCircle2;
-        text = 'Tokens emitidos!';
+        text = l10n.tokensIssued;
         color = AppColors.success;
         break;
       case MintStatus.error:
         icon = LucideIcons.xCircle;
-        text = 'Error';
+        text = l10n.error;
         color = AppColors.error;
         break;
     }
@@ -489,7 +495,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Descripcion:',
+            L10n.of(context)!.description,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 12,
@@ -515,10 +521,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     await Clipboard.setData(ClipboardData(text: _invoice!));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invoice copiado al portapapeles'),
+        SnackBar(
+          content: Text(L10n.of(context)!.invoiceCopiedToClipboard),
           backgroundColor: AppColors.success,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
     }

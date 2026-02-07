@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/models/proof.dart';
@@ -64,7 +65,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error cargando proofs: $e';
+          _errorMessage = L10n.of(context)!.loadingProofsError(e.toString());
           _isLoading = false;
         });
       }
@@ -120,9 +121,9 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
             icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            'Envio Offline',
-            style: TextStyle(
+          title: Text(
+            L10n.of(context)!.offlineSend,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -201,7 +202,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
 
           // Instrucciones
           Text(
-            'Selecciona las notas que deseas enviar:',
+            L10n.of(context)!.selectNotesToSend,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
@@ -235,7 +236,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
 
           // Botón crear token
           PrimaryButton(
-            text: _isCreating ? 'Creando...' : 'Crear token',
+            text: _isCreating ? L10n.of(context)!.creatingToken : L10n.of(context)!.createToken,
             onPressed: _selectedIds.isNotEmpty && !_isCreating
                 ? _createOfflineToken
                 : null,
@@ -246,12 +247,13 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
   }
 
   Widget _buildTotalDisplay() {
+    final l10n = L10n.of(context)!;
     return GlassCard(
       padding: const EdgeInsets.all(AppDimensions.paddingMedium),
       child: Column(
         children: [
           Text(
-            'Total a enviar',
+            l10n.totalToSend,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
@@ -265,7 +267,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            '${_selectedIds.length} notas seleccionadas',
+            l10n.notesSelected(_selectedIds.length),
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 12,
@@ -290,7 +292,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
           color: Colors.white,
         ),
         decoration: InputDecoration(
-          hintText: 'Memo (opcional)',
+          hintText: L10n.of(context)!.memoOptional,
           hintStyle: TextStyle(
             fontFamily: 'Inter',
             fontSize: 16,
@@ -342,7 +344,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error creando token: $e';
+        _errorMessage = L10n.of(context)!.creatingTokenError(e.toString());
         _isCreating = false;
       });
     }

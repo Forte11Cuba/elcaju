@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -60,9 +61,9 @@ class _MintScreenState extends State<MintScreen> {
             icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            'Depositar',
-            style: TextStyle(
+          title: Text(
+            L10n.of(context)!.deposit,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -109,11 +110,12 @@ class _MintScreenState extends State<MintScreen> {
   }
 
   Widget _buildAmountSection() {
+    final l10n = L10n.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Monto a depositar:',
+          l10n.amountToDeposit,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 16,
@@ -173,11 +175,12 @@ class _MintScreenState extends State<MintScreen> {
   }
 
   Widget _buildDescriptionSection() {
+    final l10n = L10n.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Descripcion (opcional):',
+          l10n.descriptionOptional,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 16,
@@ -199,7 +202,7 @@ class _MintScreenState extends State<MintScreen> {
               color: Colors.white,
             ),
             decoration: InputDecoration(
-              hintText: 'Ej: Deposito El Caju',
+              hintText: l10n.depositPlaceholder,
               hintStyle: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
@@ -250,8 +253,9 @@ class _MintScreenState extends State<MintScreen> {
   }
 
   Widget _buildGenerateButton() {
+    final l10n = L10n.of(context)!;
     return PrimaryButton(
-      text: _isProcessing ? 'Generando...' : 'Generar invoice',
+      text: _isProcessing ? l10n.generating : l10n.generateInvoice,
       onPressed: _isValidAmount && !_isProcessing ? _showConfirmation : null,
     );
   }
@@ -351,9 +355,9 @@ class _ConfirmationModal extends StatelessWidget {
           const SizedBox(height: AppDimensions.paddingMedium),
 
           // Título
-          const Text(
-            'Depositar Lightning',
-            style: TextStyle(
+          Text(
+            L10n.of(context)!.depositLightning,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -401,10 +405,10 @@ class _ConfirmationModal extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'Cancelar',
-                        style: TextStyle(
+                        L10n.of(context)!.cancel,
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -418,7 +422,7 @@ class _ConfirmationModal extends StatelessWidget {
               const SizedBox(width: AppDimensions.paddingMedium),
               Expanded(
                 child: PrimaryButton(
-                  text: 'Generar invoice',
+                  text: L10n.of(context)!.generateInvoice,
                   onPressed: onConfirm,
                   height: 52,
                 ),

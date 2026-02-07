@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' as cdk;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -114,9 +115,9 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
             icon: const Icon(LucideIcons.x, color: Colors.white),
             onPressed: () => _goToHome(context),
           ),
-          title: const Text(
-            'Token creado',
-            style: TextStyle(
+          title: Text(
+            L10n.of(context)!.tokenCreated,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -170,7 +171,7 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
               Padding(
                 padding: const EdgeInsets.all(AppDimensions.paddingMedium),
                 child: PrimaryButton(
-                  text: 'Volver al inicio',
+                  text: L10n.of(context)!.backToHome,
                   onPressed: () => _goToHome(context),
                 ),
               ),
@@ -334,6 +335,7 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
   }
 
   Widget _buildTokenTextDisplay() {
+    final l10n = L10n.of(context)!;
     final displayToken = widget.token.length > 50
         ? '${widget.token.substring(0, 25)}...${widget.token.substring(widget.token.length - 20)}'
         : widget.token;
@@ -351,8 +353,8 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
               const SizedBox(width: 6),
               Text(
                 isAnimated
-                    ? 'Token Cashu (QR animado - ${_urFragments.length} fragmentos UR)'
-                    : 'Token Cashu',
+                    ? l10n.tokenCashuAnimatedQr(_urFragments.length)
+                    : l10n.tokenCashu,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 12,
@@ -398,9 +400,9 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
                 children: [
                   Icon(LucideIcons.copy, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Copiar',
-                    style: TextStyle(
+                  Text(
+                    L10n.of(context)!.copy,
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -430,9 +432,9 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
                 children: [
                   Icon(LucideIcons.share2, color: Colors.white, size: 20),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Compartir',
-                    style: TextStyle(
+                  Text(
+                    L10n.of(context)!.share,
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -465,7 +467,7 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Guarda este token hasta que el receptor lo reclame. Si lo pierdes, perderas los fondos.',
+              L10n.of(context)!.keepTokenWarning,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
@@ -482,7 +484,7 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
     Clipboard.setData(ClipboardData(text: widget.token));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Token copiado al portapapeles'),
+        content: Text(L10n.of(context)!.tokenCopiedToClipboard),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

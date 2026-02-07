@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -73,9 +74,9 @@ class _SendScreenState extends State<SendScreen> {
             icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            'Enviar Cashu',
-            style: TextStyle(
+          title: Text(
+            L10n.of(context)!.sendCashu,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -85,7 +86,7 @@ class _SendScreenState extends State<SendScreen> {
             // Botón para modo offline (selección manual de proofs)
             IconButton(
               icon: const Icon(LucideIcons.coins, color: AppColors.primaryAction),
-              tooltip: 'Seleccionar notas manualmente',
+              tooltip: L10n.of(context)!.selectNotesManually,
               onPressed: _goToOfflineMode,
             ),
           ],
@@ -130,11 +131,12 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Widget _buildAmountSection() {
+    final l10n = L10n.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Monto a enviar:',
+          l10n.amountToSend,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 16,
@@ -197,7 +199,7 @@ class _SendScreenState extends State<SendScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Disponible:',
+              l10n.available,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
@@ -219,7 +221,7 @@ class _SendScreenState extends State<SendScreen> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '(Max)',
+                    l10n.max,
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 12,
@@ -236,11 +238,12 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Widget _buildMemoSection() {
+    final l10n = L10n.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Memo (opcional):',
+          l10n.memoOptional,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 16,
@@ -262,7 +265,7 @@ class _SendScreenState extends State<SendScreen> {
               color: Colors.white,
             ),
             decoration: InputDecoration(
-              hintText: 'Ej: Para el cafe',
+              hintText: l10n.memoPlaceholder,
               hintStyle: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
@@ -317,8 +320,9 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Widget _buildCreateButton() {
+    final l10n = L10n.of(context)!;
     return PrimaryButton(
-      text: _isProcessing ? 'Creando token...' : 'Crear token',
+      text: _isProcessing ? l10n.creatingToken : l10n.createToken,
       onPressed: _isValidAmount && !_isProcessing ? _showConfirmation : null,
     );
   }
@@ -338,7 +342,7 @@ class _SendScreenState extends State<SendScreen> {
 
     if (mintUrl == null) {
       setState(() {
-        _errorMessage = 'No hay mint activo';
+        _errorMessage = L10n.of(context)!.noActiveMint;
       });
       return;
     }
@@ -361,7 +365,7 @@ class _SendScreenState extends State<SendScreen> {
 
     if (mintUrl == null) {
       setState(() {
-        _errorMessage = 'No hay mint activo';
+        _errorMessage = L10n.of(context)!.noActiveMint;
       });
       return;
     }
@@ -454,11 +458,12 @@ class _SendScreenState extends State<SendScreen> {
         return;
       }
 
+      final l10n = L10n.of(context)!;
       setState(() {
         if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
-          _errorMessage = 'Balance insuficiente';
+          _errorMessage = l10n.insufficientBalance;
         } else {
-          _errorMessage = 'Error al crear token: $e';
+          _errorMessage = l10n.tokenCreationError(e.toString());
         }
       });
     } finally {
@@ -489,17 +494,17 @@ class _SendScreenState extends State<SendScreen> {
 
     if (mintUrl == null) {
       setState(() {
-        _errorMessage = 'No hay mint activo';
+        _errorMessage = L10n.of(context)!.noActiveMint;
       });
       return;
     }
 
     // Mostrar snackbar informativo
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Sin conexion. Usando modo offline...'),
+      SnackBar(
+        content: Text(L10n.of(context)!.offlineModeMessage),
         backgroundColor: AppColors.primaryAction,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
 
@@ -575,9 +580,9 @@ class _ConfirmationModal extends StatelessWidget {
           const SizedBox(height: AppDimensions.paddingMedium),
 
           // Titulo
-          const Text(
-            'Confirmar envio',
-            style: TextStyle(
+          Text(
+            L10n.of(context)!.confirmSend,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -625,10 +630,10 @@ class _ConfirmationModal extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        'Cancelar',
-                        style: TextStyle(
+                        L10n.of(context)!.cancel,
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -642,7 +647,7 @@ class _ConfirmationModal extends StatelessWidget {
               const SizedBox(width: AppDimensions.paddingMedium),
               Expanded(
                 child: PrimaryButton(
-                  text: 'Confirmar',
+                  text: L10n.of(context)!.confirm,
                   onPressed: onConfirm,
                   height: 52,
                 ),

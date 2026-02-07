@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -53,9 +54,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Text(
-              'Recibir Cashu',
-              style: TextStyle(
+            title: Text(
+              L10n.of(context)!.receiveCashu,
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -71,6 +72,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Widget _buildReceiveForm() {
+    final l10n = L10n.of(context)!;
     return Column(
       children: [
         // Contenido scrolleable
@@ -82,7 +84,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               children: [
                 // Instrucciones
                 Text(
-                  'Pega el token Cashu:',
+                  l10n.pasteTheCashuToken,
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
@@ -163,7 +165,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           const SizedBox(height: AppDimensions.paddingSmall),
 
           Text(
-            'Tokens recibidos',
+            L10n.of(context)!.tokensReceived,
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 18,
@@ -175,7 +177,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
           // Botón volver (fijo abajo)
           PrimaryButton(
-            text: 'Volver al inicio',
+            text: L10n.of(context)!.backToHome,
             onPressed: () => Navigator.pop(context),
           ),
         ],
@@ -235,7 +237,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Pegar del portapapeles',
+              L10n.of(context)!.pasteFromClipboard,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
@@ -278,7 +280,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
               ),
               const SizedBox(width: 8),
               Text(
-                'Token válido',
+                L10n.of(context)!.validToken,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
@@ -295,7 +297,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Monto:',
+                L10n.of(context)!.amount,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
@@ -333,7 +335,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Mint:',
+                L10n.of(context)!.mint,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
@@ -393,8 +395,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Widget _buildClaimButton() {
+    final l10n = L10n.of(context)!;
     return PrimaryButton(
-      text: _isProcessing ? 'Reclamando...' : 'Reclamar tokens',
+      text: _isProcessing ? l10n.claiming : l10n.claimTokens,
       onPressed: _isValidToken && !_isProcessing ? _claimToken : null,
     );
   }
@@ -428,7 +431,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       } else {
         _isValidToken = false;
         _tokenInfo = null;
-        _errorMessage = 'Token inválido o malformado';
+        _errorMessage = L10n.of(context)!.invalidToken;
       }
     });
   }
@@ -462,15 +465,16 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         _confettiController.fire();
       }
     } catch (e) {
+      final l10n = L10n.of(context)!;
       setState(() {
         // Mensajes de error más amigables
         final errorStr = e.toString().toLowerCase();
         if (errorStr.contains('already spent') || errorStr.contains('token already')) {
-          _errorMessage = 'Este token ya fue reclamado';
+          _errorMessage = l10n.tokenAlreadyClaimed;
         } else if (errorStr.contains('unknown mint') || errorStr.contains('mint not found')) {
-          _errorMessage = 'Token de un mint desconocido';
+          _errorMessage = l10n.unknownMint;
         } else {
-          _errorMessage = 'Error al reclamar: $e';
+          _errorMessage = l10n.claimError(e.toString());
         }
       });
     } finally {

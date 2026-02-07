@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -23,6 +24,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
+    final l10n = L10n.of(context)!;
     return GradientBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -33,9 +35,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            'Configuración',
-            style: TextStyle(
+          title: Text(
+            l10n.settings,
+            style: const TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
               color: Colors.white,
@@ -51,18 +53,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Sección WALLET
-                    _buildSectionHeader('WALLET'),
+                    _buildSectionHeader(l10n.walletSection),
                     const SizedBox(height: AppDimensions.paddingSmall),
                     _buildSettingTile(
                       icon: LucideIcons.key,
-                      title: 'Backup seed phrase',
-                      subtitle: 'Ver tus palabras de recuperación',
+                      title: l10n.backupSeedPhrase,
+                      subtitle: l10n.viewRecoveryWords,
                       onTap: () => _showBackupSeed(context, settingsProvider),
                     ),
                     _buildSettingTile(
                       icon: LucideIcons.landmark,
-                      title: 'Mints conectados',
-                      subtitle: 'Gestionar tus mints Cashu',
+                      title: l10n.connectedMints,
+                      subtitle: l10n.manageCashuMints,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -74,10 +76,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     _buildSettingTile(
                       icon: LucideIcons.lock,
-                      title: 'PIN de acceso',
+                      title: l10n.pinAccess,
                       subtitle: settingsProvider.pinEnabled
-                          ? 'Activado'
-                          : 'Proteger la app con PIN',
+                          ? l10n.pinEnabled
+                          : l10n.protectWithPin,
                       trailing: Switch(
                         value: settingsProvider.pinEnabled,
                         onChanged: (value) =>
@@ -87,19 +89,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     _buildSettingTile(
                       icon: LucideIcons.refreshCw,
-                      title: 'Recuperar tokens',
-                      subtitle: 'Escanear mints con seed phrase',
+                      title: l10n.recoverTokens,
+                      subtitle: l10n.scanMintsWithSeed,
                       onTap: () => _showRecoverTokensDialog(context, settingsProvider),
                     ),
 
                     const SizedBox(height: AppDimensions.paddingLarge),
 
                     // Sección APARIENCIA
-                    _buildSectionHeader('APARIENCIA'),
+                    _buildSectionHeader(l10n.appearanceSection),
                     const SizedBox(height: AppDimensions.paddingSmall),
                     _buildSettingTile(
                       icon: LucideIcons.globe,
-                      title: 'Idioma',
+                      title: l10n.language,
                       subtitle: _getLanguageName(settingsProvider.locale),
                       onTap: () => _showLanguageSelector(context, settingsProvider),
                     ),
@@ -107,16 +109,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: AppDimensions.paddingLarge),
 
                     // Sección INFORMACIÓN
-                    _buildSectionHeader('INFORMACIÓN'),
+                    _buildSectionHeader(l10n.informationSection),
                     const SizedBox(height: AppDimensions.paddingSmall),
                     _buildInfoTile(
                       icon: LucideIcons.tag,
-                      title: 'Versión',
+                      title: l10n.version,
                       subtitle: '0.0.1',
                     ),
                     _buildSettingTile(
                       icon: LucideIcons.info,
-                      title: 'Acerca de',
+                      title: l10n.about,
                       onTap: () => _showAboutDialog(context),
                     ),
                     _buildSettingTile(
@@ -267,6 +269,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildDangerButton(BuildContext context, SettingsProvider settingsProvider) {
+    final l10n = L10n.of(context)!;
     return GestureDetector(
       onTap: () => _showDeleteWalletDialog(context, settingsProvider),
       child: Container(
@@ -284,9 +287,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Icon(LucideIcons.trash2, color: AppColors.error, size: 20),
             const SizedBox(width: 8),
-            const Text(
-              'Borrar wallet',
-              style: TextStyle(
+            Text(
+              l10n.deleteWallet,
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -304,13 +307,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // ============================================================
 
   String _getLanguageName(String locale) {
+    final l10n = L10n.of(context)!;
     switch (locale) {
       case 'es':
-        return 'Español';
+        return l10n.spanish;
       case 'en':
-        return 'English';
+        return l10n.english;
       default:
-        return 'Español';
+        return l10n.spanish;
     }
   }
 
@@ -328,8 +332,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mnemonic == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se encontró el mnemonic'),
+          SnackBar(
+            content: Text(L10n.of(context)!.mnemonicNotFound),
             backgroundColor: AppColors.error,
           ),
         );
@@ -361,8 +365,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await settingsProvider.setPin(pin);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PIN activado'),
+            SnackBar(
+              content: Text(L10n.of(context)!.pinActivated),
               backgroundColor: AppColors.success,
             ),
           );
@@ -375,8 +379,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await settingsProvider.removePin();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('PIN desactivado'),
+            SnackBar(
+              content: Text(L10n.of(context)!.pinDeactivated),
               backgroundColor: AppColors.success,
             ),
           );
@@ -386,6 +390,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<String?> _showCreatePinDialog(BuildContext context) async {
+    final l10n = L10n.of(context)!;
     String? firstPin;
 
     // Primer ingreso
@@ -393,8 +398,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => _PinDialog(
-        title: 'Crear PIN',
-        subtitle: 'Ingresa un PIN de 4 dígitos',
+        title: l10n.createPin,
+        subtitle: l10n.enterPinDigits,
       ),
     );
 
@@ -405,8 +410,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => _PinDialog(
-        title: 'Confirmar PIN',
-        subtitle: 'Ingresa el PIN nuevamente',
+        title: l10n.confirmPin,
+        subtitle: l10n.enterPinAgain,
       ),
     );
 
@@ -415,8 +420,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (firstPin != confirmPin) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Los PIN no coinciden'),
+          SnackBar(
+            content: Text(l10n.pinMismatch),
             backgroundColor: AppColors.error,
           ),
         );
@@ -429,12 +434,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<bool> _verifyPinDialog(
       BuildContext context, SettingsProvider settingsProvider) async {
+    final l10n = L10n.of(context)!;
     final pin = await showDialog<String>(
       context: context,
       barrierDismissible: false,
       builder: (context) => _PinDialog(
-        title: 'Verificar PIN',
-        subtitle: 'Ingresa tu PIN actual',
+        title: l10n.verifyPin,
+        subtitle: l10n.enterCurrentPin,
       ),
     );
 
@@ -445,8 +451,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('PIN incorrecto'),
+          SnackBar(
+            content: Text(l10n.incorrectPin),
             backgroundColor: AppColors.error,
           ),
         );
@@ -458,6 +464,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// 3. Selector de idioma
   void _showLanguageSelector(
       BuildContext context, SettingsProvider settingsProvider) {
+    final l10n = L10n.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -484,9 +491,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const Text(
-              'Seleccionar idioma',
-              style: TextStyle(
+            Text(
+              l10n.selectLanguage,
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -498,14 +505,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               context,
               settingsProvider,
               'es',
-              'Español',
+              l10n.spanish,
               '🇪🇸',
             ),
             _buildLanguageOption(
               context,
               settingsProvider,
               'en',
-              'English',
+              l10n.english,
               '🇺🇸',
             ),
             const SizedBox(height: AppDimensions.paddingSmall),
@@ -531,7 +538,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Idioma cambiado a $name'),
+              content: Text(L10n.of(context)!.languageChanged(name)),
               backgroundColor: AppColors.success,
             ),
           );
@@ -625,7 +632,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Tu wallet de ecash privado',
+              L10n.of(context)!.appTagline,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
@@ -635,7 +642,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Cashu wallet con identidad cubana, hermana de La Chispa.',
+              L10n.of(context)!.aboutDescription,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
@@ -676,9 +683,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cerrar',
-              style: TextStyle(
+            child: Text(
+              L10n.of(context)!.close,
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 color: AppColors.textSecondary,
               ),
@@ -697,8 +704,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo abrir el enlace'),
+          SnackBar(
+            content: Text(L10n.of(context)!.couldNotOpenLink),
             backgroundColor: AppColors.error,
           ),
         );
@@ -757,7 +764,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al borrar: $e'),
+            content: Text(L10n.of(context)!.deleteError(e.toString())),
             backgroundColor: AppColors.error,
           ),
         );
@@ -982,6 +989,8 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = L10n.of(context)!;
+    final confirmWord = l10n.deleteConfirmWord;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -1027,9 +1036,9 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
             const SizedBox(height: AppDimensions.paddingMedium),
 
             // Título
-            const Text(
-              '¿Borrar wallet?',
-              style: TextStyle(
+            Text(
+              l10n.deleteWalletQuestion,
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -1056,10 +1065,10 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
                         size: 16,
                       ),
                       const SizedBox(width: 8),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Esta acción es irreversible',
-                          style: TextStyle(
+                          l10n.actionIrreversible,
+                          style: const TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -1071,7 +1080,7 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Se eliminarán todos los datos incluyendo tu seed phrase y tokens. Asegúrate de tener un backup.',
+                    l10n.deleteWalletWarning,
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 12,
@@ -1091,7 +1100,7 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Escribe "BORRAR" para confirmar:',
+                    l10n.typeDeleteToConfirm,
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 14,
@@ -1107,7 +1116,7 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
                       color: Colors.white,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'BORRAR',
+                      hintText: confirmWord,
                       hintStyle: TextStyle(
                         fontFamily: 'Inter',
                         fontSize: 16,
@@ -1122,7 +1131,7 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
                     ),
                     onChanged: (value) {
                       setState(() {
-                        _canDelete = value == 'BORRAR';
+                        _canDelete = value == confirmWord;
                       });
                     },
                   ),
@@ -1144,10 +1153,10 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
                         color: Colors.white.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          'Cancelar',
-                          style: TextStyle(
+                          l10n.cancel,
+                          style: const TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -1172,7 +1181,7 @@ class _DeleteWalletModalState extends State<_DeleteWalletModal> {
                       ),
                       child: Center(
                         child: Text(
-                          'Borrar wallet',
+                          l10n.deleteWallet,
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontSize: 16,
@@ -1293,9 +1302,9 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
               const SizedBox(height: AppDimensions.paddingMedium),
 
               // Título
-              const Text(
-                'Recuperar tokens',
-                style: TextStyle(
+              Text(
+                L10n.of(context)!.recoverTokensTitle,
+                style: const TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -1306,7 +1315,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
 
               // Descripción
               Text(
-                'Escanea los mints para recuperar tokens asociados a tu seed phrase (NUT-13)',
+                L10n.of(context)!.recoverTokensDescription,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
@@ -1345,6 +1354,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
   }
 
   Widget _buildMnemonicOptions() {
+    final l10n = L10n.of(context)!;
     return Column(
       children: [
         // Opción: Usar mnemonic actual
@@ -1379,9 +1389,9 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Usar mi seed phrase actual',
-                        style: TextStyle(
+                      Text(
+                        l10n.useCurrentSeedPhrase,
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -1389,7 +1399,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
                         ),
                       ),
                       Text(
-                        'Escanear mints con las 12 palabras guardadas',
+                        l10n.scanWithSavedWords,
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 12,
@@ -1438,9 +1448,9 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Usar otra seed phrase',
-                        style: TextStyle(
+                      Text(
+                        l10n.useOtherSeedPhrase,
+                        style: const TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -1448,7 +1458,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
                         ),
                       ),
                       Text(
-                        'Recuperar tokens de otras 12 palabras',
+                        l10n.recoverFromOtherWords,
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 12,
@@ -1467,6 +1477,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
   }
 
   Widget _buildMintSelector() {
+    final l10n = L10n.of(context)!;
     if (_isLoadingMints) {
       return const Padding(
         padding: EdgeInsets.all(16),
@@ -1487,7 +1498,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Mints a escanear:',
+          l10n.mintsToScan,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
@@ -1524,7 +1535,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'Todos los mints (${_availableMints.length})',
+                  l10n.allMints(_availableMints.length),
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 14,
@@ -1565,9 +1576,9 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
                   size: 18,
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  'Un mint específico',
-                  style: TextStyle(
+                Text(
+                  l10n.specificMint,
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 14,
                     color: Colors.white,
@@ -1639,7 +1650,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
           color: Colors.white,
         ),
         decoration: InputDecoration(
-          hintText: 'Ingresa las 12 palabras separadas por espacios...',
+          hintText: L10n.of(context)!.enterMnemonicWords,
           hintStyle: TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
@@ -1721,9 +1732,9 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
                       strokeWidth: 2,
                     ),
                   )
-                : const Text(
-                    'Escanear mints',
-                    style: TextStyle(
+                : Text(
+                    L10n.of(context)!.scanMints,
+                    style: const TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -1738,6 +1749,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
 
   Future<void> _startRecover() async {
     if (!mounted) return;
+    final l10n = L10n.of(context)!;
     setState(() {
       _isLoading = true;
       _result = null;
@@ -1758,7 +1770,6 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
           final recoveredDetails = <String>[];
 
           for (final mintEntry in results.entries) {
-            final mintUrl = mintEntry.key;
             final unitBalances = mintEntry.value;
             bool hasError = false;
             BigInt mintTotal = BigInt.zero;
@@ -1788,12 +1799,12 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
           setState(() {
             _isSuccess = true;
             if (recoveredDetails.isNotEmpty) {
-              _result = '¡Recuperados ${recoveredDetails.join(", ")} de $mintsScanned mint(s)!';
+              _result = l10n.recoveredTokens(recoveredDetails.join(", "), mintsScanned);
             } else {
-              _result = 'Escaneo completado. No se encontraron tokens nuevos.';
+              _result = l10n.scanCompleteNoTokens;
             }
             if (mintsWithError > 0) {
-              _result = '$_result ($mintsWithError mint(s) con error)';
+              _result = '$_result ${l10n.mintsWithError(mintsWithError)}';
             }
           });
         } else {
@@ -1802,7 +1813,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
             if (!mounted) return;
             setState(() {
               _isSuccess = false;
-              _result = 'Selecciona un mint para escanear';
+              _result = l10n.selectMintToScan;
             });
             return;
           }
@@ -1825,9 +1836,9 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
           setState(() {
             _isSuccess = true;
             if (recoveredDetails.isNotEmpty) {
-              _result = '¡Recuperados ${recoveredDetails.join(", ")} de $mintHost!';
+              _result = l10n.recoveredFromMint(recoveredDetails.join(", "), mintHost);
             } else {
-              _result = 'No se encontraron tokens en $mintHost.';
+              _result = l10n.noTokensFoundInMint(mintHost);
             }
           });
         }
@@ -1840,7 +1851,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
           if (!mounted) return;
           setState(() {
             _isSuccess = false;
-            _result = 'El mnemonic debe tener 12 o 24 palabras';
+            _result = l10n.mnemonicMustHaveWords;
           });
           return;
         }
@@ -1852,7 +1863,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
           if (!mounted) return;
           setState(() {
             _isSuccess = false;
-            _result = 'No hay mints conectados para escanear';
+            _result = l10n.noConnectedMintsToScan;
           });
           return;
         }
@@ -1870,9 +1881,9 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
             final activeUnit = walletProvider.activeUnit;
             final formatted = UnitFormatter.formatBalance(recovered, activeUnit);
             final label = UnitFormatter.getUnitLabel(activeUnit);
-            _result = '¡Recuperados y transferidos $formatted $label a tu wallet!';
+            _result = l10n.recoveredAndTransferred(formatted, label);
           } else {
-            _result = 'No se encontraron tokens asociados a ese mnemonic.';
+            _result = l10n.noTokensForMnemonic;
           }
         });
       }
@@ -1880,7 +1891,7 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
       if (!mounted) return;
       setState(() {
         _isSuccess = false;
-        _result = 'Error: $e';
+        _result = '${l10n.error}: $e';
       });
     } finally {
       if (mounted) {

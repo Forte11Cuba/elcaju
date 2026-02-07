@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' show MintInfo, ContactInfo;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
@@ -148,9 +149,9 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
               color: AppColors.success.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Text(
-              'Mint activo',
-              style: TextStyle(
+            child: Text(
+              L10n.of(context)!.activeMint,
+              style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -187,9 +188,9 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Mint Message',
-                  style: TextStyle(
+                Text(
+                  L10n.of(context)!.mintMessage,
+                  style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -296,6 +297,7 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
   }
 
   Widget _buildMintDetails(MintInfo? info) {
+    final l10n = L10n.of(context)!;
     // Obtener currency de los balances
     final currencies = widget.balances.keys.join(', ').toUpperCase();
     final currencyDisplay = currencies.isNotEmpty ? currencies : 'SAT';
@@ -303,24 +305,24 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
     // Versión del mint
     final version = info?.version != null
         ? '${info!.version!.name}/${info.version!.version}'
-        : 'Unknown';
+        : l10n.unknown;
 
     return Column(
       children: [
         _buildDetailRow(
           icon: LucideIcons.link,
-          label: 'URL',
+          label: l10n.url,
           value: widget.mintUrl,
           canCopy: true,
         ),
         _buildDetailRow(
           icon: LucideIcons.coins,
-          label: 'Currency',
+          label: l10n.currency,
           value: currencyDisplay,
         ),
         _buildDetailRow(
           icon: LucideIcons.box,
-          label: 'Version',
+          label: l10n.version,
           value: version,
         ),
       ],
@@ -424,13 +426,14 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
   }
 
   Widget _buildActions() {
+    final l10n = L10n.of(context)!;
     return Column(
       children: [
         // Usar este mint (si no es el activo)
         if (!widget.isActive && widget.onSetActive != null)
           _buildActionButton(
             icon: LucideIcons.star,
-            label: 'Usar este mint',
+            label: l10n.useThisMint,
             onTap: () {
               widget.onSetActive!();
               Navigator.pop(context);
@@ -440,15 +443,15 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
         // Copiar URL
         _buildActionButton(
           icon: LucideIcons.copy,
-          label: 'Copiar URL del mint',
-          onTap: () => _copyToClipboard(widget.mintUrl, 'URL'),
+          label: l10n.copyMintUrl,
+          onTap: () => _copyToClipboard(widget.mintUrl, l10n.url),
         ),
 
         // Eliminar mint
         if (widget.onDelete != null)
           _buildActionButton(
             icon: LucideIcons.trash2,
-            label: 'Eliminar mint',
+            label: l10n.deleteMint,
             isDestructive: true,
             onTap: () => _showDeleteConfirmation(),
           ),
@@ -501,7 +504,7 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$label copiado'),
+        content: Text(L10n.of(context)!.copied(label)),
         backgroundColor: AppColors.success,
         duration: const Duration(seconds: 2),
       ),
@@ -509,6 +512,7 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
   }
 
   void _showDeleteConfirmation() {
+    final l10n = L10n.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -516,16 +520,16 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text(
-          'Eliminar mint',
-          style: TextStyle(
+        title: Text(
+          l10n.deleteMintConfirmTitle,
+          style: const TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),
         content: Text(
-          'Si tienes balance en este mint, se perderá. ¿Estás seguro?',
+          l10n.deleteMintConfirmMessage,
           style: TextStyle(
             fontFamily: 'Inter',
             color: Colors.white.withValues(alpha: 0.8),
@@ -534,9 +538,9 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           TextButton(
@@ -545,9 +549,9 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
               Navigator.pop(context); // Volver a lista
               widget.onDelete!();
             },
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: AppColors.error),
+            child: Text(
+              l10n.delete,
+              style: const TextStyle(color: AppColors.error),
             ),
           ),
         ],
