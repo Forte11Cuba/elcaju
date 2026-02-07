@@ -343,8 +343,10 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
+      final errorMessage = L10n.of(context)!.creatingTokenError(e.toString());
       setState(() {
-        _errorMessage = L10n.of(context)!.creatingTokenError(e.toString());
+        _errorMessage = errorMessage;
         _isCreating = false;
       });
     }

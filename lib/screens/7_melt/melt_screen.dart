@@ -565,18 +565,21 @@ class _MeltScreenState extends State<MeltScreen> {
         Navigator.pop(context);
       }
     } catch (e) {
+      if (!mounted) return;
       final l10n = L10n.of(context)!;
+      final errorStr = e.toString().toLowerCase();
+      String errorMessage;
+      if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
+        errorMessage = l10n.insufficientBalance;
+      } else if (errorStr.contains('expired')) {
+        errorMessage = l10n.invoiceExpired;
+      } else if (errorStr.contains('already paid')) {
+        errorMessage = l10n.invoiceAlreadyPaid;
+      } else {
+        errorMessage = l10n.paymentError(e.toString());
+      }
       setState(() {
-        final errorStr = e.toString().toLowerCase();
-        if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
-          _errorMessage = l10n.insufficientBalance;
-        } else if (errorStr.contains('expired')) {
-          _errorMessage = l10n.invoiceExpired;
-        } else if (errorStr.contains('already paid')) {
-          _errorMessage = l10n.invoiceAlreadyPaid;
-        } else {
-          _errorMessage = l10n.paymentError(e.toString());
-        }
+        _errorMessage = errorMessage;
       });
     } finally {
       if (mounted) {

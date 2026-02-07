@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' as cdk;
 import 'package:cdk_flutter/cdk_flutter.dart' show Transaction, TransactionDirection, TransactionStatus;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -560,7 +561,8 @@ class _HistoryTransactionTile extends StatelessWidget {
     } else if (diff.inDays < 7) {
       return l10n.agoDays(diff.inDays);
     } else {
-      return '${date.day}/${date.month}/${date.year}';
+      final locale = Localizations.localeOf(context).toString();
+      return DateFormat.yMd(locale).format(date);
     }
   }
 }

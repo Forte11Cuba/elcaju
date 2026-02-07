@@ -465,17 +465,20 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         _confettiController.fire();
       }
     } catch (e) {
+      if (!mounted) return;
       final l10n = L10n.of(context)!;
+      // Mensajes de error más amigables
+      final errorStr = e.toString().toLowerCase();
+      String errorMessage;
+      if (errorStr.contains('already spent') || errorStr.contains('token already')) {
+        errorMessage = l10n.tokenAlreadyClaimed;
+      } else if (errorStr.contains('unknown mint') || errorStr.contains('mint not found')) {
+        errorMessage = l10n.unknownMint;
+      } else {
+        errorMessage = l10n.claimError(e.toString());
+      }
       setState(() {
-        // Mensajes de error más amigables
-        final errorStr = e.toString().toLowerCase();
-        if (errorStr.contains('already spent') || errorStr.contains('token already')) {
-          _errorMessage = l10n.tokenAlreadyClaimed;
-        } else if (errorStr.contains('unknown mint') || errorStr.contains('mint not found')) {
-          _errorMessage = l10n.unknownMint;
-        } else {
-          _errorMessage = l10n.claimError(e.toString());
-        }
+        _errorMessage = errorMessage;
       });
     } finally {
       if (mounted && !_showSuccess) {
