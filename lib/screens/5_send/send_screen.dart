@@ -91,30 +91,38 @@ class _SendScreenState extends State<SendScreen> {
           ],
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Monto a enviar
-                _buildAmountSection(),
+          child: Column(
+            children: [
+              // Contenido scrolleable
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Monto a enviar
+                      _buildAmountSection(),
 
-                const SizedBox(height: AppDimensions.paddingLarge),
+                      const SizedBox(height: AppDimensions.paddingLarge),
 
-                // Memo opcional
-                _buildMemoSection(),
+                      // Memo opcional
+                      _buildMemoSection(),
 
-                const SizedBox(height: AppDimensions.paddingMedium),
+                      const SizedBox(height: AppDimensions.paddingMedium),
 
-                // Mensaje de error (si hay)
-                if (_errorMessage != null) _buildErrorMessage(),
+                      // Mensaje de error (si hay)
+                      if (_errorMessage != null) _buildErrorMessage(),
+                    ],
+                  ),
+                ),
+              ),
 
-                const Spacer(),
-
-                // Botón crear token
-                _buildCreateButton(),
-              ],
-            ),
+              // Botón crear token (fijo abajo)
+              Padding(
+                padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                child: _buildCreateButton(),
+              ),
+            ],
           ),
         ),
       ),

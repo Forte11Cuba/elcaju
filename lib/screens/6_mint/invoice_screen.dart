@@ -220,36 +220,48 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   Widget _buildInvoiceView() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Título con monto
-        _buildHeader(),
+        // Contenido scrolleable
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Título con monto
+                _buildHeader(),
 
-        const SizedBox(height: AppDimensions.paddingLarge),
+                const SizedBox(height: AppDimensions.paddingLarge),
 
-        // QR del invoice
-        if (_invoice != null) _buildQRSection(),
+                // QR del invoice
+                if (_invoice != null) _buildQRSection(),
 
-        const SizedBox(height: AppDimensions.paddingLarge),
+                const SizedBox(height: AppDimensions.paddingLarge),
 
-        // Invoice truncado
-        if (_invoice != null) _buildInvoiceText(),
+                // Invoice truncado
+                if (_invoice != null) _buildInvoiceText(),
 
-        const SizedBox(height: AppDimensions.paddingMedium),
+                const SizedBox(height: AppDimensions.paddingMedium),
 
-        // Botón copiar
-        if (_invoice != null && _status == MintStatus.unpaid) _buildCopyButton(),
+                // Botón copiar
+                if (_invoice != null && _status == MintStatus.unpaid) _buildCopyButton(),
+              ],
+            ),
+          ),
+        ),
 
-        const Spacer(),
+        // Estado y descripción (fijos abajo)
+        Column(
+          children: [
+            // Estado del invoice
+            _buildStatus(),
 
-        // Estado del invoice
-        _buildStatus(),
+            const SizedBox(height: AppDimensions.paddingMedium),
 
-        const SizedBox(height: AppDimensions.paddingMedium),
-
-        // Descripción (si existe)
-        if (widget.description != null && widget.description!.isNotEmpty)
-          _buildDescription(),
+            // Descripción (si existe)
+            if (widget.description != null && widget.description!.isNotEmpty)
+              _buildDescription(),
+          ],
+        ),
       ],
     );
   }

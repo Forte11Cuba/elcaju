@@ -124,49 +124,57 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
           ),
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-            child: Column(
-              children: [
-                const SizedBox(height: AppDimensions.paddingLarge),
+          child: Column(
+            children: [
+              // Contenido scrolleable
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: AppDimensions.paddingLarge),
 
-                // Icono de exito
-                _buildSuccessIcon(),
+                      // Icono de exito
+                      _buildSuccessIcon(),
 
-                const SizedBox(height: AppDimensions.paddingLarge),
+                      const SizedBox(height: AppDimensions.paddingLarge),
 
-                // Monto
-                _buildAmountDisplay(),
+                      // Monto
+                      _buildAmountDisplay(),
 
-                const SizedBox(height: AppDimensions.paddingLarge),
+                      const SizedBox(height: AppDimensions.paddingLarge),
 
-                // QR del token (dinámico si hay múltiples fragmentos)
-                _buildQRDisplay(),
+                      // QR del token (dinámico si hay múltiples fragmentos)
+                      _buildQRDisplay(),
 
-                const SizedBox(height: AppDimensions.paddingMedium),
+                      const SizedBox(height: AppDimensions.paddingMedium),
 
-                // Token truncado
-                _buildTokenTextDisplay(),
+                      // Token truncado
+                      _buildTokenTextDisplay(),
 
-                const SizedBox(height: AppDimensions.paddingMedium),
+                      const SizedBox(height: AppDimensions.paddingMedium),
 
-                // Botones copiar y compartir
-                _buildActionButtons(context),
+                      // Botones copiar y compartir
+                      _buildActionButtons(context),
 
-                const SizedBox(height: AppDimensions.paddingLarge),
+                      const SizedBox(height: AppDimensions.paddingLarge),
 
-                // Advertencia
-                _buildWarning(),
+                      // Advertencia
+                      _buildWarning(),
+                    ],
+                  ),
+                ),
+              ),
 
-                const Spacer(),
-
-                // Boton volver al inicio
-                PrimaryButton(
+              // Botón volver al inicio (fijo abajo)
+              Padding(
+                padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                child: PrimaryButton(
                   text: 'Volver al inicio',
                   onPressed: () => _goToHome(context),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

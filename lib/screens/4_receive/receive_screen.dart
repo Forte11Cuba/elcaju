@@ -63,10 +63,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             ),
           ),
           body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-              child: _showSuccess ? _buildSuccessView() : _buildReceiveForm(),
-            ),
+            child: _showSuccess ? _buildSuccessView() : _buildReceiveForm(),
           ),
         ),
       ),
@@ -75,97 +72,114 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Widget _buildReceiveForm() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Instrucciones
-        Text(
-          'Pega el token Cashu:',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+        // Contenido scrolleable
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Instrucciones
+                Text(
+                  'Pega el token Cashu:',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.paddingSmall),
+
+                // Campo de texto para el token
+                _buildTokenInput(),
+
+                const SizedBox(height: AppDimensions.paddingMedium),
+
+                // Botón pegar del portapapeles
+                _buildPasteButton(),
+
+                const SizedBox(height: AppDimensions.paddingLarge),
+
+                // Preview del token (si es válido)
+                if (_isValidToken && _tokenInfo != null) _buildTokenPreview(),
+
+                // Mensaje de error (si hay)
+                if (_errorMessage != null) _buildErrorMessage(),
+              ],
+            ),
           ),
         ),
-        const SizedBox(height: AppDimensions.paddingSmall),
 
-        // Campo de texto para el token
-        _buildTokenInput(),
-
-        const SizedBox(height: AppDimensions.paddingMedium),
-
-        // Botón pegar del portapapeles
-        _buildPasteButton(),
-
-        const SizedBox(height: AppDimensions.paddingLarge),
-
-        // Preview del token (si es válido)
-        if (_isValidToken && _tokenInfo != null) _buildTokenPreview(),
-
-        // Mensaje de error (si hay)
-        if (_errorMessage != null) _buildErrorMessage(),
-
-        const Spacer(),
-
-        // Botón reclamar
-        _buildClaimButton(),
+        // Botón reclamar (fijo abajo)
+        Padding(
+          padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+          child: _buildClaimButton(),
+        ),
       ],
     );
   }
 
   Widget _buildSuccessView() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Icono de éxito
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.2),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            LucideIcons.checkCircle2,
-            color: AppColors.success,
-            size: 50,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.paddingLarge),
+    return Padding(
+      padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Spacer(),
 
-        // Monto recibido
-        Builder(
-          builder: (context) {
-            final unit = _receivedUnit ?? context.read<WalletProvider>().activeUnit;
-            return Text(
-              '+${UnitFormatter.formatBalance(_receivedAmount, unit)} ${UnitFormatter.getUnitLabel(unit)}',
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: AppDimensions.paddingSmall),
-
-        Text(
-          'Tokens recibidos',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 18,
-            color: AppColors.textSecondary,
+          // Icono de éxito
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              LucideIcons.checkCircle2,
+              color: AppColors.success,
+              size: 50,
+            ),
           ),
-        ),
-        const SizedBox(height: AppDimensions.paddingLarge * 2),
+          const SizedBox(height: AppDimensions.paddingLarge),
 
-        // Botón volver
-        PrimaryButton(
-          text: 'Volver al inicio',
-          onPressed: () => Navigator.pop(context),
-        ),
-      ],
+          // Monto recibido
+          Builder(
+            builder: (context) {
+              final unit = _receivedUnit ?? context.read<WalletProvider>().activeUnit;
+              return Text(
+                '+${UnitFormatter.formatBalance(_receivedAmount, unit)} ${UnitFormatter.getUnitLabel(unit)}',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: AppDimensions.paddingSmall),
+
+          Text(
+            'Tokens recibidos',
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 18,
+              color: AppColors.textSecondary,
+            ),
+          ),
+
+          const Spacer(),
+
+          // Botón volver (fijo abajo)
+          PrimaryButton(
+            text: 'Volver al inicio',
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
     );
   }
 

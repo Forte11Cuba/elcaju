@@ -70,30 +70,38 @@ class _MintScreenState extends State<MintScreen> {
           ),
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Monto a depositar
-                _buildAmountSection(),
+          child: Column(
+            children: [
+              // Contenido scrolleable
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Monto a depositar
+                      _buildAmountSection(),
 
-                const SizedBox(height: AppDimensions.paddingLarge),
+                      const SizedBox(height: AppDimensions.paddingLarge),
 
-                // Descripción opcional
-                _buildDescriptionSection(),
+                      // Descripción opcional
+                      _buildDescriptionSection(),
 
-                const SizedBox(height: AppDimensions.paddingMedium),
+                      const SizedBox(height: AppDimensions.paddingMedium),
 
-                // Mensaje de error (si hay)
-                if (_errorMessage != null) _buildErrorMessage(),
+                      // Mensaje de error (si hay)
+                      if (_errorMessage != null) _buildErrorMessage(),
+                    ],
+                  ),
+                ),
+              ),
 
-                const Spacer(),
-
-                // Botón generar invoice
-                _buildGenerateButton(),
-              ],
-            ),
+              // Botón generar invoice (fijo abajo)
+              Padding(
+                padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                child: _buildGenerateButton(),
+              ),
+            ],
           ),
         ),
       ),

@@ -82,54 +82,67 @@ class _MeltScreenState extends State<MeltScreen> {
           ),
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Instrucciones
-                Text(
-                  'Pega el invoice Lightning:',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
+          child: Column(
+            children: [
+              // Contenido scrolleable
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Instrucciones
+                      Text(
+                        'Pega el invoice Lightning:',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: AppDimensions.paddingSmall),
+
+                      // Campo de texto para el invoice
+                      _buildInvoiceInput(),
+
+                      const SizedBox(height: AppDimensions.paddingMedium),
+
+                      // Botón pegar del portapapeles
+                      _buildPasteButton(),
+
+                      const SizedBox(height: AppDimensions.paddingLarge),
+
+                      // Loading quote
+                      if (_isLoadingQuote) _buildLoadingQuote(),
+
+                      // Preview del invoice (si es válido)
+                      if (_isValidInvoice && _quote != null && !_isLoadingQuote)
+                        _buildInvoicePreview(),
+
+                      // Mensaje de error (si hay)
+                      if (_errorMessage != null) _buildErrorMessage(),
+                    ],
                   ),
                 ),
-                const SizedBox(height: AppDimensions.paddingSmall),
+              ),
 
-                // Campo de texto para el invoice
-                _buildInvoiceInput(),
+              // Balance y botón (fijos abajo)
+              Padding(
+                padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+                child: Column(
+                  children: [
+                    // Balance disponible
+                    _buildBalanceInfo(),
 
-                const SizedBox(height: AppDimensions.paddingMedium),
+                    const SizedBox(height: AppDimensions.paddingMedium),
 
-                // Botón pegar del portapapeles
-                _buildPasteButton(),
-
-                const SizedBox(height: AppDimensions.paddingLarge),
-
-                // Loading quote
-                if (_isLoadingQuote) _buildLoadingQuote(),
-
-                // Preview del invoice (si es válido)
-                if (_isValidInvoice && _quote != null && !_isLoadingQuote)
-                  _buildInvoicePreview(),
-
-                // Mensaje de error (si hay)
-                if (_errorMessage != null) _buildErrorMessage(),
-
-                const Spacer(),
-
-                // Balance disponible
-                _buildBalanceInfo(),
-
-                const SizedBox(height: AppDimensions.paddingMedium),
-
-                // Botón pagar invoice
-                _buildPayButton(),
-              ],
-            ),
+                    // Botón pagar invoice
+                    _buildPayButton(),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
