@@ -513,7 +513,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               settingsProvider,
               'en',
               l10n.english,
-              '🇺🇸',
+              '🇬🇧',
             ),
             const SizedBox(height: AppDimensions.paddingSmall),
           ],
