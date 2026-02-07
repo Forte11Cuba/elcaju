@@ -6,7 +6,10 @@ import 'package:cdk_flutter/cdk_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import '../data/transaction_meta_storage.dart';
+import '../data/pending_token.dart';
+import '../data/pending_token_storage.dart';
 
 /// Helper class para info de token parseado
 class TokenInfo {
@@ -32,6 +35,12 @@ class WalletProvider extends ChangeNotifier {
 
   /// Storage para metadata de transacciones (tipo, token, invoice)
   final TransactionMetaStorage _txMetaStorage = TransactionMetaStorage();
+
+  /// Storage para tokens pendientes de reclamar (Receive Later)
+  final PendingTokenStorage _pendingTokenStorage = PendingTokenStorage();
+
+  /// Generador de UUIDs
+  static const _uuid = Uuid();
 
   /// Mints conocidos con sus unidades soportadas.
   /// Ejemplo: {'mint.cubabitcoin.org': ['sat', 'usd']}
@@ -85,6 +94,19 @@ class WalletProvider extends ChangeNotifier {
 
   /// Lista de URLs de mints conocidos (orden de inserción)
   List<String> get mintUrls => _mintUnits.keys.toList();
+
+  // ============================================================
+  // PENDING TOKENS GETTERS
+  // ============================================================
+
+  /// Cantidad de tokens pendientes de reclamar
+  int get pendingTokenCount => _pendingTokenStorage.count;
+
+  /// Verifica si hay tokens pendientes
+  bool get hasPendingTokens => _pendingTokenStorage.hasPendingTokens;
+
+  /// Stream de cambios en pending tokens
+  Stream<void> get pendingTokenChanges => _pendingTokenStorage.changes;
 
   /// Lista de mints ordenados por balance.
   /// Cuba Bitcoin siempre primero, luego ordenados por: sats → usd → eur → otros.
@@ -274,6 +296,9 @@ class WalletProvider extends ChangeNotifier {
 
     // Inicializar storage de metadata de transacciones
     await _txMetaStorage.init();
+
+    // Inicializar storage de tokens pendientes
+    await _pendingTokenStorage.init();
 
     // Obtener directorio de documentos (path absoluto requerido)
     final dir = await getApplicationDocumentsDirectory();
@@ -1306,5 +1331,150 @@ class WalletProvider extends ChangeNotifier {
     _mnemonic = null;
     _db = null;
     notifyListeners();
+  }
+
+  // ============================================================
+  // PENDING TOKENS (Receive Later)
+  // ============================================================
+
+  /// Guarda un token para reclamar después.
+  /// Retorna el PendingToken creado o null si hay error/límite alcanzado.
+  Future<PendingToken?> addPendingToken(String encodedToken) async {
+    // Parsear token para validar y extraer info
+    final tokenInfo = parseToken(encodedToken);
+    if (tokenInfo == null) {
+      debugPrint('Token inválido para pending');
+      return null;
+    }
+
+    // Generar ID único
+    final id = _uuid.v4();
+
+    // Guardar en storage
+    final pending = await _pendingTokenStorage.add(
+      id: id,
+      encoded: encodedToken,
+      amount: tokenInfo.amount,
+      mintUrl: tokenInfo.mintUrl,
+      unit: tokenInfo.unit,
+    );
+
+    if (pending != null) {
+      notifyListeners();
+    }
+
+    return pending;
+  }
+
+  /// Lista todos los tokens pendientes
+  List<PendingToken> listPendingTokens() {
+    return _pendingTokenStorage.listAll();
+  }
+
+  /// Lista solo tokens pendientes válidos (no expirados)
+  List<PendingToken> listValidPendingTokens() {
+    return _pendingTokenStorage.listValid();
+  }
+
+  /// Elimina un token pendiente por ID
+  Future<void> removePendingToken(String id) async {
+    await _pendingTokenStorage.remove(id);
+    notifyListeners();
+  }
+
+  /// Intenta reclamar un token pendiente.
+  /// Retorna el monto recibido si tiene éxito, o lanza excepción.
+  /// Si el token está gastado o es inválido, lo elimina automáticamente.
+  Future<BigInt> claimPendingToken(String id) async {
+    final pending = _pendingTokenStorage.get(id);
+    if (pending == null) {
+      throw Exception('Token pendiente no encontrado');
+    }
+
+    try {
+      // Intentar reclamar usando el método existente
+      final amount = await receiveToken(pending.encoded);
+
+      // Éxito: eliminar de pending
+      await _pendingTokenStorage.remove(id);
+      notifyListeners();
+
+      debugPrint('Token pendiente reclamado: $id, monto: $amount');
+      return amount;
+    } catch (e) {
+      final errorStr = e.toString().toLowerCase();
+
+      // Si el token ya fue gastado o es inválido, eliminarlo
+      if (errorStr.contains('already spent') ||
+          errorStr.contains('token already') ||
+          errorStr.contains('invalid')) {
+        await _pendingTokenStorage.remove(id);
+        notifyListeners();
+        debugPrint('Token pendiente eliminado (gastado/inválido): $id');
+      } else {
+        // Otro error: registrar intento fallido
+        await _pendingTokenStorage.recordFailedAttempt(id, e.toString());
+      }
+
+      rethrow;
+    }
+  }
+
+  /// Verifica y reclama automáticamente tokens pendientes.
+  /// Retorna un mapa con estadísticas: claimed, failed, removed.
+  Future<Map<String, dynamic>> checkPendingTokens() async {
+    final tokens = _pendingTokenStorage.listValid();
+    if (tokens.isEmpty) {
+      return {'claimed': 0, 'failed': 0, 'removed': 0, 'totalClaimed': BigInt.zero};
+    }
+
+    int claimed = 0;
+    int failed = 0;
+    int removed = 0;
+    BigInt totalClaimed = BigInt.zero;
+
+    for (final token in tokens) {
+      try {
+        final amount = await claimPendingToken(token.id);
+        claimed++;
+        totalClaimed += amount;
+        debugPrint('Auto-claim exitoso: ${token.id}');
+      } catch (e) {
+        final errorStr = e.toString().toLowerCase();
+        if (errorStr.contains('already spent') ||
+            errorStr.contains('token already') ||
+            errorStr.contains('invalid')) {
+          removed++;
+          debugPrint('Auto-claim: token eliminado (gastado): ${token.id}');
+        } else {
+          failed++;
+          debugPrint('Auto-claim fallido: ${token.id} - $e');
+        }
+      }
+    }
+
+    // Limpiar expirados también
+    final expired = await _pendingTokenStorage.cleanExpired();
+    removed += expired;
+
+    if (claimed > 0 || removed > 0) {
+      notifyListeners();
+    }
+
+    return {
+      'claimed': claimed,
+      'failed': failed,
+      'removed': removed,
+      'totalClaimed': totalClaimed,
+    };
+  }
+
+  /// Limpia tokens pendientes expirados
+  Future<int> cleanExpiredPendingTokens() async {
+    final cleaned = await _pendingTokenStorage.cleanExpired();
+    if (cleaned > 0) {
+      notifyListeners();
+    }
+    return cleaned;
   }
 }

@@ -114,10 +114,20 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           ),
         ),
 
-        // Botón reclamar (fijo abajo)
+        // Botones guardar para después y reclamar (fijo abajo)
         Padding(
           padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-          child: _buildClaimButton(),
+          child: Column(
+            children: [
+              // Botón principal: Guardar para después
+              if (_isValidToken && _tokenInfo != null && !_isProcessing) ...[
+                _buildReceiveLaterButton(),
+                const SizedBox(height: AppDimensions.paddingSmall),
+              ],
+              // Botón secundario: Reclamar ahora
+              _buildClaimButton(),
+            ],
+          ),
         ),
       ],
     );
@@ -396,9 +406,50 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Widget _buildClaimButton() {
     final l10n = L10n.of(context)!;
+    // Botón principal (naranja) para reclamar - abajo, cerca de los dedos
     return PrimaryButton(
-      text: _isProcessing ? l10n.claiming : l10n.claimTokens,
+      text: _isProcessing ? l10n.claiming : l10n.receiveNow,
       onPressed: _isValidToken && !_isProcessing ? _claimToken : null,
+    );
+  }
+
+  Widget _buildReceiveLaterButton() {
+    final l10n = L10n.of(context)!;
+    // Botón secundario (outline) para guardar para después
+    return GestureDetector(
+      onTap: _saveForLater,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              LucideIcons.clock,
+              color: AppColors.textSecondary,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              l10n.receiveLater,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -434,6 +485,50 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         _errorMessage = L10n.of(context)!.invalidToken;
       }
     });
+  }
+
+  Future<void> _saveForLater() async {
+    final l10n = L10n.of(context)!;
+    final walletProvider = context.read<WalletProvider>();
+
+    try {
+      final pending = await walletProvider.addPendingToken(
+        _tokenController.text.trim(),
+      );
+
+      if (pending != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.tokenSavedForLater),
+              backgroundColor: AppColors.success,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } else {
+        // Límite alcanzado
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.pendingTokenLimitReached),
+              backgroundColor: AppColors.warning,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _claimToken() async {

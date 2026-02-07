@@ -405,5 +405,41 @@
       "amount": { "type": "String" },
       "unit": { "type": "String" }
     }
+  },
+
+  "receiveNow": "Recibir ahora",
+  "receiveLater": "Recibir despues",
+  "tokenSavedForLater": "Token guardado para reclamar despues",
+  "pendingTokenLimitReached": "Limite de tokens pendientes alcanzado (max 50)",
+  "filterToReceive": "Para recibir",
+  "noPendingTokens": "Sin tokens pendientes",
+  "noPendingTokensHint": "Guarda tokens para reclamar despues",
+  "pendingBadge": "PENDIENTE",
+  "expiresInDays": "Expira en {days} dias",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "retryCount": "{count} reintentos",
+  "@retryCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "claimNow": "Reclamar ahora",
+  "pendingTokenClaimedSuccess": "Reclamados {amount} {unit}",
+  "@pendingTokenClaimedSuccess": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "pendingTokensClaimed": "Reclamados {count} tokens ({amount} sats)",
+  "@pendingTokensClaimed": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "amount": { "type": "String" }
+    }
   }
 }

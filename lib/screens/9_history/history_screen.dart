@@ -12,6 +12,7 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/transaction_meta_storage.dart';
+import '../../data/pending_token.dart';
 import '../../providers/wallet_provider.dart';
 import '../../widgets/common/gradient_background.dart';
 
@@ -19,6 +20,7 @@ import '../../widgets/common/gradient_background.dart';
 enum HistoryFilter {
   all,
   pending,
+  toReceive, // Tokens pendientes de reclamar (Receive Later)
   cashu,
   lightning,
 }
@@ -92,6 +94,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Widget _buildFilters() {
     final l10n = L10n.of(context)!;
+    final walletProvider = context.watch<WalletProvider>();
+    final pendingCount = walletProvider.pendingTokenCount;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(
@@ -114,6 +119,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
             onTap: () => _setFilter(HistoryFilter.pending),
           ),
           const SizedBox(width: 8),
+          _FilterChipWithBadge(
+            label: l10n.filterToReceive,
+            icon: LucideIcons.download,
+            isSelected: _currentFilter == HistoryFilter.toReceive,
+            badgeCount: pendingCount,
+            onTap: () => _setFilter(HistoryFilter.toReceive),
+          ),
+          const SizedBox(width: 8),
           _FilterChip(
             label: l10n.filterEcash,
             icon: LucideIcons.coins,
@@ -134,6 +147,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Widget _buildTransactionList() {
     final walletProvider = context.watch<WalletProvider>();
+
+    // Si el filtro es "toReceive", mostrar pending tokens
+    if (_currentFilter == HistoryFilter.toReceive) {
+      return _buildPendingTokensList(walletProvider);
+    }
 
     return FutureBuilder<List<Transaction>>(
       future: walletProvider.getAllTransactions(),
@@ -174,6 +192,67 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  Widget _buildPendingTokensList(WalletProvider walletProvider) {
+    final pendingTokens = walletProvider.listPendingTokens();
+
+    if (pendingTokens.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return RefreshIndicator(
+      onRefresh: _refreshTransactions,
+      color: AppColors.primaryAction,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+        itemCount: pendingTokens.length,
+        itemBuilder: (context, index) {
+          final token = pendingTokens[index];
+          return _PendingTokenTile(
+            token: token,
+            walletProvider: walletProvider,
+            onClaim: () => _claimPendingToken(token),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _claimPendingToken(PendingToken token) async {
+    final l10n = L10n.of(context)!;
+    final walletProvider = context.read<WalletProvider>();
+
+    try {
+      final amount = await walletProvider.claimPendingToken(token.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.pendingTokenClaimedSuccess(
+              UnitFormatter.formatBalance(amount, token.unit ?? 'sat'),
+              token.unit ?? 'sat',
+            )),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final errorStr = e.toString().toLowerCase();
+        String message;
+        if (errorStr.contains('already spent') || errorStr.contains('token already')) {
+          message = l10n.tokenAlreadyClaimed;
+        } else {
+          message = l10n.claimError(e.toString());
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
   List<Transaction> _applyFilter(List<Transaction> transactions, WalletProvider walletProvider) {
     switch (_currentFilter) {
       case HistoryFilter.all:
@@ -183,6 +262,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
         return transactions
             .where((tx) => tx.status == TransactionStatus.pending)
             .toList();
+
+      case HistoryFilter.toReceive:
+        // Pending tokens se manejan por separado en _buildPendingTokensList
+        return [];
 
       case HistoryFilter.cashu:
         return transactions
@@ -209,6 +292,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
       case HistoryFilter.pending:
         message = l10n.noPendingTransactions;
         submessage = l10n.allTransactionsCompleted;
+        break;
+      case HistoryFilter.toReceive:
+        message = l10n.noPendingTokens;
+        submessage = l10n.noPendingTokensHint;
         break;
       case HistoryFilter.cashu:
         message = l10n.noEcashTransactions;
@@ -986,6 +1073,324 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
             letterSpacing: 1,
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Chip de filtro con badge
+class _FilterChipWithBadge extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool isSelected;
+  final int badgeCount;
+  final VoidCallback onTap;
+
+  const _FilterChipWithBadge({
+    required this.label,
+    required this.icon,
+    required this.isSelected,
+    required this.badgeCount,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.warning.withValues(alpha: 0.2)
+              : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.warning.withValues(alpha: 0.5)
+                : Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isSelected ? AppColors.warning : Colors.white70,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? AppColors.warning : Colors.white70,
+              ),
+            ),
+            if (badgeCount > 0) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.warning,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  badgeCount > 9 ? '9+' : badgeCount.toString(),
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Tile para un token pendiente de reclamar
+class _PendingTokenTile extends StatefulWidget {
+  final PendingToken token;
+  final WalletProvider walletProvider;
+  final VoidCallback onClaim;
+
+  const _PendingTokenTile({
+    required this.token,
+    required this.walletProvider,
+    required this.onClaim,
+  });
+
+  @override
+  State<_PendingTokenTile> createState() => _PendingTokenTileState();
+}
+
+class _PendingTokenTileState extends State<_PendingTokenTile> {
+  bool _isClaiming = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = L10n.of(context)!;
+    final token = widget.token;
+    final unit = token.unit ?? 'sat';
+    final formattedAmount = UnitFormatter.formatBalance(token.amount, unit);
+    final unitLabel = UnitFormatter.getUnitLabel(unit);
+    final mintDisplay = UnitFormatter.getMintDisplayName(token.mintUrl);
+    final daysRemaining = token.daysRemaining;
+
+    // Color según días restantes
+    Color daysColor;
+    if (daysRemaining <= 3) {
+      daysColor = AppColors.error;
+    } else if (daysRemaining <= 7) {
+      daysColor = AppColors.warning;
+    } else {
+      daysColor = AppColors.success;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppDimensions.paddingSmall),
+      padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.warning.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          // Primera fila: icono, info, monto
+          Row(
+            children: [
+              // Icono con badge PENDING
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.warning.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      LucideIcons.clock,
+                      color: AppColors.warning,
+                      size: 22,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: AppDimensions.paddingMedium),
+
+              // Info del token
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.warning.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            l10n.pendingBadge,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.warning,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          mintDisplay,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 14,
+                            color: AppColors.textSecondary.withValues(alpha: 0.7),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          LucideIcons.timer,
+                          size: 12,
+                          color: daysColor,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          l10n.expiresInDays(daysRemaining),
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            color: daysColor,
+                          ),
+                        ),
+                        if (token.hasError) ...[
+                          const SizedBox(width: 8),
+                          Icon(
+                            LucideIcons.alertTriangle,
+                            size: 12,
+                            color: AppColors.error,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            l10n.retryCount(token.retryCount),
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 12,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Monto
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    formattedAmount,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    unitLabel,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 12,
+                      color: AppColors.textSecondary.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppDimensions.paddingMedium),
+
+          // Botón reclamar (ancho completo)
+          GestureDetector(
+            onTap: _isClaiming
+                ? null
+                : () async {
+                    setState(() => _isClaiming = true);
+                    widget.onClaim();
+                    if (mounted) {
+                      setState(() => _isClaiming = false);
+                    }
+                  },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                gradient: _isClaiming
+                    ? null
+                    : const LinearGradient(colors: AppColors.buttonGradient),
+                color: _isClaiming ? Colors.grey : null,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_isClaiming)
+                    const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  else
+                    const Icon(
+                      LucideIcons.download,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _isClaiming ? l10n.claiming : l10n.claimNow,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

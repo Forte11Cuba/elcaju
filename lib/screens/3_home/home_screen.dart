@@ -36,9 +36,47 @@ class _HomeScreenState extends State<HomeScreen> {
   final CashuConfettiController _confettiController = CashuConfettiController();
 
   @override
+  void initState() {
+    super.initState();
+    // Verificar tokens pendientes al iniciar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPendingTokens();
+    });
+  }
+
+  @override
   void dispose() {
     _confettiController.dispose();
     super.dispose();
+  }
+
+  /// Verifica y reclama automáticamente tokens pendientes
+  Future<void> _checkPendingTokens() async {
+    final walletProvider = context.read<WalletProvider>();
+    if (!walletProvider.hasPendingTokens) return;
+
+    try {
+      final result = await walletProvider.checkPendingTokens();
+      final claimed = result['claimed'] as int;
+      final totalClaimed = result['totalClaimed'] as BigInt;
+
+      if (claimed > 0 && mounted) {
+        // Disparar confetti
+        _confettiController.fire();
+
+        // Mostrar snackbar
+        final l10n = L10n.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.pendingTokensClaimed(claimed, totalClaimed.toString())),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error checking pending tokens: $e');
+    }
   }
 
   @override
@@ -417,19 +455,58 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHistoryButton() {
     final l10n = L10n.of(context)!;
+    final walletProvider = context.watch<WalletProvider>();
+    final pendingCount = walletProvider.pendingTokenCount;
+
     return Padding(
       padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-      child: AnimatedActionButton(
-        label: l10n.history,
-        type: ButtonType.navigation,
-        icon: LucideIcons.history,
-        showIcon: true,
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const HistoryScreen()),
-          );
-        },
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          AnimatedActionButton(
+            label: l10n.history,
+            type: ButtonType.navigation,
+            icon: LucideIcons.history,
+            showIcon: true,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
+              );
+            },
+          ),
+          // Badge de tokens pendientes
+          if (pendingCount > 0)
+            Positioned(
+              right: -4,
+              top: -4,
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppColors.warning,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.deepVoidPurple,
+                    width: 2,
+                  ),
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 20,
+                  minHeight: 20,
+                ),
+                child: Text(
+                  pendingCount > 9 ? '9+' : pendingCount.toString(),
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

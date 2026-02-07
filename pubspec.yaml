@@ -49,6 +49,9 @@ dependencies:
   # CBOR decoder for V4 tokens
   cbor: ^6.3.0
 
+  # UUID generator for pending tokens
+  uuid: ^4.3.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
