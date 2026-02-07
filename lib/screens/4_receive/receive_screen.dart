@@ -488,6 +488,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   Future<void> _saveForLater() async {
+    if (_isProcessing) return; // Guard contra doble-tap
+
+    setState(() => _isProcessing = true);
+
     final l10n = L10n.of(context)!;
     final walletProvider = context.read<WalletProvider>();
 
@@ -527,6 +531,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             backgroundColor: AppColors.error,
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
       }
     }
   }

@@ -408,14 +408,14 @@
   },
 
   "receiveNow": "Recibir ahora",
-  "receiveLater": "Recibir despues",
-  "tokenSavedForLater": "Token guardado para reclamar despues",
-  "pendingTokenLimitReached": "Limite de tokens pendientes alcanzado (max 50)",
+  "receiveLater": "Recibir después",
+  "tokenSavedForLater": "Token guardado para reclamar después",
+  "pendingTokenLimitReached": "Límite de tokens pendientes alcanzado (max 50)",
   "filterToReceive": "Para recibir",
   "noPendingTokens": "Sin tokens pendientes",
-  "noPendingTokensHint": "Guarda tokens para reclamar despues",
+  "noPendingTokensHint": "Guarda tokens para reclamar después",
   "pendingBadge": "PENDIENTE",
-  "expiresInDays": "Expira en {days} dias",
+  "expiresInDays": "{days, plural, =1{Expira en 1 día} other{Expira en {days} días}}",
   "@expiresInDays": {
     "placeholders": {
       "days": { "type": "int" }
@@ -435,11 +435,12 @@
       "unit": { "type": "String" }
     }
   },
-  "pendingTokensClaimed": "Reclamados {count} tokens ({amount} sats)",
+  "pendingTokensClaimed": "{count, plural, =1{Reclamado 1 token ({amount} {unit})} other{Reclamados {count} tokens ({amount} {unit})}}",
   "@pendingTokensClaimed": {
     "placeholders": {
       "count": { "type": "int" },
-      "amount": { "type": "String" }
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
     }
   }
 }

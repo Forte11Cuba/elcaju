@@ -1421,23 +1421,25 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Verifica y reclama automáticamente tokens pendientes.
-  /// Retorna un mapa con estadísticas: claimed, failed, removed.
+  /// Retorna un mapa con estadísticas: claimed, failed, removed, totalClaimed, unit.
   Future<Map<String, dynamic>> checkPendingTokens() async {
     final tokens = _pendingTokenStorage.listValid();
     if (tokens.isEmpty) {
-      return {'claimed': 0, 'failed': 0, 'removed': 0, 'totalClaimed': BigInt.zero};
+      return {'claimed': 0, 'failed': 0, 'removed': 0, 'totalClaimed': BigInt.zero, 'unit': _activeUnit};
     }
 
     int claimed = 0;
     int failed = 0;
     int removed = 0;
     BigInt totalClaimed = BigInt.zero;
+    String? claimedUnit;
 
     for (final token in tokens) {
       try {
         final amount = await claimPendingToken(token.id);
         claimed++;
         totalClaimed += amount;
+        claimedUnit ??= token.unit; // Usar la unidad del primer token reclamado
         debugPrint('Auto-claim exitoso: ${token.id}');
       } catch (e) {
         final errorStr = e.toString().toLowerCase();
@@ -1466,6 +1468,7 @@ class WalletProvider extends ChangeNotifier {
       'failed': failed,
       'removed': removed,
       'totalClaimed': totalClaimed,
+      'unit': claimedUnit ?? _activeUnit,
     };
   }
 

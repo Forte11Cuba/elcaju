@@ -57,8 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final result = await walletProvider.checkPendingTokens();
-      final claimed = result['claimed'] as int;
-      final totalClaimed = result['totalClaimed'] as BigInt;
+      final claimed = (result['claimed'] as int?) ?? 0;
+      final totalClaimed = result['totalClaimed'] as BigInt? ?? BigInt.zero;
+      final unit = (result['unit'] as String?) ?? walletProvider.activeUnit;
 
       if (claimed > 0 && mounted) {
         // Disparar confetti
@@ -68,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final l10n = L10n.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.pendingTokensClaimed(claimed, totalClaimed.toString())),
+            content: Text(l10n.pendingTokensClaimed(claimed, totalClaimed.toString(), unit)),
             backgroundColor: AppColors.success,
             duration: const Duration(seconds: 3),
           ),

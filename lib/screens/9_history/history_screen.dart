@@ -1159,7 +1159,7 @@ class _FilterChipWithBadge extends StatelessWidget {
 class _PendingTokenTile extends StatefulWidget {
   final PendingToken token;
   final WalletProvider walletProvider;
-  final VoidCallback onClaim;
+  final Future<void> Function() onClaim;
 
   const _PendingTokenTile({
     required this.token,
@@ -1343,9 +1343,12 @@ class _PendingTokenTileState extends State<_PendingTokenTile> {
                 ? null
                 : () async {
                     setState(() => _isClaiming = true);
-                    widget.onClaim();
-                    if (mounted) {
-                      setState(() => _isClaiming = false);
+                    try {
+                      await widget.onClaim();
+                    } finally {
+                      if (mounted) {
+                        setState(() => _isClaiming = false);
+                      }
                     }
                   },
             child: Container(

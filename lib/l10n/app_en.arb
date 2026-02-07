@@ -295,7 +295,7 @@
   "noPendingTokens": "No pending tokens",
   "noPendingTokensHint": "Save tokens to claim later",
   "pendingBadge": "PENDING",
-  "expiresInDays": "Expires in {days} days",
+  "expiresInDays": "{days, plural, =1{Expires in 1 day} other{Expires in {days} days}}",
   "@expiresInDays": {
     "placeholders": {
       "days": { "type": "int" }
@@ -315,11 +315,12 @@
       "unit": { "type": "String" }
     }
   },
-  "pendingTokensClaimed": "Claimed {count} tokens ({amount} sats)",
+  "pendingTokensClaimed": "{count, plural, =1{Claimed 1 token ({amount} {unit})} other{Claimed {count} tokens ({amount} {unit})}}",
   "@pendingTokensClaimed": {
     "placeholders": {
       "count": { "type": "int" },
-      "amount": { "type": "String" }
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
     }
   }
 }

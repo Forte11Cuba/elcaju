@@ -24,7 +24,7 @@ class PendingTokenStorage {
   bool _isInitialized = false;
 
   /// Stream controller para notificar cambios
-  final _changesController = StreamController<void>.broadcast();
+  StreamController<void> _changesController = StreamController<void>.broadcast();
 
   /// Stream de cambios para que la UI pueda reaccionar
   Stream<void> get changes => _changesController.stream;
@@ -179,6 +179,7 @@ class PendingTokenStorage {
   /// Actualiza un token (para reintentos, errores, etc.)
   Future<void> update(PendingToken token) async {
     if (_db == null) return;
+    if (!_cache.containsKey(token.id)) return;
 
     await _db!.update(
       _tableName,
@@ -272,5 +273,7 @@ class PendingTokenStorage {
     _db = null;
     _isInitialized = false;
     await _changesController.close();
+    // Recrear el controller para permitir re-inicialización del singleton
+    _changesController = StreamController<void>.broadcast();
   }
 }
