@@ -406,13 +406,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   /// Verifica si hay conexión a internet
   Future<bool> _checkConnectivity() async {
     final result = await Connectivity().checkConnectivity();
-    return result.contains(ConnectivityResult.mobile) ||
-        result.contains(ConnectivityResult.wifi) ||
-        result.contains(ConnectivityResult.ethernet);
+    return !result.contains(ConnectivityResult.none);
   }
 
   /// Recibe el token: si hay conexión lo reclama, si no lo guarda para después
   Future<void> _receiveToken() async {
+    if (_isProcessing) return;
+    setState(() => _isProcessing = true);
+
     final hasConnection = await _checkConnectivity();
 
     if (hasConnection) {
