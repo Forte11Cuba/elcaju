@@ -114,20 +114,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           ),
         ),
 
-        // Botones guardar para después y reclamar (fijo abajo)
+        // Botón único "Recibir" (fijo abajo)
         Padding(
           padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-          child: Column(
-            children: [
-              // Botón principal: Guardar para después
-              if (_isValidToken && _tokenInfo != null && !_isProcessing) ...[
-                _buildReceiveLaterButton(),
-                const SizedBox(height: AppDimensions.paddingSmall),
-              ],
-              // Botón secundario: Reclamar ahora
-              _buildClaimButton(),
-            ],
-          ),
+          child: _buildReceiveButton(),
         ),
       ],
     );
@@ -404,52 +394,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     );
   }
 
-  Widget _buildClaimButton() {
+  Widget _buildReceiveButton() {
     final l10n = L10n.of(context)!;
-    // Botón principal (naranja) para reclamar - abajo, cerca de los dedos
+    // Botón único "Recibir" - auto-detecta conectividad
     return PrimaryButton(
-      text: _isProcessing ? l10n.claiming : l10n.receiveNow,
-      onPressed: _isValidToken && !_isProcessing ? _claimToken : null,
-    );
-  }
-
-  Widget _buildReceiveLaterButton() {
-    final l10n = L10n.of(context)!;
-    // Botón secundario (outline) para guardar para después
-    return GestureDetector(
-      onTap: _saveForLater,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.clock,
-              color: AppColors.textSecondary,
-              size: 18,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              l10n.receiveLater,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
+      text: _isProcessing ? l10n.claiming : l10n.receive,
+      onPressed: _isValidToken && !_isProcessing ? _receiveToken : null,
     );
   }
 
@@ -487,11 +437,60 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     });
   }
 
-  Future<void> _saveForLater() async {
-    if (_isProcessing) return; // Guard contra doble-tap
+  /// Método principal: recibe token con detección automática de conectividad.
+  /// 1. Si el mint es desconocido y no hay conexión → rechazar
+  /// 2. Ping al mint (3s) → si OK → claim → si falla → guardar pendiente
+  Future<void> _receiveToken() async {
+    if (_isProcessing) return;
 
-    setState(() => _isProcessing = true);
+    setState(() {
+      _isProcessing = true;
+      _errorMessage = null;
+    });
 
+    final l10n = L10n.of(context)!;
+    final walletProvider = context.read<WalletProvider>();
+
+    try {
+      final mintUrl = _tokenInfo?.mintUrl;
+      if (mintUrl == null) {
+        throw Exception('Token inválido');
+      }
+
+      // Verificar si el mint es conocido
+      final isKnownMint = walletProvider.mintUrls.contains(mintUrl);
+
+      // Verificar conectividad al mint
+      final canReach = await walletProvider.canReachMint(mintUrl);
+
+      // Si el mint es desconocido y no hay conexión → rechazar
+      if (!isKnownMint && !canReach) {
+        setState(() {
+          _errorMessage = l10n.unknownMintOffline;
+          _isProcessing = false;
+        });
+        return;
+      }
+
+      // Si no hay conexión → guardar como pendiente
+      if (!canReach) {
+        await _saveForLaterOffline();
+        return;
+      }
+
+      // Hay conexión → intentar reclamar
+      await _claimToken();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = l10n.claimError(e.toString());
+        _isProcessing = false;
+      });
+    }
+  }
+
+  /// Guarda el token como pendiente cuando no hay conexión.
+  Future<void> _saveForLaterOffline() async {
     final l10n = L10n.of(context)!;
     final walletProvider = context.read<WalletProvider>();
 
@@ -502,11 +501,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
       if (pending != null) {
         if (mounted) {
+          // Mostrar mensaje de sin conexión
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(l10n.tokenSavedForLater),
-              backgroundColor: AppColors.success,
-              duration: const Duration(seconds: 2),
+              content: Text(l10n.noConnectionTokenSaved),
+              backgroundColor: AppColors.warning,
+              duration: const Duration(seconds: 3),
             ),
           );
           Navigator.pop(context);
@@ -523,15 +523,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           );
         }
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
     } finally {
       if (mounted) {
         setState(() => _isProcessing = false);
@@ -539,18 +530,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     }
   }
 
+  /// Reclama el token directamente (cuando hay conexión).
   Future<void> _claimToken() async {
-    setState(() {
-      _isProcessing = true;
-      _errorMessage = null;
-    });
+    final walletProvider = context.read<WalletProvider>();
+
+    // Guardar unidad detectada del token ANTES de reclamar
+    final detectedUnit = _tokenInfo?.unit ?? walletProvider.activeUnit;
 
     try {
-      final walletProvider = context.read<WalletProvider>();
-
-      // Guardar unidad detectada del token ANTES de reclamar
-      final detectedUnit = _tokenInfo?.unit ?? walletProvider.activeUnit;
-
       // Reclamar token (usa unidad detectada internamente)
       final amountReceived = await walletProvider.receiveToken(
         _tokenController.text.trim(),
@@ -559,7 +546,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       if (mounted) {
         setState(() {
           _receivedAmount = amountReceived;
-          _receivedUnit = detectedUnit; // Usar unidad del token
+          _receivedUnit = detectedUnit;
           _showSuccess = true;
           _isProcessing = false;
         });
@@ -582,13 +569,8 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       }
       setState(() {
         _errorMessage = errorMessage;
+        _isProcessing = false;
       });
-    } finally {
-      if (mounted && !_showSuccess) {
-        setState(() {
-          _isProcessing = false;
-        });
-      }
     }
   }
 }

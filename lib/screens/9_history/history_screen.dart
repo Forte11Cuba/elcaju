@@ -238,15 +238,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (mounted) {
         final errorStr = e.toString().toLowerCase();
         String message;
+        Color bgColor = AppColors.error;
         if (errorStr.contains('already spent') || errorStr.contains('token already')) {
           message = l10n.tokenAlreadyClaimed;
+        } else if (errorStr.contains('no connection')) {
+          message = l10n.noConnectionTryLater;
+          bgColor = AppColors.warning;
         } else {
           message = l10n.claimError(e.toString());
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message),
-            backgroundColor: AppColors.error,
+            backgroundColor: bgColor,
           ),
         );
       }
