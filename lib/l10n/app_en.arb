@@ -290,6 +290,7 @@
   "receiveNow": "Receive now",
   "receiveLater": "Receive later",
   "tokenSavedForLater": "Token saved to claim later",
+  "noConnectionTokenSaved": "No connection. Token saved to claim later.",
   "pendingTokenLimitReached": "Pending tokens limit reached (max 50)",
   "filterToReceive": "To receive",
   "noPendingTokens": "No pending tokens",

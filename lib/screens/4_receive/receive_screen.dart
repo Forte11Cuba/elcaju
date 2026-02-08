@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
@@ -114,20 +115,10 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           ),
         ),
 
-        // Botones guardar para después y reclamar (fijo abajo)
+        // Botón recibir (fijo abajo)
         Padding(
           padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-          child: Column(
-            children: [
-              // Botón principal: Guardar para después
-              if (_isValidToken && _tokenInfo != null && !_isProcessing) ...[
-                _buildReceiveLaterButton(),
-                const SizedBox(height: AppDimensions.paddingSmall),
-              ],
-              // Botón secundario: Reclamar ahora
-              _buildClaimButton(),
-            ],
-          ),
+          child: _buildReceiveButton(),
         ),
       ],
     );
@@ -404,53 +395,83 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     );
   }
 
-  Widget _buildClaimButton() {
+  Widget _buildReceiveButton() {
     final l10n = L10n.of(context)!;
-    // Botón principal (naranja) para reclamar - abajo, cerca de los dedos
     return PrimaryButton(
-      text: _isProcessing ? l10n.claiming : l10n.receiveNow,
-      onPressed: _isValidToken && !_isProcessing ? _claimToken : null,
+      text: _isProcessing ? l10n.claiming : l10n.receive,
+      onPressed: _isValidToken && !_isProcessing ? _receiveToken : null,
     );
   }
 
-  Widget _buildReceiveLaterButton() {
+  /// Verifica si hay conexión a internet
+  Future<bool> _checkConnectivity() async {
+    final result = await Connectivity().checkConnectivity();
+    return result.contains(ConnectivityResult.mobile) ||
+        result.contains(ConnectivityResult.wifi) ||
+        result.contains(ConnectivityResult.ethernet);
+  }
+
+  /// Recibe el token: si hay conexión lo reclama, si no lo guarda para después
+  Future<void> _receiveToken() async {
+    final hasConnection = await _checkConnectivity();
+
+    if (hasConnection) {
+      await _claimToken();
+    } else {
+      await _saveForLaterOffline();
+    }
+  }
+
+  /// Guarda el token para después cuando no hay conexión
+  Future<void> _saveForLaterOffline() async {
+    if (_isProcessing) return;
+
+    setState(() => _isProcessing = true);
+
     final l10n = L10n.of(context)!;
-    // Botón secundario (outline) para guardar para después
-    return GestureDetector(
-      onTap: _saveForLater,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2),
-            width: 1,
+    final walletProvider = context.read<WalletProvider>();
+
+    try {
+      final pending = await walletProvider.addPendingToken(
+        _tokenController.text.trim(),
+      );
+
+      if (pending != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.noConnectionTokenSaved),
+              backgroundColor: AppColors.warning,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.pendingTokenLimitReached),
+              backgroundColor: AppColors.warning,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppColors.error,
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.clock,
-              color: AppColors.textSecondary,
-              size: 18,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              l10n.receiveLater,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
   }
 
   Future<void> _pasteFromClipboard() async {
@@ -485,58 +506,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         _errorMessage = L10n.of(context)!.invalidToken;
       }
     });
-  }
-
-  Future<void> _saveForLater() async {
-    if (_isProcessing) return; // Guard contra doble-tap
-
-    setState(() => _isProcessing = true);
-
-    final l10n = L10n.of(context)!;
-    final walletProvider = context.read<WalletProvider>();
-
-    try {
-      final pending = await walletProvider.addPendingToken(
-        _tokenController.text.trim(),
-      );
-
-      if (pending != null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.tokenSavedForLater),
-              backgroundColor: AppColors.success,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-          Navigator.pop(context);
-        }
-      } else {
-        // Límite alcanzado
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.pendingTokenLimitReached),
-              backgroundColor: AppColors.warning,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isProcessing = false);
-      }
-    }
   }
 
   Future<void> _claimToken() async {

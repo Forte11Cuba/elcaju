@@ -410,6 +410,7 @@
   "receiveNow": "Recibir ahora",
   "receiveLater": "Recibir después",
   "tokenSavedForLater": "Token guardado para reclamar después",
+  "noConnectionTokenSaved": "Sin conexión. Token guardado para reclamar después.",
   "pendingTokenLimitReached": "Límite de tokens pendientes alcanzado (max 50)",
   "filterToReceive": "Para recibir",
   "noPendingTokens": "Sin tokens pendientes",

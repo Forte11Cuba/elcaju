@@ -52,6 +52,9 @@ dependencies:
   # UUID generator for pending tokens
   uuid: ^4.3.3
 
+  # Connectivity detection
+  connectivity_plus: ^6.0.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
