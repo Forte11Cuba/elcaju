@@ -446,5 +446,20 @@
       "amount": { "type": "String" },
       "unit": { "type": "String" }
     }
-  }
+  },
+
+  "scan": "Escanear",
+  "scanQrCode": "Escanear QR",
+  "scanCashuToken": "Escanear token Cashu",
+  "scanLightningInvoice": "Escanear invoice",
+  "scanningAnimatedQr": "Escaneando QR animado...",
+  "pointCameraAtQr": "Apunta la cámara al código QR",
+  "pointCameraAtCashuQr": "Apunta la cámara al QR del token Cashu",
+  "pointCameraAtInvoiceQr": "Apunta la cámara al QR del invoice",
+  "unrecognizedQrCode": "Código QR no reconocido",
+  "scanCashuTokenHint": "Escanea un token Cashu (cashuA... o cashuB...)",
+  "scanLightningInvoiceHint": "Escanea un invoice Lightning (lnbc...)",
+  "addMintQuestion": "¿Agregar este mint?",
+  "cameraPermissionDenied": "Permiso de cámara denegado",
+  "paymentRequestNotSupported": "Los payment requests aún no están soportados"
 }

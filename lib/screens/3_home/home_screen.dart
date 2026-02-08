@@ -5,6 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/incoming_data_parser.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/animated_action_button.dart';
@@ -18,6 +19,7 @@ import '../7_melt/melt_screen.dart';
 import '../8_settings/settings_screen.dart';
 import '../8_settings/mints_screen.dart';
 import '../9_history/history_screen.dart';
+import '../10_scanner/scan_screen.dart';
 
 /// Pantalla principal - Home
 /// Muestra balance, acciones principales e historial
@@ -366,7 +368,10 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: _showSendOptions,
             ),
           ),
-          const SizedBox(width: AppDimensions.paddingMedium),
+          const SizedBox(width: AppDimensions.paddingSmall),
+          // Botón scan circular (centro)
+          _buildScanButton(),
+          const SizedBox(width: AppDimensions.paddingSmall),
           // Recibir (segundo) - acción importante pero segura
           Expanded(
             child: AnimatedActionButton(
@@ -376,6 +381,45 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildScanButton() {
+    return GestureDetector(
+      onTap: _openScanner,
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: AppColors.buttonGradient,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryAction.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Icon(
+          LucideIcons.scan,
+          color: Colors.white,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
+  void _openScanner() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ScanScreen(mode: ScanMode.any),
       ),
     );
   }

@@ -7,14 +7,19 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/incoming_data_parser.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
 import '../../providers/wallet_provider.dart';
+import '../10_scanner/scan_screen.dart';
 
 /// Pantalla para retirar sats a Lightning (Melt)
 class MeltScreen extends StatefulWidget {
-  const MeltScreen({super.key});
+  /// Invoice inicial (pre-cargado desde QR scanner o deep link)
+  final String? initialInvoice;
+
+  const MeltScreen({super.key, this.initialInvoice});
 
   @override
   State<MeltScreen> createState() => _MeltScreenState();
@@ -40,6 +45,13 @@ class _MeltScreenState extends State<MeltScreen> {
     super.initState();
     _activeUnit = context.read<WalletProvider>().activeUnit;
     _loadBalance();
+    // Pre-cargar invoice inicial si existe
+    if (widget.initialInvoice != null && widget.initialInvoice!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _invoiceController.text = widget.initialInvoice!;
+        _onInvoiceChanged(widget.initialInvoice!);
+      });
+    }
   }
 
   /// Obtiene la etiqueta de la unidad para display
@@ -109,8 +121,8 @@ class _MeltScreenState extends State<MeltScreen> {
 
                       const SizedBox(height: AppDimensions.paddingMedium),
 
-                      // Botón pegar del portapapeles
-                      _buildPasteButton(),
+                      // Botones pegar y escanear
+                      _buildActionButtons(),
 
                       const SizedBox(height: AppDimensions.paddingLarge),
 
@@ -176,6 +188,18 @@ class _MeltScreenState extends State<MeltScreen> {
     );
   }
 
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        // Botón pegar (expandido)
+        Expanded(child: _buildPasteButton()),
+        const SizedBox(width: 12),
+        // Botón escanear QR
+        _buildScanButton(),
+      ],
+    );
+  }
+
   Widget _buildPasteButton() {
     return GestureDetector(
       onTap: _pasteFromClipboard,
@@ -214,6 +238,40 @@ class _MeltScreenState extends State<MeltScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildScanButton() {
+    return GestureDetector(
+      onTap: _openScanner,
+      child: Container(
+        padding: const EdgeInsets.all(AppDimensions.paddingSmall + 4),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: AppColors.buttonGradient,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(
+          LucideIcons.scan,
+          color: Colors.white,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openScanner() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ScanScreen(mode: ScanMode.invoiceOnly),
+      ),
+    );
+
+    if (result != null && result.isNotEmpty && mounted) {
+      _invoiceController.text = result;
+      _onInvoiceChanged(result);
+    }
   }
 
   Widget _buildLoadingQuote() {
