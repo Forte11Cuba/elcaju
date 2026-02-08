@@ -166,6 +166,26 @@ class WalletProvider extends ChangeNotifier {
   }
 
   // ============================================================
+  // CONNECTIVITY
+  // ============================================================
+
+  /// Verifica si podemos alcanzar un mint específico.
+  /// Hace ping HTTP GET a {mintUrl}/v1/info con timeout de 3 segundos.
+  /// Retorna true si responde 200, false en cualquier otro caso.
+  Future<bool> canReachMint(String mintUrl) async {
+    try {
+      final uri = Uri.parse('$mintUrl/v1/info');
+      final response = await http.get(uri).timeout(
+        const Duration(seconds: 3),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('Ping to mint failed: $e');
+      return false;
+    }
+  }
+
+  // ============================================================
   // MINT INFO
   // ============================================================
 
@@ -1385,10 +1405,17 @@ class WalletProvider extends ChangeNotifier {
   /// Intenta reclamar un token pendiente.
   /// Retorna el monto recibido si tiene éxito, o lanza excepción.
   /// Si el token está gastado o es inválido, lo elimina automáticamente.
+  /// Verifica conectividad al mint antes de intentar reclamar.
   Future<BigInt> claimPendingToken(String id) async {
     final pending = _pendingTokenStorage.get(id);
     if (pending == null) {
       throw Exception('Token pendiente no encontrado');
+    }
+
+    // Verificar conectividad al mint primero (evita esperas largas sin conexión)
+    final canReach = await canReachMint(pending.mintUrl);
+    if (!canReach) {
+      throw Exception('No connection to mint');
     }
 
     try {
