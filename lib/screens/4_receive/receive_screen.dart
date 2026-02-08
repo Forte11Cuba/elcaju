@@ -414,21 +414,32 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
 
-    final hasConnection = await _checkConnectivity();
+    try {
+      final hasConnection = await _checkConnectivity();
 
-    if (hasConnection) {
-      await _claimToken();
-    } else {
-      await _saveForLaterOffline();
+      if (hasConnection) {
+        await _claimToken();
+      } else {
+        await _saveForLaterOffline();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted && !_showSuccess) {
+        setState(() => _isProcessing = false);
+      }
     }
   }
 
   /// Guarda el token para después cuando no hay conexión
   Future<void> _saveForLaterOffline() async {
-    if (_isProcessing) return;
-
-    setState(() => _isProcessing = true);
-
     final l10n = L10n.of(context)!;
     final walletProvider = context.read<WalletProvider>();
 
@@ -467,10 +478,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             backgroundColor: AppColors.error,
           ),
         );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isProcessing = false);
       }
     }
   }
@@ -511,7 +518,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Future<void> _claimToken() async {
     setState(() {
-      _isProcessing = true;
       _errorMessage = null;
     });
 
@@ -531,7 +537,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           _receivedAmount = amountReceived;
           _receivedUnit = detectedUnit; // Usar unidad del token
           _showSuccess = true;
-          _isProcessing = false;
         });
 
         // Disparar confetti
@@ -553,12 +558,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       setState(() {
         _errorMessage = errorMessage;
       });
-    } finally {
-      if (mounted && !_showSuccess) {
-        setState(() {
-          _isProcessing = false;
-        });
-      }
     }
   }
 }
