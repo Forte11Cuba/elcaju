@@ -1,6 +1,13 @@
 // Parser para detectar el tipo de dato entrante (QR, clipboard, etc.)
 // Soporta: tokens Cashu (A/B), invoices Lightning, URLs de mint, payment requests
 
+/// Modo de escaneo
+enum ScanMode {
+  any,          // Desde HomeScreen - detecta y navega automáticamente
+  cashuOnly,    // Desde ReceiveScreen - solo acepta tokens Cashu
+  invoiceOnly,  // Desde MeltScreen - solo acepta invoices Lightning
+}
+
 /// Tipo de dato detectado
 enum IncomingDataType {
   cashuToken,       // cashuA... / cashuB...
@@ -68,10 +75,11 @@ class IncomingDataParser {
       );
     }
 
-    // Invoice Lightning (lnbc..., lntb..., lnbcrt...)
-    if (lower.startsWith('lnbc') ||
+    // Invoice Lightning (lnbcrt..., lnbc..., lntb...)
+    // Nota: lnbcrt debe ir primero porque lnbc es prefijo de lnbcrt
+    if (lower.startsWith('lnbcrt') ||
+        lower.startsWith('lnbc') ||
         lower.startsWith('lntb') ||
-        lower.startsWith('lnbcrt') ||
         lower.startsWith('lightning:')) {
       // Remover prefijo lightning: si existe
       final invoice = lower.startsWith('lightning:')
@@ -110,9 +118,10 @@ class IncomingDataParser {
     );
   }
 
-  /// Verifica si el dato es un fragmento UR
+  /// Verifica si el dato es un fragmento UR de Cashu
+  /// Solo detectamos ur:cashu, otros tipos UR (ur:crypto-psbt, etc.) se ignoran
   static bool isUrFragment(String data) {
-    return data.toLowerCase().startsWith('ur:');
+    return data.toLowerCase().startsWith('ur:cashu');
   }
 
   /// Extrae información del header UR (índice y total)
@@ -155,11 +164,4 @@ class IncomingDataParser {
         return data.type == IncomingDataType.lightningInvoice;
     }
   }
-}
-
-/// Modo de escaneo
-enum ScanMode {
-  any,          // Desde HomeScreen - detecta y navega automáticamente
-  cashuOnly,    // Desde ReceiveScreen - solo acepta tokens Cashu
-  invoiceOnly,  // Desde MeltScreen - solo acepta invoices Lightning
 }

@@ -127,8 +127,7 @@ class _ScanScreenState extends State<ScanScreen> {
       // Verificar si es válido para el modo actual
       if (!IncomingDataParser.isValidForMode(parsed, widget.mode)) {
         _showInvalidTypeError(parsed.type);
-        setState(() => _isProcessing = false);
-        return;
+        return; // finally se encarga de setState
       }
 
       // Procesar según el tipo y modo

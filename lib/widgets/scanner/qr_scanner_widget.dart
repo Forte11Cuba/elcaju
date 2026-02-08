@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/utils/incoming_data_parser.dart';
 
@@ -155,7 +156,8 @@ class _QrScannerWidgetState extends State<QrScannerWidget> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    error.errorDetails?.message ?? 'Error de cámara',
+                    error.errorDetails?.message ??
+                        L10n.of(context)!.cameraPermissionDenied,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -289,7 +291,9 @@ class _QrScannerWidgetState extends State<QrScannerWidget> {
   }
 
   Widget _buildUrProgress() {
-    final progress = _urFragments.length / _urTotalFragments;
+    // Guard contra división por cero (aunque _urTotalFragments > 0 cuando se llama)
+    final denominator = _urTotalFragments > 0 ? _urTotalFragments : 1;
+    final progress = (_urFragments.length / denominator).clamp(0.0, 1.0);
 
     return Positioned(
       top: 16,
@@ -439,5 +443,6 @@ class _CornerPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _CornerPainter oldDelegate) =>
+      color != oldDelegate.color;
 }
