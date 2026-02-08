@@ -454,7 +454,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     try {
       final mintUrl = _tokenInfo?.mintUrl;
       if (mintUrl == null) {
-        throw Exception('Token inválido');
+        throw Exception(l10n.invalidToken);
       }
 
       // Verificar si el mint es conocido
