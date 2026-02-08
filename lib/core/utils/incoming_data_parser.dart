@@ -100,15 +100,35 @@ class IncomingDataParser {
       );
     }
 
-    // URL de mint (https://...)
+    // URL potencial de mint (https://...)
     if (lower.startsWith('https://')) {
-      // Verificar si parece una URL de mint (heurística simple)
-      // Los mints típicos tienen /v1/info o son URLs simples
-      return ParsedData(
-        type: IncomingDataType.mintUrl,
-        raw: trimmed,
-        mintUrl: trimmed,
-      );
+      try {
+        final uri = Uri.parse(trimmed);
+        final path = uri.path.toLowerCase();
+
+        // Solo clasificar como mint si tiene endpoints conocidos de Cashu
+        // o es una URL limpia (sin path o solo /)
+        final isMintEndpoint = path.contains('/v1/info') ||
+            path.contains('/v1/keys') ||
+            path.contains('/v1/mint') ||
+            path.contains('/v1/melt');
+        final isCleanUrl = path.isEmpty || path == '/';
+
+        if (isMintEndpoint || isCleanUrl) {
+          // Normalizar: quitar trailing slash y paths de API
+          String mintUrl = '${uri.scheme}://${uri.host}';
+          if (uri.port != 443) mintUrl += ':${uri.port}';
+
+          return ParsedData(
+            type: IncomingDataType.mintUrl,
+            raw: trimmed,
+            mintUrl: mintUrl,
+          );
+        }
+        // URLs con paths no-mint (ej: /about, /login) → unknown
+      } catch (_) {
+        // URL malformada → unknown
+      }
     }
 
     // Tipo desconocido

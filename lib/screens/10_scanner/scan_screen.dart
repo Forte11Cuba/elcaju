@@ -198,7 +198,12 @@ class _ScanScreenState extends State<ScanScreen> {
         break;
 
       case IncomingDataType.unknown:
-        _showError(l10n.unrecognizedQrCode);
+        // Si es una URL https, intentar verificar si es un mint
+        if (data.raw.toLowerCase().startsWith('https://')) {
+          await _tryVerifyAndAddMint(data.raw);
+        } else {
+          _showError(l10n.unrecognizedQrCode);
+        }
         break;
     }
   }
@@ -220,6 +225,38 @@ class _ScanScreenState extends State<ScanScreen> {
       widget.onDataScanned?.call(data.invoiceBolt11 ?? data.raw);
     } else {
       _showInvalidTypeError(data.type);
+    }
+  }
+
+  /// Intenta verificar si una URL es un mint válido antes de mostrar el diálogo
+  Future<void> _tryVerifyAndAddMint(String rawUrl) async {
+    final l10n = L10n.of(context)!;
+
+    try {
+      // Extraer URL base
+      final uri = Uri.parse(rawUrl);
+      String mintUrl = '${uri.scheme}://${uri.host}';
+      if (uri.port != 443 && uri.port != 0) {
+        mintUrl += ':${uri.port}';
+      }
+
+      // Verificar si es un mint real (timeout corto)
+      final walletProvider = context.read<WalletProvider>();
+      final isValidMint = await walletProvider.canReachMint(mintUrl);
+
+      if (!mounted) return;
+
+      if (isValidMint) {
+        // Es un mint válido → mostrar diálogo
+        await _showAddMintDialog(mintUrl);
+      } else {
+        // No es un mint → QR no reconocido
+        _showError(l10n.unrecognizedQrCode);
+      }
+    } catch (_) {
+      if (mounted) {
+        _showError(l10n.unrecognizedQrCode);
+      }
     }
   }
 
