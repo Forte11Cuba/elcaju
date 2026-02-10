@@ -138,10 +138,11 @@ class IncomingDataParser {
     );
   }
 
-  /// Verifica si el dato es un fragmento UR de Cashu
-  /// Solo detectamos ur:cashu, otros tipos UR (ur:crypto-psbt, etc.) se ignoran
+  /// Verifica si el dato es un fragmento UR
+  /// Detectamos cualquier UR (ur:bytes/, ur:cashu/, etc.)
+  /// cashu.me y minibits usan ur:bytes/ para tokens Cashu
   static bool isUrFragment(String data) {
-    return data.toLowerCase().startsWith('ur:cashu');
+    return data.toLowerCase().startsWith('ur:');
   }
 
   /// Extrae información del header UR (índice y total)

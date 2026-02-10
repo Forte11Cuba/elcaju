@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:cdk_flutter/cdk_flutter.dart';
 import '../../core/constants/colors.dart';
 import '../../core/utils/incoming_data_parser.dart';
 
@@ -35,10 +36,10 @@ class QrScannerWidget extends StatefulWidget {
 class _QrScannerWidgetState extends State<QrScannerWidget> {
   late MobileScannerController _controller;
 
-  // Estado para QR animados (UR multipartes)
-  final Map<int, String> _urFragments = {};
-  int _urTotalFragments = 0;
+  // Estado para QR animados (UR multipartes) usando TokenDecoder de cdk-flutter
+  TokenDecoder? _urDecoder;
   bool _isCapturingUr = false;
+  final Set<String> _urFragmentsSeen = {};  // Trackear fragmentos únicos
 
   // Evitar procesar el mismo código múltiples veces
   String? _lastProcessedCode;
@@ -47,9 +48,11 @@ class _QrScannerWidgetState extends State<QrScannerWidget> {
   void initState() {
     super.initState();
     _controller = MobileScannerController(
-      detectionSpeed: DetectionSpeed.normal,
+      detectionSpeed: DetectionSpeed.noDuplicates,
       facing: CameraFacing.back,
       torchEnabled: false,
+      // Usar resolución más alta para QRs densos
+      cameraResolution: const Size(1920, 1080),
     );
   }
 
@@ -71,61 +74,65 @@ class _QrScannerWidgetState extends State<QrScannerWidget> {
     if (rawValue == _lastProcessedCode) return;
     _lastProcessedCode = rawValue;
 
-    // Verificar si es un fragmento UR
-    if (IncomingDataParser.isUrFragment(rawValue)) {
+    // Verificar si es un fragmento UR (ur:bytes/, ur:cashu/, etc.)
+    if (rawValue.toLowerCase().startsWith('ur:')) {
       _handleUrFragment(rawValue);
     } else {
       // QR simple - emitir directamente
-      _isCapturingUr = false;
-      _urFragments.clear();
+      _resetUrState();
       widget.onDetect(rawValue);
     }
   }
 
   void _handleUrFragment(String fragment) {
-    final headerInfo = IncomingDataParser.parseUrHeader(fragment);
+    // Inicializar decoder si es necesario
+    if (_urDecoder == null) {
+      _urDecoder = TokenDecoder();
+      _isCapturingUr = true;
+      _urFragmentsSeen.clear();
+    }
 
-    if (headerInfo == null) {
-      // UR sin formato multipart (fragmento único)
-      widget.onDetect(fragment);
+    // Ignorar fragmentos ya vistos
+    if (_urFragmentsSeen.contains(fragment)) {
       return;
     }
 
-    final (currentIndex, totalFragments) = headerInfo;
-
-    // Inicializar o verificar consistencia
-    if (!_isCapturingUr) {
-      _isCapturingUr = true;
-      _urTotalFragments = totalFragments;
-      _urFragments.clear();
-    } else if (_urTotalFragments != totalFragments) {
-      // Nuevo QR con diferente número de fragmentos, resetear
-      _urFragments.clear();
-      _urTotalFragments = totalFragments;
+    // Pasar fragmento al decoder (usa fountain codes internamente)
+    try {
+      _urDecoder!.receive(input: fragment);
+      _urFragmentsSeen.add(fragment);
+    } catch (e) {
+      // Fragmento inválido o incompatible, ignorar
+      return;
     }
-
-    // Guardar fragmento
-    _urFragments[currentIndex] = fragment;
 
     // Actualizar UI
     if (mounted) setState(() {});
 
-    // Verificar si tenemos todos los fragmentos
-    if (_urFragments.length == _urTotalFragments) {
-      // Reconstruir datos completos
-      final sortedFragments = List.generate(
-        _urTotalFragments,
-        (i) => _urFragments[i + 1] ?? '',
-      );
-
-      // Emitir todos los fragmentos como lista separada por newlines
-      // El receptor debe usar cdk.decodeQrToken con la lista
-      final completeData = sortedFragments.join('\n');
-
-      _isCapturingUr = false;
-      _urFragments.clear();
-      widget.onDetect(completeData);
+    // Verificar si está completo
+    if (_urDecoder!.isComplete()) {
+      try {
+        final token = _urDecoder!.value();
+        if (token != null) {
+          final encodedToken = token.encoded;
+          _resetUrState();
+          widget.onDetect(encodedToken);
+        } else {
+          widget.onError?.call('Error: token vacío');
+          _resetUrState();
+        }
+      } catch (e) {
+        widget.onError?.call('Error decodificando UR: $e');
+        _resetUrState();
+      }
     }
+  }
+
+  void _resetUrState() {
+    _urDecoder = null;
+    _isCapturingUr = false;
+    _urFragmentsSeen.clear();
+    _lastProcessedCode = null;
   }
 
   void _toggleFlash() async {
@@ -291,10 +298,6 @@ class _QrScannerWidgetState extends State<QrScannerWidget> {
   }
 
   Widget _buildUrProgress() {
-    // Guard contra división por cero (aunque _urTotalFragments > 0 cuando se llama)
-    final denominator = _urTotalFragments > 0 ? _urTotalFragments : 1;
-    final progress = (_urFragments.length / denominator).clamp(0.0, 1.0);
-
     return Positioned(
       top: 16,
       left: 16,
@@ -320,7 +323,7 @@ class _QrScannerWidgetState extends State<QrScannerWidget> {
                   ),
                 ),
                 Text(
-                  '${_urFragments.length}/$_urTotalFragments',
+                  '${_urFragmentsSeen.length} fragmentos',
                   style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -330,10 +333,10 @@ class _QrScannerWidgetState extends State<QrScannerWidget> {
               ],
             ),
             const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: progress,
+            // Indicador indeterminado ya que TokenDecoder no expone progreso
+            const LinearProgressIndicator(
               backgroundColor: Colors.black26,
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
             ),
           ],
         ),
