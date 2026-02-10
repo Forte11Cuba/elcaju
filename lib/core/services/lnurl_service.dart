@@ -217,8 +217,14 @@ class LnurlService {
       if (callback == null || callback.isEmpty) {
         throw Exception('Respuesta LNURL-pay inválida: falta callback');
       }
-      final minSendable = BigInt.from((json['minSendable'] as num).toInt());
-      final maxSendable = BigInt.from((json['maxSendable'] as num).toInt());
+
+      final minRaw = json['minSendable'] as num?;
+      final maxRaw = json['maxSendable'] as num?;
+      if (minRaw == null || maxRaw == null) {
+        throw Exception('Respuesta LNURL-pay inválida: falta minSendable/maxSendable');
+      }
+      final minSendable = BigInt.from(minRaw.toInt());
+      final maxSendable = BigInt.from(maxRaw.toInt());
       final metadata = json['metadata'] as String?;
 
       // Extraer descripción del metadata

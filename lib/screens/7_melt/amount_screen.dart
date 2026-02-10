@@ -45,6 +45,9 @@ class _AmountScreenState extends State<AmountScreen> {
   // Equivalente en la otra unidad (para mostrar)
   String? _equivalentDisplay;
 
+  // Contador para evitar race conditions en _updateEquivalent
+  int _equivalentGeneration = 0;
+
   @override
   void initState() {
     super.initState();
@@ -84,6 +87,8 @@ class _AmountScreenState extends State<AmountScreen> {
 
   /// Actualiza el equivalente mostrado
   Future<void> _updateEquivalent() async {
+    final gen = ++_equivalentGeneration;
+
     if (_amount.isEmpty || _amountInBaseUnit == BigInt.zero) {
       setState(() => _equivalentDisplay = null);
       return;
@@ -95,6 +100,7 @@ class _AmountScreenState extends State<AmountScreen> {
       if (_isFiatUnit) {
         // Mostrar equivalente en sats
         final sats = await priceProvider.fiatCentsToSats(_amountInBaseUnit, _activeUnit);
+        if (gen != _equivalentGeneration) return; // Descartar si hay llamada más reciente
         setState(() {
           _equivalentDisplay = '≈ ${UnitFormatter.formatBalance(sats, 'sat')} sat';
         });
@@ -102,21 +108,19 @@ class _AmountScreenState extends State<AmountScreen> {
         // Mostrar equivalente en USD si hay precio
         if (priceProvider.hasPrice) {
           final usdCents = await priceProvider.satsToFiatCents(_amountInBaseUnit, 'usd');
+          if (gen != _equivalentGeneration) return; // Descartar si hay llamada más reciente
           setState(() {
             _equivalentDisplay = '≈ ${UnitFormatter.formatBalance(usdCents, 'usd')} USD';
           });
         }
       }
     } catch (_) {
+      if (gen != _equivalentGeneration) return;
       setState(() => _equivalentDisplay = null);
     }
   }
 
-  bool get _isAmountValid {
-    if (_amountInBaseUnit <= BigInt.zero) return false;
-    // Para validar contra LNURL necesitamos sats, pero hacemos validación básica aquí
-    return _amountInBaseUnit > BigInt.zero;
-  }
+  bool get _isAmountValid => _amountInBaseUnit > BigInt.zero;
 
   bool get _canPay {
     return _isAmountValid && !_isProcessing && _amountInBaseUnit <= _availableBalance;

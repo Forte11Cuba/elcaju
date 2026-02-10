@@ -537,10 +537,11 @@ class _MeltScreenState extends State<MeltScreen> {
     // Para BOLT11 con quote válido: botón Pagar
     final hasValidQuote = _isValidInvoice && _quote != null && _total <= _availableBalance;
 
-    // Para LNURL/Address o unknown: botón Continuar (para validar)
+    // Para LNURL/Address, unknown, o BOLT11 sin quote válido: botón Continuar
     final needsProcessing = _inputType == LnInputType.lnurl ||
         _inputType == LnInputType.lightningAddress ||
-        _inputType == LnInputType.unknown;
+        _inputType == LnInputType.unknown ||
+        (_inputType == LnInputType.bolt11Invoice && !hasValidQuote);
 
     // Determinar estado del botón
     final canPay = !_isProcessing && !_isLoadingQuote && !_isResolvingLnurl && hasValidQuote;
@@ -619,9 +620,19 @@ class _MeltScreenState extends State<MeltScreen> {
 
     switch (_inputType) {
       case LnInputType.bolt11Invoice:
-        // Ya procesado automáticamente, mostrar confirmación si hay quote
         if (_quote != null) {
+          // Quote válido, mostrar confirmación
           _showConfirmation();
+        } else {
+          // Sin quote, intentar obtenerlo o mostrar error
+          final cleaned = LnurlService.cleanInput(value);
+          if (cleaned.length > 50) {
+            _getQuote(cleaned);
+          } else {
+            setState(() {
+              _errorMessage = L10n.of(context)!.invalidInvoiceMalformed;
+            });
+          }
         }
         break;
 
