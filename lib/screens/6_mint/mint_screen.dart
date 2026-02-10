@@ -44,8 +44,8 @@ class _MintScreenState extends State<MintScreen> {
   /// Obtiene la etiqueta de la unidad para display
   String get _unitLabel => UnitFormatter.getUnitLabel(_activeUnit);
 
-  /// Parsea el input del usuario a BigInt según la unidad
-  BigInt get _amount => UnitFormatter.parseUserInput(_amountValue, _activeUnit);
+  /// Parsea los dígitos crudos a BigInt (ya son centavos para USD/EUR)
+  BigInt get _amount => UnitFormatter.parseRawDigits(_amountValue, _activeUnit);
 
   bool get _isValidAmount => _amount > BigInt.zero;
 
@@ -131,7 +131,7 @@ class _MintScreenState extends State<MintScreen> {
   }
 
   Widget _buildAmountDisplay() {
-    final displayAmount = _amountValue.isEmpty ? '0' : _amountValue;
+    final displayAmount = UnitFormatter.formatRawDigitsForDisplay(_amountValue, _activeUnit);
 
     return Column(
       children: [

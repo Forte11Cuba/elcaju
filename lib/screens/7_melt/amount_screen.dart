@@ -11,6 +11,7 @@ import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
 import '../../widgets/common/numpad_widget.dart';
 import '../../providers/wallet_provider.dart';
+import '../../providers/price_provider.dart';
 
 /// Pantalla para elegir monto en pagos LNURL/Lightning Address
 class AmountScreen extends StatefulWidget {
@@ -39,10 +40,15 @@ class _AmountScreenState extends State<AmountScreen> {
   bool _isProcessing = false;
   String? _errorMessage;
   BigInt _availableBalance = BigInt.zero;
+  late String _activeUnit;
+
+  // Equivalente en la otra unidad (para mostrar)
+  String? _equivalentDisplay;
 
   @override
   void initState() {
     super.initState();
+    _activeUnit = context.read<WalletProvider>().activeUnit;
     _loadBalance();
   }
 
@@ -54,18 +60,66 @@ class _AmountScreenState extends State<AmountScreen> {
     }
   }
 
-  BigInt get _amountSats {
-    if (_amount.isEmpty) return BigInt.zero;
-    return BigInt.tryParse(_amount) ?? BigInt.zero;
+  /// Obtiene el monto ingresado en la unidad base (centavos para USD, sats para sat)
+  BigInt get _amountInBaseUnit {
+    return UnitFormatter.parseRawDigits(_amount, _activeUnit);
+  }
+
+  /// Verifica si la unidad activa es fiat (necesita conversión)
+  bool get _isFiatUnit {
+    return _activeUnit.toLowerCase() == 'usd' || _activeUnit.toLowerCase() == 'eur';
+  }
+
+  /// Convierte el monto a sats para LNURL
+  Future<BigInt> _getAmountInSats() async {
+    if (!_isFiatUnit) {
+      // Ya está en sats
+      return _amountInBaseUnit;
+    }
+
+    // Convertir fiat a sats usando PriceProvider
+    final priceProvider = context.read<PriceProvider>();
+    return await priceProvider.fiatCentsToSats(_amountInBaseUnit, _activeUnit);
+  }
+
+  /// Actualiza el equivalente mostrado
+  Future<void> _updateEquivalent() async {
+    if (_amount.isEmpty || _amountInBaseUnit == BigInt.zero) {
+      setState(() => _equivalentDisplay = null);
+      return;
+    }
+
+    try {
+      final priceProvider = context.read<PriceProvider>();
+
+      if (_isFiatUnit) {
+        // Mostrar equivalente en sats
+        final sats = await priceProvider.fiatCentsToSats(_amountInBaseUnit, _activeUnit);
+        setState(() {
+          _equivalentDisplay = '≈ ${UnitFormatter.formatBalance(sats, 'sat')} sat';
+        });
+      } else {
+        // Mostrar equivalente en USD si hay precio
+        if (priceProvider.hasPrice) {
+          final usdCents = await priceProvider.satsToFiatCents(_amountInBaseUnit, 'usd');
+          setState(() {
+            _equivalentDisplay = '≈ ${UnitFormatter.formatBalance(usdCents, 'usd')} USD';
+          });
+        }
+      }
+    } catch (_) {
+      setState(() => _equivalentDisplay = null);
+    }
   }
 
   bool get _isAmountValid {
-    if (_amountSats <= BigInt.zero) return false;
-    return widget.params.isAmountValid(_amountSats);
+    if (_amountInBaseUnit <= BigInt.zero) return false;
+    // Para validar contra LNURL necesitamos sats, pero hacemos validación básica aquí
+    return _amountInBaseUnit > BigInt.zero;
   }
 
   bool get _canPay {
-    return _isAmountValid && !_isProcessing && _amountSats <= _availableBalance;
+    return _isAmountValid && !_isProcessing && _amountInBaseUnit <= _availableBalance;
   }
 
   String get _destinationLabel {
@@ -113,7 +167,7 @@ class _AmountScreenState extends State<AmountScreen> {
                       _buildAmountDisplay(),
                       const SizedBox(height: AppDimensions.paddingSmall),
 
-                      // Rango permitido
+                      // Rango permitido (siempre en sats porque es LNURL)
                       _buildRangeInfo(),
                       const SizedBox(height: AppDimensions.paddingLarge),
 
@@ -201,7 +255,8 @@ class _AmountScreenState extends State<AmountScreen> {
   }
 
   Widget _buildAmountDisplay() {
-    final displayAmount = _amount.isEmpty ? '0' : _amount;
+    final displayAmount = UnitFormatter.formatRawDigitsForDisplay(_amount, _activeUnit);
+    final unitLabel = UnitFormatter.getUnitLabel(_activeUnit);
 
     return Column(
       children: [
@@ -218,18 +273,31 @@ class _AmountScreenState extends State<AmountScreen> {
         ),
         const SizedBox(height: 4),
         Text(
-          'sats',
-          style: TextStyle(
+          unitLabel,
+          style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 18,
             color: AppColors.textSecondary,
           ),
         ),
+        // Mostrar equivalente en la otra unidad
+        if (_equivalentDisplay != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            _equivalentDisplay!,
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 14,
+              color: AppColors.textSecondary.withValues(alpha: 0.7),
+            ),
+          ),
+        ],
       ],
     );
   }
 
   Widget _buildRangeInfo() {
+    // LNURL min/max siempre en sats
     final min = widget.params.minSats;
     final max = widget.params.maxSats;
 
@@ -240,7 +308,7 @@ class _AmountScreenState extends State<AmountScreen> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        'Min: $min  •  Max: $max sats',
+        'Min: $min  •  Max: $max sat',
         style: TextStyle(
           fontFamily: 'Inter',
           fontSize: 13,
@@ -258,13 +326,14 @@ class _AmountScreenState extends State<AmountScreen> {
           _errorMessage = null;
           _amount = newValue;
         });
+        // Actualizar equivalente de forma asíncrona
+        _updateEquivalent();
       },
     );
   }
 
   Widget _buildBalanceInfo() {
-    final activeUnit = context.read<WalletProvider>().activeUnit;
-    final unitLabel = UnitFormatter.getUnitLabel(activeUnit);
+    final unitLabel = UnitFormatter.getUnitLabel(_activeUnit);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -278,7 +347,7 @@ class _AmountScreenState extends State<AmountScreen> {
           ),
         ),
         Text(
-          '${UnitFormatter.formatBalance(_availableBalance, activeUnit)} $unitLabel',
+          '${UnitFormatter.formatBalance(_availableBalance, _activeUnit)} $unitLabel',
           style: const TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
@@ -337,15 +406,27 @@ class _AmountScreenState extends State<AmountScreen> {
     });
 
     try {
-      // 1. Obtener invoice desde LNURL callback
+      // 1. Convertir monto a sats para LNURL
+      final amountSats = await _getAmountInSats();
+
+      // Validar contra límites LNURL
+      if (!widget.params.isAmountValid(amountSats)) {
+        setState(() {
+          _isProcessing = false;
+          _errorMessage = L10n.of(context)!.amountOutOfRange;
+        });
+        return;
+      }
+
+      // 2. Obtener invoice desde LNURL callback
       final invoiceResult = await LnurlService.fetchInvoice(
         widget.params.callback,
-        _amountSats,
+        amountSats,
       );
 
       if (!mounted) return;
 
-      // 2. Obtener quote del mint
+      // 3. Obtener quote del mint (en la unidad del mint)
       final walletProvider = context.read<WalletProvider>();
       final quote = await walletProvider.getMeltQuote(invoiceResult.invoice);
 
@@ -353,7 +434,7 @@ class _AmountScreenState extends State<AmountScreen> {
 
       final total = quote.amount + quote.feeReserve;
 
-      // 3. Verificar balance suficiente
+      // 4. Verificar balance suficiente
       if (total > _availableBalance) {
         setState(() {
           _isProcessing = false;
@@ -362,27 +443,27 @@ class _AmountScreenState extends State<AmountScreen> {
         return;
       }
 
-      // 4. Mostrar confirmación
+      // 5. Mostrar confirmación (montos del mint, en activeUnit)
       final confirmed = await _showConfirmation(quote.amount, quote.feeReserve, total);
 
-      if (!confirmed || !mounted) {
-        setState(() => _isProcessing = false);
+      if (!confirmed) {
+        if (mounted) setState(() => _isProcessing = false);
         return;
       }
+      if (!mounted) return;
 
-      // 5. Ejecutar pago
+      // 6. Ejecutar pago
       final totalPaid = await walletProvider.melt(quote);
 
       if (!mounted) return;
 
-      // 6. Mostrar éxito y volver
+      // 7. Mostrar éxito y volver
       final l10n = L10n.of(context)!;
-      final activeUnit = walletProvider.activeUnit;
-      final unitLabel = UnitFormatter.getUnitLabel(activeUnit);
+      final unitLabel = UnitFormatter.getUnitLabel(_activeUnit);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.sent('-${UnitFormatter.formatBalance(totalPaid, activeUnit)}', unitLabel)),
+          content: Text(l10n.sent('-${UnitFormatter.formatBalance(totalPaid, _activeUnit)}', unitLabel)),
           backgroundColor: AppColors.success,
           duration: const Duration(seconds: 3),
         ),
@@ -411,15 +492,16 @@ class _AmountScreenState extends State<AmountScreen> {
     } else if (lower.contains('expired')) {
       return l10n.invoiceExpired;
     } else if (lower.contains('min') || lower.contains('max')) {
-      return 'Monto fuera del rango permitido';
+      return l10n.amountOutOfRange;
+    } else if (lower.contains('precio') || lower.contains('price')) {
+      return 'No se pudo obtener el precio de BTC';
     }
 
     return error.replaceFirst('Exception: ', '');
   }
 
   Future<bool> _showConfirmation(BigInt amount, BigInt fee, BigInt total) async {
-    final activeUnit = context.read<WalletProvider>().activeUnit;
-    final unitLabel = UnitFormatter.getUnitLabel(activeUnit);
+    final unitLabel = UnitFormatter.getUnitLabel(_activeUnit);
 
     final result = await showModalBottomSheet<bool>(
       context: context,
@@ -475,9 +557,9 @@ class _AmountScreenState extends State<AmountScreen> {
             ),
             const SizedBox(height: AppDimensions.paddingSmall),
 
-            // Monto
+            // Monto (en la unidad del mint)
             Text(
-              '${UnitFormatter.formatBalance(amount, activeUnit)} $unitLabel',
+              '${UnitFormatter.formatBalance(amount, _activeUnit)} $unitLabel',
               style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 28,
@@ -486,7 +568,7 @@ class _AmountScreenState extends State<AmountScreen> {
               ),
             ),
             Text(
-              '+ ~${UnitFormatter.formatBalance(fee, activeUnit)} $unitLabel fee',
+              '+ ~${UnitFormatter.formatBalance(fee, _activeUnit)} $unitLabel fee',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
@@ -495,7 +577,7 @@ class _AmountScreenState extends State<AmountScreen> {
             ),
             const SizedBox(height: AppDimensions.paddingSmall),
             Text(
-              'Total: ${UnitFormatter.formatBalance(total, activeUnit)} $unitLabel',
+              'Total: ${UnitFormatter.formatBalance(total, _activeUnit)} $unitLabel',
               style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,

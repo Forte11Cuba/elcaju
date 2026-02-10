@@ -168,6 +168,13 @@
   "pay": "Pagar",
   "fee": "fee",
   "invoiceExpired": "Invoice expirado",
+  "amountOutOfRange": "Monto fuera del rango permitido",
+  "resolvingType": "Resolviendo {type}...",
+  "@resolvingType": {
+    "placeholders": {
+      "type": { "type": "String" }
+    }
+  },
   "invoiceAlreadyPaid": "Invoice ya fue pagado",
   "paymentError": "Error al pagar: {error}",
   "@paymentError": {

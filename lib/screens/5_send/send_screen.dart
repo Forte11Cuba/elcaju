@@ -57,8 +57,8 @@ class _SendScreenState extends State<SendScreen> {
   /// Obtiene la etiqueta de la unidad para display
   String get _unitLabel => UnitFormatter.getUnitLabel(_activeUnit);
 
-  /// Parsea el input del usuario a BigInt según la unidad
-  BigInt get _amount => UnitFormatter.parseUserInput(_amountValue, _activeUnit);
+  /// Parsea los dígitos crudos a BigInt (ya son centavos para USD/EUR)
+  BigInt get _amount => UnitFormatter.parseRawDigits(_amountValue, _activeUnit);
 
   bool get _isValidAmount => _amount > BigInt.zero && _amount <= _availableBalance;
 
@@ -158,7 +158,7 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Widget _buildAmountDisplay() {
-    final displayAmount = _amountValue.isEmpty ? '0' : _amountValue;
+    final displayAmount = UnitFormatter.formatRawDigitsForDisplay(_amountValue, _activeUnit);
 
     return Column(
       children: [
@@ -305,8 +305,8 @@ class _SendScreenState extends State<SendScreen> {
 
   void _setMaxAmount() {
     setState(() {
-      // Formatear el balance para el numpad (sin separadores de miles)
-      _amountValue = UnitFormatter.formatBalance(_availableBalance, _activeUnit).replaceAll(',', '');
+      // El balance ya está en la unidad base (centavos para USD/EUR, sats para SAT)
+      _amountValue = _availableBalance.toString();
       _errorMessage = null;
     });
   }

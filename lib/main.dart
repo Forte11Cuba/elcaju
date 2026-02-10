@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/wallet_provider.dart';
 import 'providers/settings_provider.dart';
+import 'providers/price_provider.dart';
 import 'screens/1_splash/splash_screen.dart';
 
 void main() async {
@@ -30,11 +31,16 @@ void main() async {
     ),
   );
 
+  // Inicializar PriceProvider
+  final priceProvider = PriceProvider();
+  priceProvider.initialize();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => WalletProvider()),
+        ChangeNotifierProvider.value(value: priceProvider),
       ],
       child: const ElCajuApp(),
     ),

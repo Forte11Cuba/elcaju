@@ -137,6 +137,13 @@
   "pay": "Pay",
   "fee": "fee",
   "invoiceExpired": "Invoice expired",
+  "amountOutOfRange": "Amount out of allowed range",
+  "resolvingType": "Resolving {type}...",
+  "@resolvingType": {
+    "placeholders": {
+      "type": { "type": "String" }
+    }
+  },
   "invoiceAlreadyPaid": "Invoice already paid",
   "paymentError": "Payment error: {error}",
   "sent": "{amount} {unit} sent",

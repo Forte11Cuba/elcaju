@@ -303,7 +303,7 @@ class _MeltScreenState extends State<MeltScreen> {
           ),
           const SizedBox(width: 12),
           Text(
-            'Resolviendo $typeLabel...',
+            L10n.of(context)!.resolvingType(typeLabel),
             style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 14,
@@ -600,7 +600,11 @@ class _MeltScreenState extends State<MeltScreen> {
     // Solo procesar automáticamente invoices BOLT11
     // LNURL y Lightning Address requieren botón explícito
     if (inputType == LnInputType.bolt11Invoice) {
-      _getQuote(LnurlService.cleanInput(value));
+      // BOLT11 invoices son 200+ chars; evitar llamar API con input parcial
+      final cleaned = LnurlService.cleanInput(value);
+      if (cleaned.length > 50) {
+        _getQuote(cleaned);
+      }
     }
     // No mostrar error para unknown - el usuario puede estar escribiendo
   }

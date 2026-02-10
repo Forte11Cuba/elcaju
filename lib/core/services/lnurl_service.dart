@@ -213,9 +213,12 @@ class LnurlService {
       }
 
       // Extraer parámetros
-      final callback = json['callback'] as String;
-      final minSendable = BigInt.from(json['minSendable'] as int);
-      final maxSendable = BigInt.from(json['maxSendable'] as int);
+      final callback = json['callback'] as String?;
+      if (callback == null || callback.isEmpty) {
+        throw Exception('Respuesta LNURL-pay inválida: falta callback');
+      }
+      final minSendable = BigInt.from((json['minSendable'] as num).toInt());
+      final maxSendable = BigInt.from((json['maxSendable'] as num).toInt());
       final metadata = json['metadata'] as String?;
 
       // Extraer descripción del metadata
