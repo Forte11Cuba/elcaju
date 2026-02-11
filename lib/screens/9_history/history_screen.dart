@@ -77,16 +77,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            // Filtros
-            _buildFilters(),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Filtros
+              _buildFilters(),
 
-            // Lista de transacciones
-            Expanded(
-              child: _buildTransactionList(),
-            ),
-          ],
+              // Lista de transacciones
+              Expanded(
+                child: _buildTransactionList(),
+              ),
+            ],
+          ),
         ),
       ),
     );

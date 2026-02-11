@@ -627,7 +627,8 @@ class _MethodSelectorModal extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: AppDimensions.paddingSmall),
+          // Espacio para la barra de navegación del sistema
+          SizedBox(height: MediaQuery.of(context).padding.bottom + AppDimensions.paddingSmall),
         ],
       ),
     );

@@ -53,10 +53,11 @@ class _ScanScreenState extends State<ScanScreen> {
         ),
         centerTitle: true,
       ),
-      body: Stack(
-        children: [
-          // Scanner
-          QrScannerWidget(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Scanner
+            QrScannerWidget(
             onDetect: _onCodeDetected,
             showFlashControl: true,
             showCameraSwitch: false,
@@ -89,6 +90,7 @@ class _ScanScreenState extends State<ScanScreen> {
               ),
             ),
         ],
+        ),
       ),
     );
   }

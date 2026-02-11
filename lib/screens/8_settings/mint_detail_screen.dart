@@ -51,9 +51,10 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
             onPressed: () => Navigator.pop(context),
           ),
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
                 // Header: Logo + Nombre
@@ -93,6 +94,7 @@ class _MintDetailScreenState extends State<MintDetailScreen> {
                 const SizedBox(height: 40),
               ],
             ),
+          ),
           ),
         ),
       ),
