@@ -69,6 +69,7 @@ class ElCajuApp extends StatelessWidget {
       supportedLocales: const [
         Locale('es'), // Español (por defecto)
         Locale('en'), // English
+        Locale('pt'), // Português
       ],
       locale: Locale(settingsProvider.locale),
 
