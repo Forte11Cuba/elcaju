@@ -215,6 +215,7 @@
   "german": "Deutsch",
   "italian": "Italiano",
   "korean": "한국어",
+  "chinese": "中文",
 
   "mnemonicNotFound": "Mnemonic not found",
   "createPin": "Create PIN",
