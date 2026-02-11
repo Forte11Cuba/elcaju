@@ -1,0 +1,489 @@
+{
+  "@@locale": "sw",
+
+  "appName": "ElCaju",
+  "appTagline": "Pochi yako ya faragha ya ecash",
+  "loadingMessage1": "Kusimba sarafu zako...",
+  "loadingMessage2": "Kuandaa e-tokeni zako...",
+  "loadingMessage3": "Kuunganisha na Mint...",
+  "loadingMessage4": "Faragha kwa chaguo-msingi.",
+  "loadingMessage5": "Kusaini tokeni kwa upofu...",
+  "loadingMessage6": "Go full Calle...",
+  "loadingMessage7": "Cashu + Bitchat = Faragha + Uhuru",
+  "aboutTagline": "Faragha bila mipaka.",
+
+  "welcomeTitle": "Karibu ElCaju",
+  "welcomeSubtitle": "Cashu kwa ulimwengu. Imetengenezwa Cuba.",
+
+  "createWallet": "Unda pochi mpya",
+  "restoreWallet": "Rejesha pochi",
+
+  "createWalletTitle": "Unda pochi",
+  "creatingWallet": "Kuunda pochi yako...",
+  "generatingSeed": "Kutengeneza maneno yako ya mbegu kwa usalama",
+  "createWalletDescription": "Maneno 12 ya mbegu yatatengenezwa.\nYahifadhi mahali salama.",
+  "generateWallet": "Tengeneza pochi",
+
+  "walletCreated": "Pochi imeundwa!",
+  "walletCreatedDescription": "Pochi yako iko tayari. Tunakushauri uhifadhi nakala ya maneno yako ya mbegu sasa.",
+  "backupWarning": "Bila nakala, utapoteza uwezo wa kufikia fedha zako ukipoteza kifaa.",
+  "backupNow": "Hifadhi nakala sasa",
+  "backupLater": "Fanya baadaye",
+
+  "backupTitle": "Nakala rudufu",
+  "seedPhraseTitle": "Maneno yako ya mbegu",
+  "seedPhraseDescription": "Hifadhi maneno haya 12 kwa mpangilio. Ndiyo njia pekee ya kurejesha pochi yako.",
+  "revealSeedPhrase": "Onyesha maneno ya mbegu",
+  "tapToReveal": "Bofya kitufe kuonyesha\nmaneno yako ya mbegu",
+  "copyToClipboard": "Nakili kwenye ubao wa kunakili",
+  "seedCopied": "Maneno yamenakiliwa kwenye ubao",
+  "neverShareSeed": "Usishiriki maneno yako ya mbegu na mtu yeyote.",
+  "confirmBackup": "Nimehifadhi maneno yangu ya mbegu mahali salama",
+  "continue_": "Endelea",
+
+  "restoreTitle": "Rejesha pochi",
+  "enterSeedPhrase": "Ingiza maneno yako ya mbegu",
+  "enterSeedDescription": "Andika maneno 12 au 24 yakitengwa na nafasi.",
+  "seedPlaceholder": "neno1 neno2 neno3 ...",
+  "wordCount": "maneno {count}",
+  "@wordCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "needWords": "(unahitaji 12 au 24)",
+  "restoreError": "Hitilafu ya kurejesha: {error}",
+  "@restoreError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "homeTitle": "Nyumbani",
+  "receive": "Pokea",
+  "send": "Tuma",
+  "sendAction": "Tuma ↗",
+  "receiveAction": "↘ Pokea",
+  "deposit": "Weka",
+  "withdraw": "Toa",
+  "lightning": "Lightning",
+  "cashu": "Cashu",
+  "ecash": "Ecash",
+  "history": "Historia",
+  "noTransactions": "Hakuna miamala bado",
+  "depositOrReceive": "Weka au pokea sats kuanza",
+  "noMint": "Hakuna mint",
+
+  "balance": "Salio",
+  "sats": "sats",
+
+  "pasteEcashToken": "Bandika tokeni ya ecash",
+  "generateInvoiceToDeposit": "Tengeneza ankara ya kuweka",
+  "createEcashToken": "Unda tokeni ya ecash",
+  "payLightningInvoice": "Lipa ankara ya Lightning",
+
+  "receiveCashu": "Pokea Cashu",
+  "pasteTheCashuToken": "Bandika tokeni ya Cashu:",
+  "pasteFromClipboard": "Bandika kutoka ubao",
+  "validToken": "Tokeni halali",
+  "invalidToken": "Tokeni batili au imeharibika",
+  "amount": "Kiasi:",
+  "mint": "Mint:",
+  "claiming": "Kudai...",
+  "claimTokens": "Dai tokeni",
+  "tokensReceived": "Tokeni zimepokelewa",
+  "backToHome": "Rudi nyumbani",
+  "tokenAlreadyClaimed": "Tokeni hii tayari imedaiwa",
+  "unknownMint": "Tokeni kutoka mint isiyojulikana",
+  "claimError": "Hitilafu ya kudai: {error}",
+  "@claimError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "sendCashu": "Tuma Cashu",
+  "selectNotesManually": "Chagua noti kwa mkono",
+  "amountToSend": "Kiasi cha kutuma:",
+  "available": "Inapatikana:",
+  "max": "(Upeo)",
+  "memoOptional": "Memo (si lazima):",
+  "memoPlaceholder": "Malipo haya ni ya nini?",
+  "creatingToken": "Kuunda tokeni...",
+  "createToken": "Unda tokeni",
+  "noActiveMint": "Hakuna mint inayofanya kazi",
+  "offlineModeMessage": "Hakuna muunganisho. Kutumia hali ya nje ya mtandao...",
+  "confirmSend": "Thibitisha kutuma",
+  "confirm": "Thibitisha",
+  "cancel": "Ghairi",
+  "insufficientBalance": "Salio halitoshi",
+  "tokenCreationError": "Hitilafu ya kuunda tokeni: {error}",
+  "@tokenCreationError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "tokenCreated": "Tokeni imeundwa",
+  "copy": "Nakili",
+  "share": "Shiriki",
+  "tokenCashu": "Tokeni ya Cashu",
+  "tokenCashuAnimatedQr": "Tokeni ya Cashu (QR inayosogea - vipande {fragments} vya UR)",
+  "@tokenCashuAnimatedQr": {
+    "placeholders": {
+      "fragments": { "type": "int" }
+    }
+  },
+  "keepTokenWarning": "Hifadhi tokeni hii hadi mpokeaji aidai. Ukiipoteza, utapoteza fedha.",
+  "tokenCopiedToClipboard": "Tokeni imenakiliwa kwenye ubao",
+
+  "amountToDeposit": "Kiasi cha kuweka:",
+  "descriptionOptional": "Maelezo (si lazima):",
+  "depositPlaceholder": "Amana hii ni ya nini?",
+  "generating": "Kutengeneza...",
+  "generateInvoice": "Tengeneza ankara",
+  "depositLightning": "Weka Lightning",
+
+  "payInvoiceTitle": "Lipa ankara",
+  "generatingInvoice": "Kutengeneza ankara...",
+  "waitingForPayment": "Kusubiri malipo...",
+  "paymentReceived": "Malipo yamepokelewa",
+  "tokensIssued": "Tokeni zimetolewa!",
+  "error": "Hitilafu",
+  "unknownError": "Hitilafu isiyojulikana",
+  "back": "Rudi",
+  "copyInvoice": "Nakili ankara",
+  "description": "Maelezo:",
+  "invoiceCopiedToClipboard": "Ankara imenakiliwa kwenye ubao",
+  "deposited": "{amount} {unit} zimewekwa",
+  "@deposited": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "pasteLightningInvoice": "Bandika ankara ya Lightning:",
+  "gettingQuote": "Kupata bei...",
+  "validInvoice": "Ankara halali",
+  "invalidInvoice": "Ankara batili",
+  "invalidInvoiceMalformed": "Ankara batili au imeharibika",
+  "feeReserved": "Ada iliyohifadhiwa:",
+  "total": "Jumla:",
+  "paying": "Kulipa...",
+  "payInvoice": "Lipa ankara",
+  "confirmPayment": "Thibitisha malipo",
+  "pay": "Lipa",
+  "fee": "ada",
+  "invoiceExpired": "Ankara imeisha muda",
+  "amountOutOfRange": "Kiasi nje ya masafa yanayoruhusiwa",
+  "resolvingType": "Kutatua {type}...",
+  "@resolvingType": {
+    "placeholders": {
+      "type": { "type": "String" }
+    }
+  },
+  "invoiceAlreadyPaid": "Ankara tayari imelipwa",
+  "paymentError": "Hitilafu ya malipo: {error}",
+  "@paymentError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "sent": "{amount} {unit} zimetumwa",
+  "@sent": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "filterAll": "Zote",
+  "filterPending": "Zinazosubiri",
+  "filterEcash": "Ecash",
+  "filterLightning": "Lightning",
+  "receiveTokensToStart": "Pokea tokeni za Cashu kuanza",
+  "noPendingTransactions": "Hakuna miamala inayosubiri",
+  "allTransactionsCompleted": "Miamala yako yote imekamilika",
+  "noEcashTransactions": "Hakuna miamala ya Ecash",
+  "sendOrReceiveTokens": "Tuma au pokea tokeni za Cashu",
+  "noLightningTransactions": "Hakuna miamala ya Lightning",
+  "depositOrWithdrawLightning": "Weka au toa kupitia Lightning",
+  "pendingStatus": "Inasubiri",
+  "receivedStatus": "Imepokelewa",
+  "sentStatus": "Imetumwa",
+  "now": "Sasa",
+  "agoMinutes": "Dakika {minutes} zilizopita",
+  "@agoMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "agoHours": "Saa {hours} zilizopita",
+  "@agoHours": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "agoDays": "Siku {days} zilizopita",
+  "@agoDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "lightningInvoice": "Ankara ya Lightning",
+  "receivedEcash": "Ecash Iliyopokelewa",
+  "sentEcash": "Ecash Iliyotumwa",
+  "outgoingLightningPayment": "Malipo ya Lightning Yanayotoka",
+  "invoiceNotAvailable": "Ankara haipatikani",
+  "tokenNotAvailable": "Tokeni haipatikani",
+  "unit": "Kitengo",
+  "status": "Hali",
+  "pending": "Inasubiri",
+  "memo": "Memo",
+  "copyInvoiceButton": "NAKILI ANKARA",
+  "copyButton": "NAKILI",
+  "invoiceCopied": "Ankara imenakiliwa",
+  "tokenCopied": "Tokeni imenakiliwa",
+  "speed": "KASI:",
+
+  "settings": "Mipangilio",
+  "walletSection": "POCHI",
+  "backupSeedPhrase": "Nakala ya maneno ya mbegu",
+  "viewRecoveryWords": "Tazama maneno yako ya kurejesha",
+  "connectedMints": "Mint zilizounganishwa",
+  "manageCashuMints": "Simamia mint zako za Cashu",
+  "pinAccess": "Ufikiaji wa PIN",
+  "pinEnabled": "Imewashwa",
+  "protectWithPin": "Linda programu kwa PIN",
+  "recoverTokens": "Rejesha tokeni",
+  "scanMintsWithSeed": "Changanua mint na maneno ya mbegu",
+  "appearanceSection": "LUGHA",
+  "language": "Lugha",
+  "informationSection": "MAELEZO",
+  "version": "Toleo",
+  "about": "Kuhusu",
+  "deleteWallet": "Futa pochi",
+  "spanish": "Español",
+  "english": "English",
+  "portuguese": "Português",
+  "french": "Français",
+  "russian": "Русский",
+  "german": "Deutsch",
+  "italian": "Italiano",
+  "korean": "한국어",
+  "chinese": "中文",
+  "japanese": "日本語",
+  "swahili": "Kiswahili",
+
+  "mnemonicNotFound": "Mnemonic haijapatikana",
+  "createPin": "Unda PIN",
+  "enterPinDigits": "Ingiza PIN ya tarakimu 4",
+  "confirmPin": "Thibitisha PIN",
+  "enterPinAgain": "Ingiza PIN tena",
+  "pinMismatch": "PIN hazilingani",
+  "pinActivated": "PIN imewashwa",
+  "pinDeactivated": "PIN imezimwa",
+  "verifyPin": "Thibitisha PIN",
+  "enterCurrentPin": "Ingiza PIN yako ya sasa",
+  "incorrectPin": "PIN si sahihi",
+  "selectLanguage": "Chagua lugha",
+  "languageChanged": "Lugha imebadilishwa kuwa {language}",
+  "@languageChanged": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "close": "Funga",
+  "aboutDescription": "Pochi ya Cashu yenye DNA ya Cuba kwa ulimwengu wote. Ndugu wa La Chispa.",
+  "couldNotOpenLink": "Haikuweza kufungua kiungo",
+
+  "deleteWalletQuestion": "Futa pochi?",
+  "actionIrreversible": "Kitendo hiki hakiwezi kutenduliwa",
+  "deleteWalletWarning": "Data zote zitafutwa ikiwa ni pamoja na maneno yako ya mbegu na tokeni. Hakikisha una nakala.",
+  "typeDeleteToConfirm": "Andika \"FUTA\" kuthibitisha:",
+  "deleteConfirmWord": "FUTA",
+  "deleteError": "Hitilafu ya kufuta: {error}",
+  "@deleteError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "recoverTokensTitle": "Rejesha tokeni",
+  "recoverTokensDescription": "Changanua mint kurejesha tokeni zinazohusiana na maneno yako ya mbegu (NUT-13)",
+  "useCurrentSeedPhrase": "Tumia maneno yangu ya mbegu ya sasa",
+  "scanWithSavedWords": "Changanua mint na maneno 12 yaliyohifadhiwa",
+  "useOtherSeedPhrase": "Tumia maneno mengine ya mbegu",
+  "recoverFromOtherWords": "Rejesha tokeni kutoka maneno mengine 12",
+  "mintsToScan": "Mint za kuchanganua:",
+  "allMints": "Mint zote ({count})",
+  "@allMints": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "specificMint": "Mint maalum",
+  "enterMnemonicWords": "Ingiza maneno 12 yakitengwa na nafasi...",
+  "scanMints": "Changanua mint",
+  "selectMintToScan": "Chagua mint ya kuchanganua",
+  "mnemonicMustHaveWords": "Mnemonic lazima iwe na maneno 12 au 24",
+  "noConnectedMintsToScan": "Hakuna mint zilizounganishwa za kuchanganua",
+  "recoveredTokens": "Zimerejeshwa {tokens} kutoka mint {mints}!",
+  "@recoveredTokens": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mints": { "type": "int" }
+    }
+  },
+  "scanCompleteNoTokens": "Uchanganuzi umekamilika. Hakuna tokeni mpya zilizopatikana.",
+  "mintsWithError": "(mint {count} zenye hitilafu)",
+  "@mintsWithError": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "recoveredFromMint": "Zimerejeshwa {tokens} kutoka {mint}!",
+  "@recoveredFromMint": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mint": { "type": "String" }
+    }
+  },
+  "noTokensFoundInMint": "Hakuna tokeni zilizopatikana katika {mint}.",
+  "@noTokensFoundInMint": {
+    "placeholders": {
+      "mint": { "type": "String" }
+    }
+  },
+  "recoveredAndTransferred": "Zimerejeshwa na kuhamishwa {amount} {unit} kwenye pochi yako!",
+  "@recoveredAndTransferred": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "noTokensForMnemonic": "Hakuna tokeni zilizopatikana zinazohusiana na mnemonic hiyo.",
+
+  "noConnectedMints": "Hakuna mint zilizounganishwa",
+  "addMintToStart": "Ongeza mint kuanza",
+  "addMint": "Ongeza mint",
+  "mintDeleted": "Mint imefutwa",
+  "activeMintUpdated": "Mint inayofanya kazi imesasishwa",
+  "mintUrl": "URL ya mint:",
+  "mintUrlPlaceholder": "https://mint.example.com",
+  "urlMustStartWithHttps": "URL lazima ianze na https://",
+  "connectingToMint": "Kuunganisha na mint...",
+  "mintAddedSuccessfully": "Mint imeongezwa kwa mafanikio",
+  "couldNotConnectToMint": "Haikuweza kuunganisha na mint",
+  "add": "Ongeza",
+
+  "success": "Mafanikio",
+  "loading": "Inapakia...",
+  "retry": "Jaribu tena",
+
+  "activeMint": "Mint inayofanya kazi",
+  "mintMessage": "Ujumbe wa Mint",
+  "url": "URL",
+  "currency": "Sarafu",
+  "unknown": "Haijulikani",
+  "useThisMint": "Tumia mint hii",
+  "copyMintUrl": "Nakili URL ya mint",
+  "deleteMint": "Futa mint",
+  "copied": "{label} imenakiliwa",
+  "@copied": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "deleteMintConfirmTitle": "Futa mint",
+  "deleteMintConfirmMessage": "Ukiwa na salio katika mint hii, itapotea. Una uhakika?",
+  "delete": "Futa",
+
+  "offlineSend": "Tuma Nje ya Mtandao",
+  "selectNotesToSend": "Chagua noti unazotaka kutuma:",
+  "totalToSend": "Jumla ya kutuma",
+  "notesSelected": "noti {count} zimechaguliwa",
+  "@notesSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "loadingProofsError": "Hitilafu ya kupakia uthibitisho: {error}",
+  "@loadingProofsError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "creatingTokenError": "Hitilafu ya kuunda tokeni: {error}",
+  "@creatingTokenError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "unknownState": "Hali isiyojulikana",
+  "depositAmountTitle": "Weka {amount} {unit}",
+  "@depositAmountTitle": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "receiveNow": "Pokea sasa",
+  "receiveLater": "Pokea baadaye",
+  "tokenSavedForLater": "Tokeni imehifadhiwa kudai baadaye",
+  "noConnectionTokenSaved": "Hakuna muunganisho. Tokeni imehifadhiwa kudai baadaye.",
+  "unknownMintOffline": "Tokeni hii ni kutoka mint isiyojulikana. Unganisha na mtandao kuongeza na kudai tokeni.",
+  "noConnectionTryLater": "Hakuna muunganisho na mint. Jaribu baadaye.",
+  "saveTokenError": "Hitilafu ya kuhifadhi tokeni. Jaribu tena.",
+  "pendingTokenLimitReached": "Kikomo cha tokeni zinazosubiri kimefikiwa (upeo 50)",
+  "filterToReceive": "Za kupokea",
+  "noPendingTokens": "Hakuna tokeni zinazosubiri",
+  "noPendingTokensHint": "Hifadhi tokeni kudai baadaye",
+  "pendingBadge": "INASUBIRI",
+  "expiresInDays": "{days, plural, =1{Inaisha siku 1} other{Inaisha siku {days}}}",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "retryCount": "majaribio {count}",
+  "@retryCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "claimNow": "Dai sasa",
+  "pendingTokenClaimedSuccess": "Zimedaiwa {amount} {unit}",
+  "@pendingTokenClaimedSuccess": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "pendingTokensClaimed": "{count, plural, =1{Imedaiwa tokeni 1 ({amount} {unit})} other{Zimedaiwa tokeni {count} ({amount} {unit})}}",
+  "@pendingTokensClaimed": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "scan": "Changanua",
+  "scanQrCode": "Changanua QR",
+  "scanCashuToken": "Changanua tokeni ya Cashu",
+  "scanLightningInvoice": "Changanua ankara",
+  "scanningAnimatedQr": "Kuchanganua QR inayosogea...",
+  "pointCameraAtQr": "Elekeza kamera kwenye msimbo wa QR",
+  "pointCameraAtCashuQr": "Elekeza kamera kwenye QR ya tokeni ya Cashu",
+  "pointCameraAtInvoiceQr": "Elekeza kamera kwenye QR ya ankara",
+  "unrecognizedQrCode": "Msimbo wa QR haujatambuliwa",
+  "scanCashuTokenHint": "Changanua tokeni ya Cashu (cashuA... au cashuB...)",
+  "scanLightningInvoiceHint": "Changanua ankara ya Lightning (lnbc...)",
+  "addMintQuestion": "Ongeza mint hii?",
+  "cameraPermissionDenied": "Ruhusa ya kamera imekataliwa",
+  "paymentRequestNotSupported": "Maombi ya malipo bado hayatumiki"
+}

@@ -217,6 +217,7 @@
   "korean": "한국어",
   "chinese": "中文",
   "japanese": "日本語",
+  "swahili": "Kiswahili",
 
   "mnemonicNotFound": "Mnemonic not found",
   "createPin": "Create PIN",

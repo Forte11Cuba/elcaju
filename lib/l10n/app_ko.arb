@@ -274,6 +274,7 @@
   "korean": "한국어",
   "chinese": "中文",
   "japanese": "日本語",
+  "swahili": "Kiswahili",
 
   "mnemonicNotFound": "니모닉을 찾을 수 없음",
   "createPin": "PIN 만들기",
