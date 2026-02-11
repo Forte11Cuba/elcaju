@@ -1,0 +1,488 @@
+{
+  "@@locale": "ja",
+
+  "appName": "ElCaju",
+  "appTagline": "プライベートなecashウォレット",
+  "loadingMessage1": "コインを暗号化中...",
+  "loadingMessage2": "e-トークンを準備中...",
+  "loadingMessage3": "Mintに接続中...",
+  "loadingMessage4": "デフォルトでプライバシー保護。",
+  "loadingMessage5": "ブラインド署名中...",
+  "loadingMessage6": "Go full Calle...",
+  "loadingMessage7": "Cashu + Bitchat = プライバシー + 自由",
+  "aboutTagline": "国境のないプライバシー。",
+
+  "welcomeTitle": "ElCajuへようこそ",
+  "welcomeSubtitle": "世界のためのCashu。キューバ製。",
+
+  "createWallet": "新しいウォレットを作成",
+  "restoreWallet": "ウォレットを復元",
+
+  "createWalletTitle": "ウォレット作成",
+  "creatingWallet": "ウォレットを作成中...",
+  "generatingSeed": "シードフレーズを安全に生成中",
+  "createWalletDescription": "12語のシードフレーズが生成されます。\n安全な場所に保管してください。",
+  "generateWallet": "ウォレットを生成",
+
+  "walletCreated": "ウォレット作成完了！",
+  "walletCreatedDescription": "ウォレットの準備ができました。今すぐシードフレーズをバックアップすることをお勧めします。",
+  "backupWarning": "バックアップがないと、デバイスを紛失した場合に資金にアクセスできなくなります。",
+  "backupNow": "今すぐバックアップ",
+  "backupLater": "後でする",
+
+  "backupTitle": "バックアップ",
+  "seedPhraseTitle": "シードフレーズ",
+  "seedPhraseDescription": "この12語を順番に保存してください。ウォレットを復元する唯一の方法です。",
+  "revealSeedPhrase": "シードフレーズを表示",
+  "tapToReveal": "ボタンをタップして\nシードフレーズを表示",
+  "copyToClipboard": "クリップボードにコピー",
+  "seedCopied": "フレーズをクリップボードにコピーしました",
+  "neverShareSeed": "シードフレーズを誰にも共有しないでください。",
+  "confirmBackup": "シードフレーズを安全な場所に保存しました",
+  "continue_": "続ける",
+
+  "restoreTitle": "ウォレットを復元",
+  "enterSeedPhrase": "シードフレーズを入力",
+  "enterSeedDescription": "12語または24語をスペースで区切って入力してください。",
+  "seedPlaceholder": "単語1 単語2 単語3 ...",
+  "wordCount": "{count}語",
+  "@wordCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "needWords": "（12語または24語が必要）",
+  "restoreError": "復元エラー：{error}",
+  "@restoreError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "homeTitle": "ホーム",
+  "receive": "受取",
+  "send": "送金",
+  "sendAction": "送金 ↗",
+  "receiveAction": "↘ 受取",
+  "deposit": "入金",
+  "withdraw": "出金",
+  "lightning": "Lightning",
+  "cashu": "Cashu",
+  "ecash": "Ecash",
+  "history": "履歴",
+  "noTransactions": "取引履歴がありません",
+  "depositOrReceive": "satsを入金または受け取って開始",
+  "noMint": "Mintなし",
+
+  "balance": "残高",
+  "sats": "sats",
+
+  "pasteEcashToken": "ecashトークンを貼り付け",
+  "generateInvoiceToDeposit": "入金用インボイスを生成",
+  "createEcashToken": "ecashトークンを作成",
+  "payLightningInvoice": "Lightningインボイスを支払う",
+
+  "receiveCashu": "Cashuを受け取る",
+  "pasteTheCashuToken": "Cashuトークンを貼り付け：",
+  "pasteFromClipboard": "クリップボードから貼り付け",
+  "validToken": "有効なトークン",
+  "invalidToken": "無効または不正なトークン",
+  "amount": "金額：",
+  "mint": "Mint：",
+  "claiming": "請求中...",
+  "claimTokens": "トークンを請求",
+  "tokensReceived": "トークンを受け取りました",
+  "backToHome": "ホームに戻る",
+  "tokenAlreadyClaimed": "このトークンは既に請求済みです",
+  "unknownMint": "不明なMintからのトークン",
+  "claimError": "請求エラー：{error}",
+  "@claimError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "sendCashu": "Cashuを送る",
+  "selectNotesManually": "ノートを手動で選択",
+  "amountToSend": "送金額：",
+  "available": "利用可能：",
+  "max": "（最大）",
+  "memoOptional": "メモ（任意）：",
+  "memoPlaceholder": "この支払いは何のためですか？",
+  "creatingToken": "トークン作成中...",
+  "createToken": "トークンを作成",
+  "noActiveMint": "アクティブなMintがありません",
+  "offlineModeMessage": "接続なし。オフラインモード使用中...",
+  "confirmSend": "送金を確認",
+  "confirm": "確認",
+  "cancel": "キャンセル",
+  "insufficientBalance": "残高不足",
+  "tokenCreationError": "トークン作成エラー：{error}",
+  "@tokenCreationError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "tokenCreated": "トークン作成完了",
+  "copy": "コピー",
+  "share": "共有",
+  "tokenCashu": "Cashuトークン",
+  "tokenCashuAnimatedQr": "Cashuトークン（アニメーションQR - {fragments}個のURフラグメント）",
+  "@tokenCashuAnimatedQr": {
+    "placeholders": {
+      "fragments": { "type": "int" }
+    }
+  },
+  "keepTokenWarning": "受取人が請求するまでこのトークンを保管してください。紛失すると資金を失います。",
+  "tokenCopiedToClipboard": "トークンをクリップボードにコピーしました",
+
+  "amountToDeposit": "入金額：",
+  "descriptionOptional": "説明（任意）：",
+  "depositPlaceholder": "この入金は何のためですか？",
+  "generating": "生成中...",
+  "generateInvoice": "インボイスを生成",
+  "depositLightning": "Lightning入金",
+
+  "payInvoiceTitle": "インボイスを支払う",
+  "generatingInvoice": "インボイス生成中...",
+  "waitingForPayment": "支払い待ち...",
+  "paymentReceived": "支払いを受け取りました",
+  "tokensIssued": "トークンが発行されました！",
+  "error": "エラー",
+  "unknownError": "不明なエラー",
+  "back": "戻る",
+  "copyInvoice": "インボイスをコピー",
+  "description": "説明：",
+  "invoiceCopiedToClipboard": "インボイスをクリップボードにコピーしました",
+  "deposited": "{amount} {unit}を入金しました",
+  "@deposited": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "pasteLightningInvoice": "Lightningインボイスを貼り付け：",
+  "gettingQuote": "見積もり取得中...",
+  "validInvoice": "有効なインボイス",
+  "invalidInvoice": "無効なインボイス",
+  "invalidInvoiceMalformed": "無効または不正なインボイス",
+  "feeReserved": "予約手数料：",
+  "total": "合計：",
+  "paying": "支払い中...",
+  "payInvoice": "インボイスを支払う",
+  "confirmPayment": "支払いを確認",
+  "pay": "支払う",
+  "fee": "手数料",
+  "invoiceExpired": "インボイス期限切れ",
+  "amountOutOfRange": "金額が許容範囲外です",
+  "resolvingType": "{type}を解決中...",
+  "@resolvingType": {
+    "placeholders": {
+      "type": { "type": "String" }
+    }
+  },
+  "invoiceAlreadyPaid": "インボイスは支払い済みです",
+  "paymentError": "支払いエラー：{error}",
+  "@paymentError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "sent": "{amount} {unit}を送金しました",
+  "@sent": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "filterAll": "すべて",
+  "filterPending": "保留中",
+  "filterEcash": "Ecash",
+  "filterLightning": "Lightning",
+  "receiveTokensToStart": "Cashuトークンを受け取って開始",
+  "noPendingTransactions": "保留中の取引はありません",
+  "allTransactionsCompleted": "すべての取引が完了しました",
+  "noEcashTransactions": "Ecash取引はありません",
+  "sendOrReceiveTokens": "Cashuトークンを送受信",
+  "noLightningTransactions": "Lightning取引はありません",
+  "depositOrWithdrawLightning": "Lightningで入出金",
+  "pendingStatus": "保留中",
+  "receivedStatus": "受取済み",
+  "sentStatus": "送金済み",
+  "now": "たった今",
+  "agoMinutes": "{minutes}分前",
+  "@agoMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "agoHours": "{hours}時間前",
+  "@agoHours": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "agoDays": "{days}日前",
+  "@agoDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "lightningInvoice": "Lightningインボイス",
+  "receivedEcash": "Ecash受取",
+  "sentEcash": "Ecash送金",
+  "outgoingLightningPayment": "Lightning出金",
+  "invoiceNotAvailable": "インボイスは利用できません",
+  "tokenNotAvailable": "トークンは利用できません",
+  "unit": "単位",
+  "status": "ステータス",
+  "pending": "保留中",
+  "memo": "メモ",
+  "copyInvoiceButton": "インボイスをコピー",
+  "copyButton": "コピー",
+  "invoiceCopied": "インボイスをコピーしました",
+  "tokenCopied": "トークンをコピーしました",
+  "speed": "速度：",
+
+  "settings": "設定",
+  "walletSection": "ウォレット",
+  "backupSeedPhrase": "シードフレーズのバックアップ",
+  "viewRecoveryWords": "復元用単語を表示",
+  "connectedMints": "接続中のMint",
+  "manageCashuMints": "Cashu Mintを管理",
+  "pinAccess": "PINアクセス",
+  "pinEnabled": "有効",
+  "protectWithPin": "PINでアプリを保護",
+  "recoverTokens": "トークンを復元",
+  "scanMintsWithSeed": "シードフレーズでMintをスキャン",
+  "appearanceSection": "言語",
+  "language": "言語",
+  "informationSection": "情報",
+  "version": "バージョン",
+  "about": "このアプリについて",
+  "deleteWallet": "ウォレットを削除",
+  "spanish": "Español",
+  "english": "English",
+  "portuguese": "Português",
+  "french": "Français",
+  "russian": "Русский",
+  "german": "Deutsch",
+  "italian": "Italiano",
+  "korean": "한국어",
+  "chinese": "中文",
+  "japanese": "日本語",
+
+  "mnemonicNotFound": "ニーモニックが見つかりません",
+  "createPin": "PINを作成",
+  "enterPinDigits": "4桁のPINを入力",
+  "confirmPin": "PINを確認",
+  "enterPinAgain": "PINを再入力",
+  "pinMismatch": "PINが一致しません",
+  "pinActivated": "PINが有効になりました",
+  "pinDeactivated": "PINが無効になりました",
+  "verifyPin": "PINを確認",
+  "enterCurrentPin": "現在のPINを入力",
+  "incorrectPin": "PINが正しくありません",
+  "selectLanguage": "言語を選択",
+  "languageChanged": "言語を{language}に変更しました",
+  "@languageChanged": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "close": "閉じる",
+  "aboutDescription": "キューバのDNAを持つ世界のためのCashuウォレット。La Chispaの兄弟。",
+  "couldNotOpenLink": "リンクを開けませんでした",
+
+  "deleteWalletQuestion": "ウォレットを削除しますか？",
+  "actionIrreversible": "この操作は取り消せません",
+  "deleteWalletWarning": "シードフレーズとトークンを含むすべてのデータが削除されます。バックアップがあることを確認してください。",
+  "typeDeleteToConfirm": "確認のため「DELETE」と入力：",
+  "deleteConfirmWord": "DELETE",
+  "deleteError": "削除エラー：{error}",
+  "@deleteError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "recoverTokensTitle": "トークンを復元",
+  "recoverTokensDescription": "シードフレーズに関連付けられたトークンを復元するためにMintをスキャン（NUT-13）",
+  "useCurrentSeedPhrase": "現在のシードフレーズを使用",
+  "scanWithSavedWords": "保存された12語でMintをスキャン",
+  "useOtherSeedPhrase": "別のシードフレーズを使用",
+  "recoverFromOtherWords": "別の12語からトークンを復元",
+  "mintsToScan": "スキャンするMint：",
+  "allMints": "すべてのMint（{count}件）",
+  "@allMints": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "specificMint": "特定のMint",
+  "enterMnemonicWords": "12語をスペースで区切って入力...",
+  "scanMints": "Mintをスキャン",
+  "selectMintToScan": "スキャンするMintを選択",
+  "mnemonicMustHaveWords": "ニーモニックは12語または24語である必要があります",
+  "noConnectedMintsToScan": "スキャンできる接続済みMintがありません",
+  "recoveredTokens": "{mints}件のMintから{tokens}を復元しました！",
+  "@recoveredTokens": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mints": { "type": "int" }
+    }
+  },
+  "scanCompleteNoTokens": "スキャン完了。新しいトークンは見つかりませんでした。",
+  "mintsWithError": "（{count}件のMintでエラー）",
+  "@mintsWithError": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "recoveredFromMint": "{mint}から{tokens}を復元しました！",
+  "@recoveredFromMint": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mint": { "type": "String" }
+    }
+  },
+  "noTokensFoundInMint": "{mint}でトークンが見つかりませんでした。",
+  "@noTokensFoundInMint": {
+    "placeholders": {
+      "mint": { "type": "String" }
+    }
+  },
+  "recoveredAndTransferred": "{amount} {unit}を復元してウォレットに転送しました！",
+  "@recoveredAndTransferred": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "noTokensForMnemonic": "そのニーモニックに関連付けられたトークンは見つかりませんでした。",
+
+  "noConnectedMints": "接続済みMintがありません",
+  "addMintToStart": "Mintを追加して開始",
+  "addMint": "Mintを追加",
+  "mintDeleted": "Mintを削除しました",
+  "activeMintUpdated": "アクティブMintを更新しました",
+  "mintUrl": "Mint URL：",
+  "mintUrlPlaceholder": "https://mint.example.com",
+  "urlMustStartWithHttps": "URLはhttps://で始まる必要があります",
+  "connectingToMint": "Mintに接続中...",
+  "mintAddedSuccessfully": "Mintを追加しました",
+  "couldNotConnectToMint": "Mintに接続できませんでした",
+  "add": "追加",
+
+  "success": "成功",
+  "loading": "読み込み中...",
+  "retry": "再試行",
+
+  "activeMint": "アクティブMint",
+  "mintMessage": "Mintメッセージ",
+  "url": "URL",
+  "currency": "通貨",
+  "unknown": "不明",
+  "useThisMint": "このMintを使用",
+  "copyMintUrl": "Mint URLをコピー",
+  "deleteMint": "Mintを削除",
+  "copied": "{label}をコピーしました",
+  "@copied": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "deleteMintConfirmTitle": "Mintを削除",
+  "deleteMintConfirmMessage": "このMintに残高がある場合、失われます。よろしいですか？",
+  "delete": "削除",
+
+  "offlineSend": "オフライン送金",
+  "selectNotesToSend": "送信するノートを選択：",
+  "totalToSend": "送金合計",
+  "notesSelected": "{count}件のノートを選択",
+  "@notesSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "loadingProofsError": "プルーフ読み込みエラー：{error}",
+  "@loadingProofsError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "creatingTokenError": "トークン作成エラー：{error}",
+  "@creatingTokenError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "unknownState": "不明な状態",
+  "depositAmountTitle": "{amount} {unit}を入金",
+  "@depositAmountTitle": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "receiveNow": "今すぐ受け取る",
+  "receiveLater": "後で受け取る",
+  "tokenSavedForLater": "トークンを保存しました。後で請求できます",
+  "noConnectionTokenSaved": "接続なし。トークンを保存しました。後で請求できます。",
+  "unknownMintOffline": "このトークンは不明なMintからのものです。インターネットに接続してMintを追加し、トークンを請求してください。",
+  "noConnectionTryLater": "Mintに接続できません。後でもう一度お試しください。",
+  "saveTokenError": "トークンの保存エラー。もう一度お試しください。",
+  "pendingTokenLimitReached": "保留中トークンの上限に達しました（最大50件）",
+  "filterToReceive": "受取予定",
+  "noPendingTokens": "保留中のトークンはありません",
+  "noPendingTokensHint": "トークンを保存して後で請求",
+  "pendingBadge": "保留中",
+  "expiresInDays": "{days, plural, =1{1日後に期限切れ} other{{days}日後に期限切れ}}",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "retryCount": "{count}回リトライ",
+  "@retryCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "claimNow": "今すぐ請求",
+  "pendingTokenClaimedSuccess": "{amount} {unit}を請求しました",
+  "@pendingTokenClaimedSuccess": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "pendingTokensClaimed": "{count, plural, =1{1件のトークン（{amount} {unit}）を請求しました} other{{count}件のトークン（{amount} {unit}）を請求しました}}",
+  "@pendingTokensClaimed": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "scan": "スキャン",
+  "scanQrCode": "QRコードをスキャン",
+  "scanCashuToken": "Cashuトークンをスキャン",
+  "scanLightningInvoice": "インボイスをスキャン",
+  "scanningAnimatedQr": "アニメーションQRをスキャン中...",
+  "pointCameraAtQr": "カメラをQRコードに向けてください",
+  "pointCameraAtCashuQr": "カメラをCashuトークンのQRに向けてください",
+  "pointCameraAtInvoiceQr": "カメラをインボイスのQRに向けてください",
+  "unrecognizedQrCode": "認識できないQRコード",
+  "scanCashuTokenHint": "Cashuトークンをスキャン（cashuA...またはcashuB...）",
+  "scanLightningInvoiceHint": "Lightningインボイスをスキャン（lnbc...）",
+  "addMintQuestion": "このMintを追加しますか？",
+  "cameraPermissionDenied": "カメラの許可が拒否されました",
+  "paymentRequestNotSupported": "支払いリクエストはまだサポートされていません"
+}
