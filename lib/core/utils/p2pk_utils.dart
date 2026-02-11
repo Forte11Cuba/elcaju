@@ -122,9 +122,10 @@ class P2PKUtils {
         final data = parsed[1];
         if (data is Map && data.containsKey('data')) {
           final pubkey = data['data'];
-          // Validar que sea hex de 64 caracteres
+          // Validar que sea hex de 64 chars (x-only) o 66 chars (SEC1 comprimido)
           if (pubkey is String &&
-              RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(pubkey)) {
+              (RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(pubkey) ||
+               RegExp(r'^0[23][0-9a-fA-F]{64}$').hasMatch(pubkey))) {
             return pubkey.toLowerCase();
           }
         }

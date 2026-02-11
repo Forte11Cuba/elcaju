@@ -188,7 +188,10 @@ class P2PKProvider extends ChangeNotifier {
   bool isTokenLockedToUs(String encodedToken) {
     final lockedPubkey = P2PKUtils.extractLockedPubkey(encodedToken);
     if (lockedPubkey == null) return false;
-    return _keys.any((k) => k.publicKey.toLowerCase() == lockedPubkey.toLowerCase());
+
+    // Normalizar a x-only (64 chars) para comparación
+    final normalizedLocked = _normalizeToXOnly(lockedPubkey);
+    return _keys.any((k) => _normalizeToXOnly(k.publicKey) == normalizedLocked);
   }
 
   /// Obtiene la clave privada para desbloquear un token
@@ -197,12 +200,24 @@ class P2PKProvider extends ChangeNotifier {
     final lockedPubkey = P2PKUtils.extractLockedPubkey(encodedToken);
     if (lockedPubkey == null) return null;
 
+    // Normalizar a x-only (64 chars) para comparación
+    final normalizedLocked = _normalizeToXOnly(lockedPubkey);
     final key = _keys.cast<P2PKKey?>().firstWhere(
-          (k) => k?.publicKey.toLowerCase() == lockedPubkey.toLowerCase(),
+          (k) => k != null && _normalizeToXOnly(k.publicKey) == normalizedLocked,
           orElse: () => null,
         );
 
     return key?.privateKey;
+  }
+
+  /// Normaliza pubkey a formato x-only (64 chars) para comparación
+  /// Si es SEC1 (66 chars con prefijo 02/03), quita el prefijo
+  String _normalizeToXOnly(String pubkey) {
+    final lower = pubkey.toLowerCase();
+    if (lower.length == 66 && (lower.startsWith('02') || lower.startsWith('03'))) {
+      return lower.substring(2);
+    }
+    return lower;
   }
 
   /// Extrae la pubkey bloqueada de un token
