@@ -1,4 +1,7 @@
-# ElCaju 🥜
+## ElCaju 🥜
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Forte11Cuba/elcaju)   
+  *Ask questions about this project using DeepWiki AI*
 
 <p align="center">
   <img src="assets/img/elcajucubano.png" alt="ElCaju Logo" width="200"/>
