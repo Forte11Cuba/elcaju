@@ -3,9 +3,17 @@
 
   "appName": "ElCaju",
   "appTagline": "Your private ecash wallet",
+  "loadingMessage1": "Encrypting your coins...",
+  "loadingMessage2": "Preparing your e-tokens...",
+  "loadingMessage3": "Connecting to the Mint...",
+  "loadingMessage4": "Privacy by default.",
+  "loadingMessage5": "Blind signing tokens...",
+  "loadingMessage6": "Go full Calle...",
+  "loadingMessage7": "Cashu + Bitchat = Privacy + Freedom",
+  "aboutTagline": "Privacy without borders.",
 
   "welcomeTitle": "Welcome to ElCaju",
-  "welcomeSubtitle": "Your private ecash wallet.\nSimple, secure and non-custodial.",
+  "welcomeSubtitle": "Cashu for the world. Made in Cuba.",
 
   "createWallet": "Create new wallet",
   "restoreWallet": "Restore wallet",
@@ -85,7 +93,7 @@
   "available": "Available:",
   "max": "(Max)",
   "memoOptional": "Memo (optional):",
-  "memoPlaceholder": "E.g.: For coffee",
+  "memoPlaceholder": "What is this payment for?",
   "creatingToken": "Creating token...",
   "createToken": "Create token",
   "noActiveMint": "No active mint",
@@ -106,7 +114,7 @@
 
   "amountToDeposit": "Amount to deposit:",
   "descriptionOptional": "Description (optional):",
-  "depositPlaceholder": "E.g.: El Caju deposit",
+  "depositPlaceholder": "What is this deposit for?",
   "generating": "Generating...",
   "generateInvoice": "Generate invoice",
   "depositLightning": "Deposit Lightning",
@@ -216,7 +224,7 @@
   "selectLanguage": "Select language",
   "languageChanged": "Language changed to {language}",
   "close": "Close",
-  "aboutDescription": "Cashu wallet with Cuban identity, sister of La Chispa.",
+  "aboutDescription": "A Cashu wallet with Cuban DNA for the entire world. Brother of La Chispa.",
   "couldNotOpenLink": "Could not open link",
 
   "deleteWalletQuestion": "Delete wallet?",

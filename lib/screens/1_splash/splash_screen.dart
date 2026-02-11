@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -25,6 +26,11 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnimation;
   String? _errorMessage;
 
+  // Mensajes de carga aleatorios
+  int _currentMessageIndex = 0;
+  Timer? _messageTimer;
+  final _random = Random();
+
   @override
   void initState() {
     super.initState();
@@ -39,8 +45,33 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
+    // Iniciar rotación de mensajes de carga
+    _currentMessageIndex = _random.nextInt(7);
+    _messageTimer = Timer.periodic(const Duration(milliseconds: 800), (_) {
+      if (mounted) {
+        setState(() {
+          _currentMessageIndex = _random.nextInt(7);
+        });
+      }
+    });
+
     // Inicializar la app
     _initializeApp();
+  }
+
+  /// Obtiene el mensaje de carga actual basado en el índice
+  String _getLoadingMessage(L10n? l10n) {
+    if (l10n == null) return 'Cargando...';
+    switch (_currentMessageIndex) {
+      case 0: return l10n.loadingMessage1;
+      case 1: return l10n.loadingMessage2;
+      case 2: return l10n.loadingMessage3;
+      case 3: return l10n.loadingMessage4;
+      case 4: return l10n.loadingMessage5;
+      case 5: return l10n.loadingMessage6;
+      case 6: return l10n.loadingMessage7;
+      default: return l10n.loadingMessage1;
+    }
   }
 
   Future<void> _initializeApp() async {
@@ -148,6 +179,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
+    _messageTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -188,9 +220,9 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: AppDimensions.paddingSmall),
 
-                  // Subtítulo
+                  // Mensaje de carga aleatorio
                   Text(
-                    l10n?.appTagline ?? 'Tu wallet de ecash privado',
+                    _getLoadingMessage(l10n),
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 16,

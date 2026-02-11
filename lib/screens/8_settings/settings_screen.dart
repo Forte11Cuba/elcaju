@@ -632,7 +632,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              L10n.of(context)!.appTagline,
+              L10n.of(context)!.aboutTagline,
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,

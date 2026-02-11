@@ -3,9 +3,17 @@
 
   "appName": "ElCaju",
   "appTagline": "Tu wallet de ecash privado",
+  "loadingMessage1": "Cifrando tus monedas...",
+  "loadingMessage2": "Preparando tus e-tokens...",
+  "loadingMessage3": "Conectando con el Mint...",
+  "loadingMessage4": "Privacidad por defecto.",
+  "loadingMessage5": "Firmando tokens ciegamente...",
+  "loadingMessage6": "Go full Calle...",
+  "loadingMessage7": "Cashu + Bitchat = Privacidad + Libertad",
+  "aboutTagline": "Privacidad sin fronteras.",
 
   "welcomeTitle": "Bienvenido a ElCaju",
-  "welcomeSubtitle": "Tu wallet de ecash privado.\nSimple, seguro y sin custodia.",
+  "welcomeSubtitle": "Cashu para el mundo. Hecho en Cuba.",
 
   "createWallet": "Crear nueva wallet",
   "restoreWallet": "Restaurar wallet",
@@ -100,7 +108,7 @@
   "available": "Disponible:",
   "max": "(Max)",
   "memoOptional": "Memo (opcional):",
-  "memoPlaceholder": "Ej: Para el café",
+  "memoPlaceholder": "¿Para qué es este pago?",
   "creatingToken": "Creando token...",
   "createToken": "Crear token",
   "noActiveMint": "No hay mint activo",
@@ -131,7 +139,7 @@
 
   "amountToDeposit": "Monto a depositar:",
   "descriptionOptional": "Descripción (opcional):",
-  "depositPlaceholder": "Ej: Deposito El Caju",
+  "depositPlaceholder": "¿Para qué es esta recarga?",
   "generating": "Generando...",
   "generateInvoice": "Generar invoice",
   "depositLightning": "Depositar Lightning",
@@ -278,7 +286,7 @@
     }
   },
   "close": "Cerrar",
-  "aboutDescription": "Cashu wallet con identidad cubana, hermana de La Chispa.",
+  "aboutDescription": "Un wallet de Cashu con ADN cubano para el mundo entero. Hermano de La Chispa.",
   "couldNotOpenLink": "No se pudo abrir el enlace",
 
   "deleteWalletQuestion": "¿Borrar wallet?",
