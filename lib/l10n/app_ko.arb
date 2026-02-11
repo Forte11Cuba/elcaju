@@ -1,0 +1,486 @@
+{
+  "@@locale": "ko",
+
+  "appName": "ElCaju",
+  "appTagline": "당신의 프라이빗 ecash 지갑",
+  "loadingMessage1": "코인 암호화 중...",
+  "loadingMessage2": "e-토큰 준비 중...",
+  "loadingMessage3": "Mint에 연결 중...",
+  "loadingMessage4": "기본 프라이버시.",
+  "loadingMessage5": "블라인드 서명 토큰...",
+  "loadingMessage6": "Go full Calle...",
+  "loadingMessage7": "Cashu + Bitchat = 프라이버시 + 자유",
+  "aboutTagline": "국경 없는 프라이버시.",
+
+  "welcomeTitle": "ElCaju에 오신 것을 환영합니다",
+  "welcomeSubtitle": "세계를 위한 Cashu. 쿠바에서 제작.",
+
+  "createWallet": "새 지갑 만들기",
+  "restoreWallet": "지갑 복구",
+
+  "createWalletTitle": "지갑 만들기",
+  "creatingWallet": "지갑 생성 중...",
+  "generatingSeed": "시드 문구를 안전하게 생성 중",
+  "createWalletDescription": "12개의 단어로 된 시드 문구가 생성됩니다.\n안전한 곳에 보관하세요.",
+  "generateWallet": "지갑 생성",
+
+  "walletCreated": "지갑이 생성되었습니다!",
+  "walletCreatedDescription": "지갑이 준비되었습니다. 지금 시드 문구를 백업하는 것을 권장합니다.",
+  "backupWarning": "백업 없이는 기기를 분실하면 자금에 접근할 수 없습니다.",
+  "backupNow": "지금 백업",
+  "backupLater": "나중에 하기",
+
+  "backupTitle": "백업",
+  "seedPhraseTitle": "시드 문구",
+  "seedPhraseDescription": "이 12개의 단어를 순서대로 저장하세요. 지갑을 복구하는 유일한 방법입니다.",
+  "revealSeedPhrase": "시드 문구 보기",
+  "tapToReveal": "버튼을 탭하여\n시드 문구를 확인하세요",
+  "copyToClipboard": "클립보드에 복사",
+  "seedCopied": "문구가 클립보드에 복사되었습니다",
+  "neverShareSeed": "시드 문구를 절대 다른 사람과 공유하지 마세요.",
+  "confirmBackup": "시드 문구를 안전한 곳에 저장했습니다",
+  "continue_": "계속",
+
+  "restoreTitle": "지갑 복구",
+  "enterSeedPhrase": "시드 문구를 입력하세요",
+  "enterSeedDescription": "12개 또는 24개의 단어를 공백으로 구분하여 입력하세요.",
+  "seedPlaceholder": "단어1 단어2 단어3 ...",
+  "wordCount": "{count}개 단어",
+  "@wordCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "needWords": "(12개 또는 24개 필요)",
+  "restoreError": "복구 오류: {error}",
+  "@restoreError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "homeTitle": "홈",
+  "receive": "받기",
+  "send": "보내기",
+  "sendAction": "보내기 ↗",
+  "receiveAction": "↘ 받기",
+  "deposit": "입금",
+  "withdraw": "출금",
+  "lightning": "Lightning",
+  "cashu": "Cashu",
+  "ecash": "Ecash",
+  "history": "거래 내역",
+  "noTransactions": "거래 내역이 없습니다",
+  "depositOrReceive": "시작하려면 sats를 입금하거나 받으세요",
+  "noMint": "Mint 없음",
+
+  "balance": "잔액",
+  "sats": "sats",
+
+  "pasteEcashToken": "ecash 토큰 붙여넣기",
+  "generateInvoiceToDeposit": "입금용 인보이스 생성",
+  "createEcashToken": "ecash 토큰 만들기",
+  "payLightningInvoice": "Lightning 인보이스 결제",
+
+  "receiveCashu": "Cashu 받기",
+  "pasteTheCashuToken": "Cashu 토큰을 붙여넣으세요:",
+  "pasteFromClipboard": "클립보드에서 붙여넣기",
+  "validToken": "유효한 토큰",
+  "invalidToken": "유효하지 않거나 손상된 토큰",
+  "amount": "금액:",
+  "mint": "Mint:",
+  "claiming": "청구 중...",
+  "claimTokens": "토큰 청구",
+  "tokensReceived": "토큰을 받았습니다",
+  "backToHome": "홈으로 돌아가기",
+  "tokenAlreadyClaimed": "이 토큰은 이미 청구되었습니다",
+  "unknownMint": "알 수 없는 mint의 토큰",
+  "claimError": "청구 오류: {error}",
+  "@claimError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "sendCashu": "Cashu 보내기",
+  "selectNotesManually": "수동으로 노트 선택",
+  "amountToSend": "보낼 금액:",
+  "available": "사용 가능:",
+  "max": "(최대)",
+  "memoOptional": "메모 (선택사항):",
+  "memoPlaceholder": "이 결제는 무엇을 위한 것인가요?",
+  "creatingToken": "토큰 생성 중...",
+  "createToken": "토큰 만들기",
+  "noActiveMint": "활성 mint 없음",
+  "offlineModeMessage": "연결 없음. 오프라인 모드...",
+  "confirmSend": "보내기 확인",
+  "confirm": "확인",
+  "cancel": "취소",
+  "insufficientBalance": "잔액 부족",
+  "tokenCreationError": "토큰 생성 오류: {error}",
+  "@tokenCreationError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "tokenCreated": "토큰이 생성되었습니다",
+  "copy": "복사",
+  "share": "공유",
+  "tokenCashu": "Cashu 토큰",
+  "tokenCashuAnimatedQr": "Cashu 토큰 (애니메이션 QR - {fragments}개 UR 조각)",
+  "@tokenCashuAnimatedQr": {
+    "placeholders": {
+      "fragments": { "type": "int" }
+    }
+  },
+  "keepTokenWarning": "수신자가 청구할 때까지 이 토큰을 보관하세요. 분실하면 자금을 잃게 됩니다.",
+  "tokenCopiedToClipboard": "토큰이 클립보드에 복사되었습니다",
+
+  "amountToDeposit": "입금할 금액:",
+  "descriptionOptional": "설명 (선택사항):",
+  "depositPlaceholder": "이 입금은 무엇을 위한 것인가요?",
+  "generating": "생성 중...",
+  "generateInvoice": "인보이스 생성",
+  "depositLightning": "Lightning 입금",
+
+  "payInvoiceTitle": "인보이스 결제",
+  "generatingInvoice": "인보이스 생성 중...",
+  "waitingForPayment": "결제 대기 중...",
+  "paymentReceived": "결제 완료",
+  "tokensIssued": "토큰이 발행되었습니다!",
+  "error": "오류",
+  "unknownError": "알 수 없는 오류",
+  "back": "뒤로",
+  "copyInvoice": "인보이스 복사",
+  "description": "설명:",
+  "invoiceCopiedToClipboard": "인보이스가 클립보드에 복사되었습니다",
+  "deposited": "{amount} {unit} 입금됨",
+  "@deposited": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "pasteLightningInvoice": "Lightning 인보이스를 붙여넣으세요:",
+  "gettingQuote": "견적 조회 중...",
+  "validInvoice": "유효한 인보이스",
+  "invalidInvoice": "유효하지 않은 인보이스",
+  "invalidInvoiceMalformed": "유효하지 않거나 손상된 인보이스",
+  "feeReserved": "예약 수수료:",
+  "total": "총액:",
+  "paying": "결제 중...",
+  "payInvoice": "인보이스 결제",
+  "confirmPayment": "결제 확인",
+  "pay": "결제",
+  "fee": "수수료",
+  "invoiceExpired": "인보이스 만료됨",
+  "amountOutOfRange": "허용 범위를 벗어난 금액",
+  "resolvingType": "{type} 확인 중...",
+  "@resolvingType": {
+    "placeholders": {
+      "type": { "type": "String" }
+    }
+  },
+  "invoiceAlreadyPaid": "이미 결제된 인보이스",
+  "paymentError": "결제 오류: {error}",
+  "@paymentError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "sent": "{amount} {unit} 전송됨",
+  "@sent": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "filterAll": "전체",
+  "filterPending": "대기 중",
+  "filterEcash": "Ecash",
+  "filterLightning": "Lightning",
+  "receiveTokensToStart": "시작하려면 Cashu 토큰을 받으세요",
+  "noPendingTransactions": "대기 중인 거래 없음",
+  "allTransactionsCompleted": "모든 거래가 완료되었습니다",
+  "noEcashTransactions": "Ecash 거래 없음",
+  "sendOrReceiveTokens": "Cashu 토큰을 보내거나 받으세요",
+  "noLightningTransactions": "Lightning 거래 없음",
+  "depositOrWithdrawLightning": "Lightning으로 입금 또는 출금",
+  "pendingStatus": "대기 중",
+  "receivedStatus": "받음",
+  "sentStatus": "보냄",
+  "now": "방금",
+  "agoMinutes": "{minutes}분 전",
+  "@agoMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "agoHours": "{hours}시간 전",
+  "@agoHours": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "agoDays": "{days}일 전",
+  "@agoDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "lightningInvoice": "Lightning 인보이스",
+  "receivedEcash": "Ecash 받음",
+  "sentEcash": "Ecash 보냄",
+  "outgoingLightningPayment": "Lightning 송금",
+  "invoiceNotAvailable": "인보이스를 사용할 수 없음",
+  "tokenNotAvailable": "토큰을 사용할 수 없음",
+  "unit": "단위",
+  "status": "상태",
+  "pending": "대기 중",
+  "memo": "메모",
+  "copyInvoiceButton": "인보이스 복사",
+  "copyButton": "복사",
+  "invoiceCopied": "인보이스 복사됨",
+  "tokenCopied": "토큰 복사됨",
+  "speed": "속도:",
+
+  "settings": "설정",
+  "walletSection": "지갑",
+  "backupSeedPhrase": "시드 문구 백업",
+  "viewRecoveryWords": "복구 단어 보기",
+  "connectedMints": "연결된 Mint",
+  "manageCashuMints": "Cashu mint 관리",
+  "pinAccess": "PIN 잠금",
+  "pinEnabled": "활성화됨",
+  "protectWithPin": "PIN으로 앱 보호",
+  "recoverTokens": "토큰 복구",
+  "scanMintsWithSeed": "시드 문구로 mint 스캔",
+  "appearanceSection": "언어",
+  "language": "언어",
+  "informationSection": "정보",
+  "version": "버전",
+  "about": "정보",
+  "deleteWallet": "지갑 삭제",
+  "spanish": "Español",
+  "english": "English",
+  "portuguese": "Português",
+  "french": "Français",
+  "russian": "Русский",
+  "german": "Deutsch",
+  "italian": "Italiano",
+  "korean": "한국어",
+
+  "mnemonicNotFound": "니모닉을 찾을 수 없음",
+  "createPin": "PIN 만들기",
+  "enterPinDigits": "4자리 PIN을 입력하세요",
+  "confirmPin": "PIN 확인",
+  "enterPinAgain": "PIN을 다시 입력하세요",
+  "pinMismatch": "PIN이 일치하지 않습니다",
+  "pinActivated": "PIN 활성화됨",
+  "pinDeactivated": "PIN 비활성화됨",
+  "verifyPin": "PIN 확인",
+  "enterCurrentPin": "현재 PIN을 입력하세요",
+  "incorrectPin": "잘못된 PIN",
+  "selectLanguage": "언어 선택",
+  "languageChanged": "언어가 {language}(으)로 변경되었습니다",
+  "@languageChanged": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "close": "닫기",
+  "aboutDescription": "전 세계를 위한 쿠바 DNA를 가진 Cashu 지갑. La Chispa의 형제.",
+  "couldNotOpenLink": "링크를 열 수 없음",
+
+  "deleteWalletQuestion": "지갑을 삭제하시겠습니까?",
+  "actionIrreversible": "이 작업은 되돌릴 수 없습니다",
+  "deleteWalletWarning": "시드 문구와 토큰을 포함한 모든 데이터가 삭제됩니다. 백업이 있는지 확인하세요.",
+  "typeDeleteToConfirm": "확인하려면 \"삭제\"를 입력하세요:",
+  "deleteConfirmWord": "삭제",
+  "deleteError": "삭제 오류: {error}",
+  "@deleteError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "recoverTokensTitle": "토큰 복구",
+  "recoverTokensDescription": "시드 문구와 연결된 토큰을 복구하기 위해 mint 스캔 (NUT-13)",
+  "useCurrentSeedPhrase": "현재 시드 문구 사용",
+  "scanWithSavedWords": "저장된 12개 단어로 mint 스캔",
+  "useOtherSeedPhrase": "다른 시드 문구 사용",
+  "recoverFromOtherWords": "다른 12개 단어에서 토큰 복구",
+  "mintsToScan": "스캔할 Mint:",
+  "allMints": "모든 mint ({count}개)",
+  "@allMints": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "specificMint": "특정 mint",
+  "enterMnemonicWords": "공백으로 구분된 12개 단어를 입력하세요...",
+  "scanMints": "Mint 스캔",
+  "selectMintToScan": "스캔할 mint 선택",
+  "mnemonicMustHaveWords": "니모닉은 12개 또는 24개 단어여야 합니다",
+  "noConnectedMintsToScan": "스캔할 연결된 mint 없음",
+  "recoveredTokens": "{mints}개 mint에서 {tokens} 복구됨!",
+  "@recoveredTokens": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mints": { "type": "int" }
+    }
+  },
+  "scanCompleteNoTokens": "스캔 완료. 새 토큰을 찾지 못했습니다.",
+  "mintsWithError": "({count}개 mint 오류)",
+  "@mintsWithError": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "recoveredFromMint": "{mint}에서 {tokens} 복구됨!",
+  "@recoveredFromMint": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mint": { "type": "String" }
+    }
+  },
+  "noTokensFoundInMint": "{mint}에서 토큰을 찾을 수 없음.",
+  "@noTokensFoundInMint": {
+    "placeholders": {
+      "mint": { "type": "String" }
+    }
+  },
+  "recoveredAndTransferred": "{amount} {unit}이(가) 지갑으로 복구 및 전송되었습니다!",
+  "@recoveredAndTransferred": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "noTokensForMnemonic": "해당 니모닉과 연결된 토큰을 찾을 수 없음.",
+
+  "noConnectedMints": "연결된 mint 없음",
+  "addMintToStart": "시작하려면 mint를 추가하세요",
+  "addMint": "Mint 추가",
+  "mintDeleted": "Mint 삭제됨",
+  "activeMintUpdated": "활성 mint 업데이트됨",
+  "mintUrl": "Mint URL:",
+  "mintUrlPlaceholder": "https://mint.example.com",
+  "urlMustStartWithHttps": "URL은 https://로 시작해야 합니다",
+  "connectingToMint": "Mint에 연결 중...",
+  "mintAddedSuccessfully": "Mint가 성공적으로 추가되었습니다",
+  "couldNotConnectToMint": "Mint에 연결할 수 없음",
+  "add": "추가",
+
+  "success": "성공",
+  "loading": "로딩 중...",
+  "retry": "다시 시도",
+
+  "activeMint": "활성 Mint",
+  "mintMessage": "Mint 메시지",
+  "url": "URL",
+  "currency": "통화",
+  "unknown": "알 수 없음",
+  "useThisMint": "이 mint 사용",
+  "copyMintUrl": "Mint URL 복사",
+  "deleteMint": "Mint 삭제",
+  "copied": "{label} 복사됨",
+  "@copied": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "deleteMintConfirmTitle": "Mint 삭제",
+  "deleteMintConfirmMessage": "이 mint에 잔액이 있으면 잃게 됩니다. 확실합니까?",
+  "delete": "삭제",
+
+  "offlineSend": "오프라인 전송",
+  "selectNotesToSend": "보낼 노트를 선택하세요:",
+  "totalToSend": "보낼 총액",
+  "notesSelected": "{count}개 노트 선택됨",
+  "@notesSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "loadingProofsError": "증명 로드 오류: {error}",
+  "@loadingProofsError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "creatingTokenError": "토큰 생성 오류: {error}",
+  "@creatingTokenError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "unknownState": "알 수 없는 상태",
+  "depositAmountTitle": "{amount} {unit} 입금",
+  "@depositAmountTitle": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "receiveNow": "지금 받기",
+  "receiveLater": "나중에 받기",
+  "tokenSavedForLater": "나중에 청구하기 위해 토큰이 저장되었습니다",
+  "noConnectionTokenSaved": "연결 없음. 나중에 청구하기 위해 토큰이 저장되었습니다.",
+  "unknownMintOffline": "이 토큰은 알 수 없는 mint의 것입니다. 인터넷에 연결하여 추가하고 토큰을 청구하세요.",
+  "noConnectionTryLater": "Mint에 연결할 수 없음. 나중에 다시 시도하세요.",
+  "saveTokenError": "토큰 저장 오류. 다시 시도해 주세요.",
+  "pendingTokenLimitReached": "대기 중 토큰 한도 도달 (최대 50개)",
+  "filterToReceive": "받을 항목",
+  "noPendingTokens": "대기 중인 토큰 없음",
+  "noPendingTokensHint": "나중에 청구할 토큰을 저장하세요",
+  "pendingBadge": "대기 중",
+  "expiresInDays": "{days, plural, =1{1일 후 만료} other{{days}일 후 만료}}",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "retryCount": "{count}회 재시도",
+  "@retryCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "claimNow": "지금 청구",
+  "pendingTokenClaimedSuccess": "{amount} {unit} 청구됨",
+  "@pendingTokenClaimedSuccess": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "pendingTokensClaimed": "{count, plural, =1{1개 토큰 청구됨 ({amount} {unit})} other{{count}개 토큰 청구됨 ({amount} {unit})}}",
+  "@pendingTokensClaimed": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "scan": "스캔",
+  "scanQrCode": "QR 스캔",
+  "scanCashuToken": "Cashu 토큰 스캔",
+  "scanLightningInvoice": "인보이스 스캔",
+  "scanningAnimatedQr": "애니메이션 QR 스캔 중...",
+  "pointCameraAtQr": "카메라를 QR 코드에 맞추세요",
+  "pointCameraAtCashuQr": "카메라를 Cashu 토큰 QR에 맞추세요",
+  "pointCameraAtInvoiceQr": "카메라를 인보이스 QR에 맞추세요",
+  "unrecognizedQrCode": "인식할 수 없는 QR 코드",
+  "scanCashuTokenHint": "Cashu 토큰 스캔 (cashuA... 또는 cashuB...)",
+  "scanLightningInvoiceHint": "Lightning 인보이스 스캔 (lnbc...)",
+  "addMintQuestion": "이 mint를 추가하시겠습니까?",
+  "cameraPermissionDenied": "카메라 권한이 거부되었습니다",
+  "paymentRequestNotSupported": "결제 요청은 아직 지원되지 않습니다"
+}
