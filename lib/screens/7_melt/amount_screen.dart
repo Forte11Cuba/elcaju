@@ -240,7 +240,7 @@ class _AmountScreenState extends State<AmountScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  widget.params.description ?? widget.destination,
+                  'Payment to ${widget.destination}',
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 14,
