@@ -209,6 +209,7 @@
   "deleteWallet": "Delete wallet",
   "spanish": "Español",
   "english": "English",
+  "portuguese": "Português",
 
   "mnemonicNotFound": "Mnemonic not found",
   "createPin": "Create PIN",

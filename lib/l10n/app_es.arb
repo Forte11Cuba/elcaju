@@ -266,6 +266,7 @@
   "deleteWallet": "Borrar wallet",
   "spanish": "Español",
   "english": "English",
+  "portuguese": "Português",
 
   "mnemonicNotFound": "No se encontró el mnemonic",
   "createPin": "Crear PIN",
