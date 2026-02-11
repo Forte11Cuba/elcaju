@@ -8,11 +8,13 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/incoming_data_parser.dart';
+import '../../core/services/lnurl_service.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
 import '../../providers/wallet_provider.dart';
 import '../10_scanner/scan_screen.dart';
+import 'amount_screen.dart';
 
 /// Pantalla para retirar sats a Lightning (Melt)
 class MeltScreen extends StatefulWidget {
@@ -39,6 +41,10 @@ class _MeltScreenState extends State<MeltScreen> {
   BigInt _total = BigInt.zero;
   BigInt _availableBalance = BigInt.zero;
   String? _errorMessage;
+
+  // Estado para LNURL/Lightning Address (solo para mostrar loading)
+  LnInputType _inputType = LnInputType.unknown;
+  bool _isResolvingLnurl = false;
 
   @override
   void initState() {
@@ -126,6 +132,9 @@ class _MeltScreenState extends State<MeltScreen> {
 
                       const SizedBox(height: AppDimensions.paddingLarge),
 
+                      // Loading LNURL resolve
+                      if (_isResolvingLnurl) _buildResolvingLnurl(),
+
                       // Loading quote
                       if (_isLoadingQuote) _buildLoadingQuote(),
 
@@ -174,7 +183,7 @@ class _MeltScreenState extends State<MeltScreen> {
           color: Colors.white,
         ),
         decoration: InputDecoration(
-          hintText: 'lnbc1000n1pj...',
+          hintText: 'lnbc..., lnurl1..., user@domain.com',
           hintStyle: TextStyle(
             fontFamily: 'Inter',
             fontSize: 14,
@@ -272,6 +281,38 @@ class _MeltScreenState extends State<MeltScreen> {
       _invoiceController.text = result;
       _onInvoiceChanged(result);
     }
+  }
+
+  Widget _buildResolvingLnurl() {
+    final typeLabel = _inputType == LnInputType.lightningAddress
+        ? 'Lightning Address'
+        : 'LNURL';
+
+    return GlassCard(
+      padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primaryAction,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            L10n.of(context)!.resolvingType(typeLabel),
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildLoadingQuote() {
@@ -491,16 +532,43 @@ class _MeltScreenState extends State<MeltScreen> {
 
   Widget _buildPayButton() {
     final l10n = L10n.of(context)!;
-    final canPay = _isValidInvoice &&
-        _quote != null &&
-        !_isProcessing &&
-        !_isLoadingQuote &&
-        _total <= _availableBalance;
+    final hasInput = _invoiceController.text.trim().isNotEmpty;
+
+    // Para BOLT11 con quote válido: botón Pagar
+    final hasValidQuote = _isValidInvoice && _quote != null && _total <= _availableBalance;
+
+    // Para LNURL/Address, unknown, o BOLT11 sin quote válido: botón Continuar
+    final needsProcessing = _inputType == LnInputType.lnurl ||
+        _inputType == LnInputType.lightningAddress ||
+        _inputType == LnInputType.unknown ||
+        (_inputType == LnInputType.bolt11Invoice && !hasValidQuote);
+
+    // Determinar estado del botón
+    final canPay = !_isProcessing && !_isLoadingQuote && !_isResolvingLnurl && hasValidQuote;
+    final canContinue = !_isProcessing && !_isLoadingQuote && !_isResolvingLnurl &&
+        hasInput && needsProcessing;
+
+    // Texto del botón
+    String buttonText;
+    if (_isProcessing) {
+      buttonText = l10n.paying;
+    } else if (needsProcessing && !hasValidQuote) {
+      buttonText = l10n.continue_;
+    } else {
+      buttonText = l10n.payInvoice;
+    }
 
     return PrimaryButton(
-      text: _isProcessing ? l10n.paying : l10n.payInvoice,
-      onPressed: canPay ? _showConfirmation : null,
+      text: buttonText,
+      onPressed: canPay ? _handlePay : (canContinue ? _processInput : null),
     );
+  }
+
+  Future<void> _handlePay() async {
+    // Cerrar teclado
+    FocusScope.of(context).unfocus();
+    // Flujo normal con invoice directo
+    _showConfirmation();
   }
 
   Future<void> _pasteFromClipboard() async {
@@ -518,6 +586,7 @@ class _MeltScreenState extends State<MeltScreen> {
       _isValidInvoice = false;
 
       if (value.isEmpty) {
+        _inputType = LnInputType.unknown;
         _invoiceAmount = BigInt.zero;
         _feeReserve = BigInt.zero;
         _total = BigInt.zero;
@@ -525,19 +594,126 @@ class _MeltScreenState extends State<MeltScreen> {
       }
     });
 
-    // Verificar formato básico
-    final trimmed = value.trim().toLowerCase();
-    if (!trimmed.startsWith('lnbc') &&
-        !trimmed.startsWith('lntb') &&
-        !trimmed.startsWith('lnbcrt')) {
-      setState(() {
-        _errorMessage = L10n.of(context)!.invalidInvoice;
-      });
-      return;
-    }
+    // Detectar tipo de input (sin mostrar error, solo detectar)
+    final inputType = LnurlService.detectType(value);
+    setState(() => _inputType = inputType);
 
-    // Obtener quote real
-    _getQuote(value.trim());
+    // Solo procesar automáticamente invoices BOLT11
+    // LNURL y Lightning Address requieren botón explícito
+    if (inputType == LnInputType.bolt11Invoice) {
+      // BOLT11 invoices son 200+ chars; evitar llamar API con input parcial
+      final cleaned = LnurlService.cleanInput(value);
+      if (cleaned.length > 50) {
+        _getQuote(cleaned);
+      }
+    }
+    // No mostrar error para unknown - el usuario puede estar escribiendo
+  }
+
+  /// Procesa el input actual (llamado por botón Continuar)
+  void _processInput() {
+    final value = _invoiceController.text.trim();
+    if (value.isEmpty) return;
+
+    // Cerrar teclado
+    FocusScope.of(context).unfocus();
+
+    switch (_inputType) {
+      case LnInputType.bolt11Invoice:
+        if (_quote != null) {
+          // Quote válido, mostrar confirmación
+          _showConfirmation();
+        } else {
+          // Sin quote, intentar obtenerlo o mostrar error
+          final cleaned = LnurlService.cleanInput(value);
+          if (cleaned.length > 50) {
+            _getQuote(cleaned);
+          } else {
+            setState(() {
+              _errorMessage = L10n.of(context)!.invalidInvoiceMalformed;
+            });
+          }
+        }
+        break;
+
+      case LnInputType.lnurl:
+        _resolveLnurl(value);
+        break;
+
+      case LnInputType.lightningAddress:
+        _resolveLightningAddress(value);
+        break;
+
+      case LnInputType.unknown:
+        setState(() {
+          _errorMessage = L10n.of(context)!.invalidInvoice;
+        });
+        break;
+    }
+  }
+
+  Future<void> _resolveLnurl(String lnurl) async {
+    setState(() {
+      _isResolvingLnurl = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final params = await LnurlService.resolveLnurl(lnurl);
+      if (mounted) {
+        setState(() => _isResolvingLnurl = false);
+        // Navegar a AmountScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AmountScreen(
+              destination: lnurl,
+              destinationType: LnInputType.lnurl,
+              params: params,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isResolvingLnurl = false;
+          _errorMessage = L10n.of(context)!.paymentError(e.toString().replaceFirst('Exception: ', ''));
+        });
+      }
+    }
+  }
+
+  Future<void> _resolveLightningAddress(String address) async {
+    setState(() {
+      _isResolvingLnurl = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final params = await LnurlService.resolveLightningAddress(address);
+      if (mounted) {
+        setState(() => _isResolvingLnurl = false);
+        // Navegar a AmountScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AmountScreen(
+              destination: address,
+              destinationType: LnInputType.lightningAddress,
+              params: params,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isResolvingLnurl = false;
+          _errorMessage = L10n.of(context)!.paymentError(e.toString().replaceFirst('Exception: ', ''));
+        });
+      }
+    }
   }
 
   Future<void> _getQuote(String invoice) async {

@@ -50,6 +50,9 @@ dependencies:
   # CBOR decoder for V4 tokens
   cbor: ^6.3.0
 
+  # Bech32 decoder for LNURL
+  bech32: ^0.2.2
+
   # UUID generator for pending tokens
   uuid: ^4.3.3
 

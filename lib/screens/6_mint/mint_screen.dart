@@ -8,6 +8,7 @@ import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
+import '../../widgets/common/numpad_widget.dart';
 import '../../providers/wallet_provider.dart';
 import 'invoice_screen.dart';
 
@@ -20,9 +21,9 @@ class MintScreen extends StatefulWidget {
 }
 
 class _MintScreenState extends State<MintScreen> {
-  final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
+  String _amountValue = '';
   late String _activeUnit;
 
   bool _isProcessing = false;
@@ -36,7 +37,6 @@ class _MintScreenState extends State<MintScreen> {
 
   @override
   void dispose() {
-    _amountController.dispose();
     _descriptionController.dispose();
     super.dispose();
   }
@@ -44,8 +44,8 @@ class _MintScreenState extends State<MintScreen> {
   /// Obtiene la etiqueta de la unidad para display
   String get _unitLabel => UnitFormatter.getUnitLabel(_activeUnit);
 
-  /// Parsea el input del usuario a BigInt según la unidad
-  BigInt get _amount => UnitFormatter.parseUserInput(_amountController.text, _activeUnit);
+  /// Parsea los dígitos crudos a BigInt (ya son centavos para USD/EUR)
+  BigInt get _amount => UnitFormatter.parseRawDigits(_amountValue, _activeUnit);
 
   bool get _isValidAmount => _amount > BigInt.zero;
 
@@ -110,64 +110,49 @@ class _MintScreenState extends State<MintScreen> {
   }
 
   Widget _buildAmountSection() {
-    final l10n = L10n.of(context)!;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Display del monto
+        _buildAmountDisplay(),
+        const SizedBox(height: AppDimensions.paddingMedium),
+
+        // Teclado numérico
+        NumpadWidget(
+          value: _amountValue,
+          onChanged: (newValue) {
+            setState(() {
+              _errorMessage = null;
+              _amountValue = newValue;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAmountDisplay() {
+    final displayAmount = UnitFormatter.formatRawDigitsForDisplay(_amountValue, _activeUnit);
+
+    return Column(
       children: [
         Text(
-          l10n.amountToDeposit,
+          displayAmount,
           style: TextStyle(
             fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+            color: _isValidAmount || _amountValue.isEmpty
+                ? Colors.white
+                : AppColors.error,
           ),
         ),
-        const SizedBox(height: AppDimensions.paddingSmall),
-
-        // Input de monto
-        GlassCard(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.paddingMedium,
-            vertical: AppDimensions.paddingSmall,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: '0',
-                    hintStyle: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
-                    border: InputBorder.none,
-                  ),
-                  onChanged: (_) => setState(() {
-                    _errorMessage = null;
-                  }),
-                ),
-              ),
-              Text(
-                _unitLabel,
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
+        const SizedBox(height: 4),
+        Text(
+          _unitLabel,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 18,
+            color: AppColors.textSecondary,
           ),
         ),
       ],

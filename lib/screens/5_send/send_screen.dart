@@ -9,6 +9,7 @@ import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
+import '../../widgets/common/numpad_widget.dart';
 import '../../providers/wallet_provider.dart';
 import 'share_token_screen.dart';
 import 'offline_send_screen.dart';
@@ -22,9 +23,9 @@ class SendScreen extends StatefulWidget {
 }
 
 class _SendScreenState extends State<SendScreen> {
-  final TextEditingController _amountController = TextEditingController();
   final TextEditingController _memoController = TextEditingController();
 
+  String _amountValue = '';
   bool _isProcessing = false;
   String? _errorMessage;
   BigInt _availableBalance = BigInt.zero;
@@ -49,7 +50,6 @@ class _SendScreenState extends State<SendScreen> {
 
   @override
   void dispose() {
-    _amountController.dispose();
     _memoController.dispose();
     super.dispose();
   }
@@ -57,8 +57,8 @@ class _SendScreenState extends State<SendScreen> {
   /// Obtiene la etiqueta de la unidad para display
   String get _unitLabel => UnitFormatter.getUnitLabel(_activeUnit);
 
-  /// Parsea el input del usuario a BigInt según la unidad
-  BigInt get _amount => UnitFormatter.parseUserInput(_amountController.text, _activeUnit);
+  /// Parsea los dígitos crudos a BigInt (ya son centavos para USD/EUR)
+  BigInt get _amount => UnitFormatter.parseRawDigits(_amountValue, _activeUnit);
 
   bool get _isValidAmount => _amount > BigInt.zero && _amount <= _availableBalance;
 
@@ -131,107 +131,83 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Widget _buildAmountSection() {
-    final l10n = L10n.of(context)!;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          l10n.amountToSend,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: AppDimensions.paddingSmall),
-
-        // Input de monto
-        GlassCard(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.paddingMedium,
-            vertical: AppDimensions.paddingSmall,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: '0',
-                    hintStyle: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
-                    border: InputBorder.none,
-                  ),
-                  onChanged: (_) => setState(() {
-                    _errorMessage = null;
-                  }),
-                ),
-              ),
-              Text(
-                _unitLabel,
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-
+        // Display del monto
+        _buildAmountDisplay(),
         const SizedBox(height: AppDimensions.paddingSmall),
 
         // Balance disponible
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              l10n.available,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 14,
-                color: AppColors.textSecondary.withValues(alpha: 0.7),
-              ),
-            ),
-            GestureDetector(
-              onTap: _setMaxAmount,
-              child: Row(
-                children: [
-                  Text(
-                    '${UnitFormatter.formatBalance(_availableBalance, _activeUnit)} $_unitLabel',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryAction,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    l10n.max,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 12,
-                      color: AppColors.primaryAction.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        _buildBalanceRow(),
+        const SizedBox(height: AppDimensions.paddingMedium),
+
+        // Teclado numérico
+        NumpadWidget(
+          value: _amountValue,
+          showMaxButton: true,
+          onMaxPressed: _setMaxAmount,
+          onChanged: (newValue) {
+            setState(() {
+              _errorMessage = null;
+              _amountValue = newValue;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAmountDisplay() {
+    final displayAmount = UnitFormatter.formatRawDigitsForDisplay(_amountValue, _activeUnit);
+
+    return Column(
+      children: [
+        Text(
+          displayAmount,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+            color: _isValidAmount || _amountValue.isEmpty
+                ? Colors.white
+                : AppColors.error,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          _unitLabel,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 18,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBalanceRow() {
+    final l10n = L10n.of(context)!;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '${l10n.available} ',
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            color: AppColors.textSecondary.withValues(alpha: 0.7),
+          ),
+        ),
+        Text(
+          '${UnitFormatter.formatBalance(_availableBalance, _activeUnit)} $_unitLabel',
+          style: const TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppColors.primaryAction,
+          ),
         ),
       ],
     );
@@ -328,9 +304,9 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   void _setMaxAmount() {
-    // Formatear el balance para el input (sin separadores de miles)
-    _amountController.text = UnitFormatter.formatBalance(_availableBalance, _activeUnit).replaceAll(',', '');
     setState(() {
+      // El balance ya está en la unidad base (centavos para USD/EUR, sats para SAT)
+      _amountValue = _availableBalance.toString();
       _errorMessage = null;
     });
   }

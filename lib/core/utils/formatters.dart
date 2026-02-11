@@ -111,6 +111,42 @@ class UnitFormatter {
     }
   }
 
+  /// Formatea dígitos crudos para display con decimales fijos (estilo POS).
+  /// Para USD/EUR (2 decimales): "1" → "0.01", "15" → "0.15", "150" → "1.50"
+  /// Para SAT (0 decimales): "1" → "1", "15" → "15"
+  static String formatRawDigitsForDisplay(String rawDigits, String unit) {
+    final multiplier = getMultiplier(unit);
+
+    if (rawDigits.isEmpty) {
+      return multiplier == 100 ? '0.00' : '0';
+    }
+
+    if (multiplier == 100) {
+      // USD/EUR: 2 decimales fijos
+      final digits = rawDigits.padLeft(3, '0');
+      final intPart = digits.substring(0, digits.length - 2);
+      final decPart = digits.substring(digits.length - 2);
+
+      // Formatear parte entera con separador de miles
+      final intValue = int.tryParse(intPart) ?? 0;
+      final formattedInt = NumberFormat('#,##0').format(intValue);
+
+      return '$formattedInt.$decPart';
+    } else {
+      // SAT: sin decimales, con separador de miles
+      final value = int.tryParse(rawDigits) ?? 0;
+      return NumberFormat('#,###').format(value);
+    }
+  }
+
+  /// Convierte dígitos crudos del numpad a BigInt (centavos para USD/EUR, sats para SAT).
+  /// "150" USD → BigInt(150) (ya son centavos)
+  /// "150" SAT → BigInt(150)
+  static BigInt parseRawDigits(String rawDigits, String unit) {
+    if (rawDigits.isEmpty) return BigInt.zero;
+    return BigInt.tryParse(rawDigits) ?? BigInt.zero;
+  }
+
   /// Obtiene el nombre del host de un mint URL.
   /// Ejemplo: 'https://mint.cubabitcoin.org' → 'cubabitcoin.org'
   static String getMintDisplayName(String mintUrl) {
