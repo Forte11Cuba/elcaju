@@ -1,0 +1,487 @@
+{
+  "@@locale": "zh",
+
+  "appName": "ElCaju",
+  "appTagline": "您的私密电子现金钱包",
+  "loadingMessage1": "正在加密您的代币...",
+  "loadingMessage2": "正在准备您的电子代币...",
+  "loadingMessage3": "正在连接铸造厂...",
+  "loadingMessage4": "默认隐私保护。",
+  "loadingMessage5": "正在盲签代币...",
+  "loadingMessage6": "全力以赴...",
+  "loadingMessage7": "Cashu + Bitchat = 隐私 + 自由",
+  "aboutTagline": "无国界隐私。",
+
+  "welcomeTitle": "欢迎使用 ElCaju",
+  "welcomeSubtitle": "面向世界的 Cashu。古巴制造。",
+
+  "createWallet": "创建新钱包",
+  "restoreWallet": "恢复钱包",
+
+  "createWalletTitle": "创建钱包",
+  "creatingWallet": "正在创建您的钱包...",
+  "generatingSeed": "正在安全生成您的助记词",
+  "createWalletDescription": "将生成一个12词助记词。\n请将其保存在安全的地方。",
+  "generateWallet": "生成钱包",
+
+  "walletCreated": "钱包已创建！",
+  "walletCreatedDescription": "您的钱包已准备就绪。我们建议您现在备份助记词。",
+  "backupWarning": "如果没有备份，一旦丢失设备，您将无法访问您的资金。",
+  "backupNow": "立即备份",
+  "backupLater": "稍后备份",
+
+  "backupTitle": "备份",
+  "seedPhraseTitle": "您的助记词",
+  "seedPhraseDescription": "按顺序保存这12个单词。这是恢复钱包的唯一方式。",
+  "revealSeedPhrase": "显示助记词",
+  "tapToReveal": "点击按钮显示\n您的助记词",
+  "copyToClipboard": "复制到剪贴板",
+  "seedCopied": "助记词已复制到剪贴板",
+  "neverShareSeed": "切勿与任何人分享您的助记词。",
+  "confirmBackup": "我已将助记词保存在安全的地方",
+  "continue_": "继续",
+
+  "restoreTitle": "恢复钱包",
+  "enterSeedPhrase": "输入您的助记词",
+  "enterSeedDescription": "输入12或24个单词，用空格分隔。",
+  "seedPlaceholder": "单词1 单词2 单词3 ...",
+  "wordCount": "{count} 个单词",
+  "@wordCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "needWords": "（需要12或24个）",
+  "restoreError": "恢复错误：{error}",
+  "@restoreError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "homeTitle": "首页",
+  "receive": "收款",
+  "send": "付款",
+  "sendAction": "付款 ↗",
+  "receiveAction": "↘ 收款",
+  "deposit": "存入",
+  "withdraw": "提取",
+  "lightning": "闪电网络",
+  "cashu": "Cashu",
+  "ecash": "电子现金",
+  "history": "历史记录",
+  "noTransactions": "暂无交易",
+  "depositOrReceive": "存入或接收聪开始使用",
+  "noMint": "无铸造厂",
+
+  "balance": "余额",
+  "sats": "聪",
+
+  "pasteEcashToken": "粘贴电子现金代币",
+  "generateInvoiceToDeposit": "生成存款发票",
+  "createEcashToken": "创建电子现金代币",
+  "payLightningInvoice": "支付闪电发票",
+
+  "receiveCashu": "接收 Cashu",
+  "pasteTheCashuToken": "粘贴 Cashu 代币：",
+  "pasteFromClipboard": "从剪贴板粘贴",
+  "validToken": "有效代币",
+  "invalidToken": "无效或格式错误的代币",
+  "amount": "金额：",
+  "mint": "铸造厂：",
+  "claiming": "正在领取...",
+  "claimTokens": "领取代币",
+  "tokensReceived": "已收到代币",
+  "backToHome": "返回首页",
+  "tokenAlreadyClaimed": "此代币已被领取",
+  "unknownMint": "来自未知铸造厂的代币",
+  "claimError": "领取错误：{error}",
+  "@claimError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "sendCashu": "发送 Cashu",
+  "selectNotesManually": "手动选择票据",
+  "amountToSend": "发送金额：",
+  "available": "可用：",
+  "max": "（最大）",
+  "memoOptional": "备注（可选）：",
+  "memoPlaceholder": "这笔付款是用于什么？",
+  "creatingToken": "正在创建代币...",
+  "createToken": "创建代币",
+  "noActiveMint": "没有活跃的铸造厂",
+  "offlineModeMessage": "无连接。使用离线模式...",
+  "confirmSend": "确认发送",
+  "confirm": "确认",
+  "cancel": "取消",
+  "insufficientBalance": "余额不足",
+  "tokenCreationError": "创建代币错误：{error}",
+  "@tokenCreationError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "tokenCreated": "代币已创建",
+  "copy": "复制",
+  "share": "分享",
+  "tokenCashu": "Cashu 代币",
+  "tokenCashuAnimatedQr": "Cashu 代币（动态二维码 - {fragments} 个 UR 片段）",
+  "@tokenCashuAnimatedQr": {
+    "placeholders": {
+      "fragments": { "type": "int" }
+    }
+  },
+  "keepTokenWarning": "请保留此代币直到收款方领取。如果丢失，资金将无法找回。",
+  "tokenCopiedToClipboard": "代币已复制到剪贴板",
+
+  "amountToDeposit": "存入金额：",
+  "descriptionOptional": "描述（可选）：",
+  "depositPlaceholder": "这笔存款是用于什么？",
+  "generating": "正在生成...",
+  "generateInvoice": "生成发票",
+  "depositLightning": "闪电存款",
+
+  "payInvoiceTitle": "支付发票",
+  "generatingInvoice": "正在生成发票...",
+  "waitingForPayment": "等待付款...",
+  "paymentReceived": "已收到付款",
+  "tokensIssued": "代币已发行！",
+  "error": "错误",
+  "unknownError": "未知错误",
+  "back": "返回",
+  "copyInvoice": "复制发票",
+  "description": "描述：",
+  "invoiceCopiedToClipboard": "发票已复制到剪贴板",
+  "deposited": "已存入 {amount} {unit}",
+  "@deposited": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "pasteLightningInvoice": "粘贴闪电发票：",
+  "gettingQuote": "正在获取报价...",
+  "validInvoice": "有效发票",
+  "invalidInvoice": "无效发票",
+  "invalidInvoiceMalformed": "无效或格式错误的发票",
+  "feeReserved": "预留手续费：",
+  "total": "总计：",
+  "paying": "正在支付...",
+  "payInvoice": "支付发票",
+  "confirmPayment": "确认支付",
+  "pay": "支付",
+  "fee": "手续费",
+  "invoiceExpired": "发票已过期",
+  "amountOutOfRange": "金额超出允许范围",
+  "resolvingType": "正在解析 {type}...",
+  "@resolvingType": {
+    "placeholders": {
+      "type": { "type": "String" }
+    }
+  },
+  "invoiceAlreadyPaid": "发票已支付",
+  "paymentError": "支付错误：{error}",
+  "@paymentError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "sent": "已发送 {amount} {unit}",
+  "@sent": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "filterAll": "全部",
+  "filterPending": "待处理",
+  "filterEcash": "电子现金",
+  "filterLightning": "闪电",
+  "receiveTokensToStart": "接收 Cashu 代币开始使用",
+  "noPendingTransactions": "没有待处理的交易",
+  "allTransactionsCompleted": "所有交易已完成",
+  "noEcashTransactions": "没有电子现金交易",
+  "sendOrReceiveTokens": "发送或接收 Cashu 代币",
+  "noLightningTransactions": "没有闪电交易",
+  "depositOrWithdrawLightning": "通过闪电网络存入或提取",
+  "pendingStatus": "待处理",
+  "receivedStatus": "已收到",
+  "sentStatus": "已发送",
+  "now": "刚刚",
+  "agoMinutes": "{minutes} 分钟前",
+  "@agoMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "agoHours": "{hours} 小时前",
+  "@agoHours": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "agoDays": "{days} 天前",
+  "@agoDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "lightningInvoice": "闪电发票",
+  "receivedEcash": "收到电子现金",
+  "sentEcash": "发送电子现金",
+  "outgoingLightningPayment": "闪电支出",
+  "invoiceNotAvailable": "发票不可用",
+  "tokenNotAvailable": "代币不可用",
+  "unit": "单位",
+  "status": "状态",
+  "pending": "待处理",
+  "memo": "备注",
+  "copyInvoiceButton": "复制发票",
+  "copyButton": "复制",
+  "invoiceCopied": "发票已复制",
+  "tokenCopied": "代币已复制",
+  "speed": "速度：",
+
+  "settings": "设置",
+  "walletSection": "钱包",
+  "backupSeedPhrase": "备份助记词",
+  "viewRecoveryWords": "查看恢复词",
+  "connectedMints": "已连接铸造厂",
+  "manageCashuMints": "管理您的 Cashu 铸造厂",
+  "pinAccess": "PIN 访问",
+  "pinEnabled": "已启用",
+  "protectWithPin": "用 PIN 保护应用",
+  "recoverTokens": "恢复代币",
+  "scanMintsWithSeed": "使用助记词扫描铸造厂",
+  "appearanceSection": "语言",
+  "language": "语言",
+  "informationSection": "信息",
+  "version": "版本",
+  "about": "关于",
+  "deleteWallet": "删除钱包",
+  "spanish": "Español",
+  "english": "English",
+  "portuguese": "Português",
+  "french": "Français",
+  "russian": "Русский",
+  "german": "Deutsch",
+  "italian": "Italiano",
+  "korean": "한국어",
+  "chinese": "中文",
+
+  "mnemonicNotFound": "未找到助记词",
+  "createPin": "创建 PIN",
+  "enterPinDigits": "输入4位数 PIN",
+  "confirmPin": "确认 PIN",
+  "enterPinAgain": "再次输入 PIN",
+  "pinMismatch": "PIN 不匹配",
+  "pinActivated": "PIN 已激活",
+  "pinDeactivated": "PIN 已停用",
+  "verifyPin": "验证 PIN",
+  "enterCurrentPin": "输入当前 PIN",
+  "incorrectPin": "PIN 错误",
+  "selectLanguage": "选择语言",
+  "languageChanged": "语言已更改为 {language}",
+  "@languageChanged": {
+    "placeholders": {
+      "language": { "type": "String" }
+    }
+  },
+  "close": "关闭",
+  "aboutDescription": "具有古巴基因的 Cashu 钱包，面向全世界。La Chispa 的兄弟项目。",
+  "couldNotOpenLink": "无法打开链接",
+
+  "deleteWalletQuestion": "删除钱包？",
+  "actionIrreversible": "此操作不可撤销",
+  "deleteWalletWarning": "所有数据将被删除，包括您的助记词和代币。请确保您有备份。",
+  "typeDeleteToConfirm": "输入 \"DELETE\" 确认：",
+  "deleteConfirmWord": "DELETE",
+  "deleteError": "删除错误：{error}",
+  "@deleteError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "recoverTokensTitle": "恢复代币",
+  "recoverTokensDescription": "扫描铸造厂以恢复与您的助记词关联的代币（NUT-13）",
+  "useCurrentSeedPhrase": "使用当前助记词",
+  "scanWithSavedWords": "使用保存的12个单词扫描铸造厂",
+  "useOtherSeedPhrase": "使用其他助记词",
+  "recoverFromOtherWords": "从其他12个单词恢复代币",
+  "mintsToScan": "要扫描的铸造厂：",
+  "allMints": "所有铸造厂（{count}个）",
+  "@allMints": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "specificMint": "特定铸造厂",
+  "enterMnemonicWords": "输入12个单词，用空格分隔...",
+  "scanMints": "扫描铸造厂",
+  "selectMintToScan": "选择要扫描的铸造厂",
+  "mnemonicMustHaveWords": "助记词必须有12或24个单词",
+  "noConnectedMintsToScan": "没有已连接的铸造厂可扫描",
+  "recoveredTokens": "已从 {mints} 个铸造厂恢复 {tokens}！",
+  "@recoveredTokens": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mints": { "type": "int" }
+    }
+  },
+  "scanCompleteNoTokens": "扫描完成。未发现新代币。",
+  "mintsWithError": "（{count}个铸造厂出错）",
+  "@mintsWithError": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "recoveredFromMint": "已从 {mint} 恢复 {tokens}！",
+  "@recoveredFromMint": {
+    "placeholders": {
+      "tokens": { "type": "String" },
+      "mint": { "type": "String" }
+    }
+  },
+  "noTokensFoundInMint": "在 {mint} 中未发现代币。",
+  "@noTokensFoundInMint": {
+    "placeholders": {
+      "mint": { "type": "String" }
+    }
+  },
+  "recoveredAndTransferred": "已恢复并转入 {amount} {unit} 到您的钱包！",
+  "@recoveredAndTransferred": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "noTokensForMnemonic": "未发现与该助记词关联的代币。",
+
+  "noConnectedMints": "没有已连接的铸造厂",
+  "addMintToStart": "添加铸造厂开始使用",
+  "addMint": "添加铸造厂",
+  "mintDeleted": "铸造厂已删除",
+  "activeMintUpdated": "活跃铸造厂已更新",
+  "mintUrl": "铸造厂 URL：",
+  "mintUrlPlaceholder": "https://mint.example.com",
+  "urlMustStartWithHttps": "URL 必须以 https:// 开头",
+  "connectingToMint": "正在连接铸造厂...",
+  "mintAddedSuccessfully": "铸造厂添加成功",
+  "couldNotConnectToMint": "无法连接到铸造厂",
+  "add": "添加",
+
+  "success": "成功",
+  "loading": "加载中...",
+  "retry": "重试",
+
+  "activeMint": "活跃铸造厂",
+  "mintMessage": "铸造厂消息",
+  "url": "网址",
+  "currency": "货币",
+  "unknown": "未知",
+  "useThisMint": "使用此铸造厂",
+  "copyMintUrl": "复制铸造厂 URL",
+  "deleteMint": "删除铸造厂",
+  "copied": "{label} 已复制",
+  "@copied": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "deleteMintConfirmTitle": "删除铸造厂",
+  "deleteMintConfirmMessage": "如果您在此铸造厂有余额，将会丢失。确定要删除吗？",
+  "delete": "删除",
+
+  "offlineSend": "离线发送",
+  "selectNotesToSend": "选择要发送的票据：",
+  "totalToSend": "发送总额",
+  "notesSelected": "已选择 {count} 张票据",
+  "@notesSelected": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "loadingProofsError": "加载证明错误：{error}",
+  "@loadingProofsError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "creatingTokenError": "创建代币错误：{error}",
+  "@creatingTokenError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+
+  "unknownState": "未知状态",
+  "depositAmountTitle": "存入 {amount} {unit}",
+  "@depositAmountTitle": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "receiveNow": "立即接收",
+  "receiveLater": "稍后接收",
+  "tokenSavedForLater": "代币已保存，稍后领取",
+  "noConnectionTokenSaved": "无连接。代币已保存，稍后领取。",
+  "unknownMintOffline": "此代币来自未知铸造厂。请连接互联网以添加并领取代币。",
+  "noConnectionTryLater": "无法连接铸造厂。请稍后重试。",
+  "saveTokenError": "保存代币错误。请重试。",
+  "pendingTokenLimitReached": "待处理代币达到上限（最多50个）",
+  "filterToReceive": "待接收",
+  "noPendingTokens": "没有待处理代币",
+  "noPendingTokensHint": "保存代币稍后领取",
+  "pendingBadge": "待处理",
+  "expiresInDays": "{days, plural, =1{1天后过期} other{{days}天后过期}}",
+  "@expiresInDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "retryCount": "{count} 次重试",
+  "@retryCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "claimNow": "立即领取",
+  "pendingTokenClaimedSuccess": "已领取 {amount} {unit}",
+  "@pendingTokenClaimedSuccess": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+  "pendingTokensClaimed": "{count, plural, =1{已领取1个代币（{amount} {unit}）} other{已领取{count}个代币（{amount} {unit}）}}",
+  "@pendingTokensClaimed": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "amount": { "type": "String" },
+      "unit": { "type": "String" }
+    }
+  },
+
+  "scan": "扫描",
+  "scanQrCode": "扫描二维码",
+  "scanCashuToken": "扫描 Cashu 代币",
+  "scanLightningInvoice": "扫描发票",
+  "scanningAnimatedQr": "正在扫描动态二维码...",
+  "pointCameraAtQr": "将相机对准二维码",
+  "pointCameraAtCashuQr": "将相机对准 Cashu 代币二维码",
+  "pointCameraAtInvoiceQr": "将相机对准发票二维码",
+  "unrecognizedQrCode": "无法识别的二维码",
+  "scanCashuTokenHint": "扫描 Cashu 代币（cashuA... 或 cashuB...）",
+  "scanLightningInvoiceHint": "扫描闪电发票（lnbc...）",
+  "addMintQuestion": "添加此铸造厂？",
+  "cameraPermissionDenied": "相机权限被拒绝",
+  "paymentRequestNotSupported": "付款请求尚不支持"
+}

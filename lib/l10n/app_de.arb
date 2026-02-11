@@ -272,6 +272,7 @@
   "german": "Deutsch",
   "italian": "Italiano",
   "korean": "한국어",
+  "chinese": "中文",
 
   "mnemonicNotFound": "Mnemonic nicht gefunden",
   "createPin": "PIN erstellen",
