@@ -110,8 +110,7 @@ class P2PKUtils {
     if (secret is String) {
       secretStr = secret;
     } else if (secret is List<int>) {
-      secretStr = utf8.decode(secret);
-    } else if (secret is Uint8List) {
+      // Uint8List también es List<int>, así que este branch cubre ambos
       secretStr = utf8.decode(secret);
     } else {
       return null;

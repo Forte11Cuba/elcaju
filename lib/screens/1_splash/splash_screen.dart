@@ -98,7 +98,12 @@ class _SplashScreenState extends State<SplashScreen>
           await walletProvider.initialize(mnemonic);
 
           // Inicializar P2PK (derivar clave principal del mnemonic)
-          await p2pkProvider.initialize(mnemonic);
+          // Aislado: P2PK es secundario, su fallo no debe bloquear la wallet
+          try {
+            await p2pkProvider.initialize(mnemonic);
+          } catch (e) {
+            debugPrint('[SplashScreen] Error initializing P2PK (non-fatal): $e');
+          }
 
           if (!mounted) return;
 

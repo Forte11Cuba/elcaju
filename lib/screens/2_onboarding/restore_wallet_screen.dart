@@ -69,7 +69,11 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
       await walletProvider.initialize(mnemonic);
 
       // Inicializar P2PK (derivar clave principal del mnemonic)
-      await p2pkProvider.initialize(mnemonic);
+      try {
+        await p2pkProvider.initialize(mnemonic);
+      } catch (e) {
+        debugPrint('[RestoreWalletScreen] Error initializing P2PK (non-fatal): $e');
+      }
 
       if (mounted) {
         Navigator.pushAndRemoveUntil(

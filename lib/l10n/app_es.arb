@@ -511,5 +511,10 @@
   "p2pkEnterPrivateKey": "Ingresa la clave privada (nsec)",
   "p2pkDeleteTitle": "Eliminar clave",
   "p2pkDeleteConfirm": "¿Eliminar esta clave? No podrás recibir tokens bloqueados a ella.",
-  "p2pkRequiresConnection": "P2PK requiere conexión al mint"
+  "p2pkRequiresConnection": "P2PK requiere conexión al mint",
+  "p2pkErrorMaxKeysReached": "Máximo de claves importadas alcanzado (10)",
+  "p2pkErrorInvalidNsec": "nsec inválido",
+  "p2pkErrorKeyAlreadyExists": "Esta clave ya existe",
+  "p2pkErrorKeyNotFound": "Clave no encontrada",
+  "p2pkErrorCannotDeletePrimary": "No se puede eliminar la clave principal"
 }

@@ -464,9 +464,13 @@ class _SendScreenState extends State<SendScreen> {
 
   Widget _buildCreateButton() {
     final l10n = L10n.of(context)!;
+    // Si P2PK está habilitado, también debe haber una pubkey válida
+    final isP2PKValid = !_useP2PK ||
+        (_pubkeyController.text.isNotEmpty && _pubkeyError == null);
+    final canCreate = _isValidAmount && !_isProcessing && isP2PKValid;
     return PrimaryButton(
       text: _isProcessing ? l10n.creatingToken : l10n.createToken,
-      onPressed: _isValidAmount && !_isProcessing ? _showConfirmation : null,
+      onPressed: canCreate ? _showConfirmation : null,
     );
   }
 
@@ -590,7 +594,7 @@ class _SendScreenState extends State<SendScreen> {
         if (pubkeyHex == null) {
           throw Exception(L10n.of(context)!.p2pkInvalidPubkey);
         }
-        debugPrint('[SendScreen] Calling sendTokensP2pk with amount: $amount, pubkey: ${pubkeyHex.substring(0, 16)}...');
+        debugPrint('[SendScreen] Calling sendTokensP2pk with amount: $amount, pubkey: ${pubkeyHex.length > 16 ? pubkeyHex.substring(0, 16) : pubkeyHex}...');
         token = await walletProvider.sendTokensP2pk(amount, pubkeyHex, memo);
         debugPrint('[SendScreen] Token P2PK creado exitosamente!');
       } else {

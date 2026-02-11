@@ -485,5 +485,10 @@
   "scanLightningInvoiceHint": "Changanua ankara ya Lightning (lnbc...)",
   "addMintQuestion": "Ongeza mint hii?",
   "cameraPermissionDenied": "Ruhusa ya kamera imekataliwa",
-  "paymentRequestNotSupported": "Maombi ya malipo bado hayatumiki"
+  "paymentRequestNotSupported": "Maombi ya malipo bado hayatumiki",
+  "p2pkErrorMaxKeysReached": "Idadi ya juu ya funguo zilizoingizwa imefikiwa (10)",
+  "p2pkErrorInvalidNsec": "nsec batili",
+  "p2pkErrorKeyAlreadyExists": "Ufunguo huu tayari upo",
+  "p2pkErrorKeyNotFound": "Ufunguo haujapatikana",
+  "p2pkErrorCannotDeletePrimary": "Haiwezekani kufuta ufunguo mkuu"
 }

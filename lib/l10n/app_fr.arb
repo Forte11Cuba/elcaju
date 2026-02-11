@@ -485,5 +485,10 @@
   "scanLightningInvoiceHint": "Scannez une facture Lightning (lnbc...)",
   "addMintQuestion": "Ajouter ce mint ?",
   "cameraPermissionDenied": "Permission de la caméra refusée",
-  "paymentRequestNotSupported": "Les demandes de paiement ne sont pas encore prises en charge"
+  "paymentRequestNotSupported": "Les demandes de paiement ne sont pas encore prises en charge",
+  "p2pkErrorMaxKeysReached": "Nombre maximum de clés importées atteint (10)",
+  "p2pkErrorInvalidNsec": "nsec invalide",
+  "p2pkErrorKeyAlreadyExists": "Cette clé existe déjà",
+  "p2pkErrorKeyNotFound": "Clé non trouvée",
+  "p2pkErrorCannotDeletePrimary": "Impossible de supprimer la clé principale"
 }

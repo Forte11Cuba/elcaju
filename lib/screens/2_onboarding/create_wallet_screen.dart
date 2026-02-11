@@ -49,7 +49,11 @@ class _CreateWalletScreenState extends State<CreateWalletScreen> {
       await walletProvider.initialize(_mnemonic!);
 
       // Inicializar P2PK (derivar clave principal del mnemonic)
-      await p2pkProvider.initialize(_mnemonic!);
+      try {
+        await p2pkProvider.initialize(_mnemonic!);
+      } catch (e) {
+        debugPrint('[CreateWalletScreen] Error initializing P2PK (non-fatal): $e');
+      }
 
       setState(() {
         _isCreating = false;

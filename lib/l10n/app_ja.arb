@@ -485,5 +485,10 @@
   "scanLightningInvoiceHint": "Lightningインボイスをスキャン（lnbc...）",
   "addMintQuestion": "このMintを追加しますか？",
   "cameraPermissionDenied": "カメラの許可が拒否されました",
-  "paymentRequestNotSupported": "支払いリクエストはまだサポートされていません"
+  "paymentRequestNotSupported": "支払いリクエストはまだサポートされていません",
+  "p2pkErrorMaxKeysReached": "インポート可能な鍵の上限に達しました（10）",
+  "p2pkErrorInvalidNsec": "無効なnsec",
+  "p2pkErrorKeyAlreadyExists": "この鍵は既に存在します",
+  "p2pkErrorKeyNotFound": "鍵が見つかりません",
+  "p2pkErrorCannotDeletePrimary": "プライマリ鍵は削除できません"
 }

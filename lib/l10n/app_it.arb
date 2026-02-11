@@ -485,5 +485,10 @@
   "scanLightningInvoiceHint": "Scansiona una fattura Lightning (lnbc...)",
   "addMintQuestion": "Aggiungere questo mint?",
   "cameraPermissionDenied": "Permesso fotocamera negato",
-  "paymentRequestNotSupported": "Le richieste di pagamento non sono ancora supportate"
+  "paymentRequestNotSupported": "Le richieste di pagamento non sono ancora supportate",
+  "p2pkErrorMaxKeysReached": "Numero massimo di chiavi importate raggiunto (10)",
+  "p2pkErrorInvalidNsec": "nsec non valido",
+  "p2pkErrorKeyAlreadyExists": "Questa chiave esiste già",
+  "p2pkErrorKeyNotFound": "Chiave non trovata",
+  "p2pkErrorCannotDeletePrimary": "Impossibile eliminare la chiave principale"
 }

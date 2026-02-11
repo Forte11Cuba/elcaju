@@ -18,6 +18,25 @@ import '../models/p2pk_key.dart';
 import '../core/utils/nostr_utils.dart';
 import '../core/utils/p2pk_utils.dart';
 
+/// Códigos de error para operaciones P2PK
+enum P2PKErrorCode {
+  maxKeysReached,
+  invalidNsec,
+  keyAlreadyExists,
+  keyNotFound,
+  cannotDeletePrimaryKey,
+}
+
+/// Excepción tipada para errores P2PK (traducir en UI con L10n)
+class P2PKException implements Exception {
+  final P2PKErrorCode code;
+
+  const P2PKException(this.code);
+
+  @override
+  String toString() => 'P2PKException: $code';
+}
+
 class P2PKProvider extends ChangeNotifier {
   static const _storageKey = 'p2pk_keys';
   static const _maxImportedKeys = 10;
@@ -59,9 +78,18 @@ class P2PKProvider extends ChangeNotifier {
     // Cargar claves guardadas
     await _loadKeys();
 
-    // Derivar clave principal si no existe
+    // Siempre derivar para comparar con la almacenada
+    final derived = await _deriveFromMnemonic(mnemonic);
+
     if (_primaryKey == null) {
-      _primaryKey = await _deriveFromMnemonic(mnemonic);
+      // Primera vez: guardar clave derivada
+      _primaryKey = derived;
+      _keys.insert(0, _primaryKey!);
+      await _saveKeys();
+    } else if (_primaryKey!.publicKey != derived.publicKey) {
+      // Mnemonic cambió (ej: wallet restore) — reemplazar clave primaria
+      _keys.removeWhere((k) => k.isDerived);
+      _primaryKey = derived;
       _keys.insert(0, _primaryKey!);
       await _saveKeys();
     }
@@ -78,7 +106,7 @@ class P2PKProvider extends ChangeNotifier {
   /// Importa una clave desde nsec
   Future<P2PKKey> importFromNsec(String nsec, String label) async {
     if (!canImportMore) {
-      throw Exception('Máximo de claves importadas alcanzado ($_maxImportedKeys)');
+      throw const P2PKException(P2PKErrorCode.maxKeysReached);
     }
 
     // Limpiar input
@@ -89,7 +117,7 @@ class P2PKProvider extends ChangeNotifier {
 
     final privateKeyHex = NostrUtils.nsecToHex(cleanNsec);
     if (privateKeyHex == null) {
-      throw Exception('nsec inválido');
+      throw const P2PKException(P2PKErrorCode.invalidNsec);
     }
 
     // Obtener pubkey usando cdk-flutter
@@ -97,7 +125,7 @@ class P2PKProvider extends ChangeNotifier {
 
     // Verificar que no exista ya
     if (_keys.any((k) => k.publicKey == publicKeyHex)) {
-      throw Exception('Esta clave ya existe');
+      throw const P2PKException(P2PKErrorCode.keyAlreadyExists);
     }
 
     final key = P2PKKey(
@@ -125,11 +153,11 @@ class P2PKProvider extends ChangeNotifier {
         );
 
     if (key == null) {
-      throw Exception('Clave no encontrada');
+      throw const P2PKException(P2PKErrorCode.keyNotFound);
     }
 
     if (key.isDerived) {
-      throw Exception('No se puede eliminar la clave principal');
+      throw const P2PKException(P2PKErrorCode.cannotDeletePrimaryKey);
     }
 
     _keys.removeWhere((k) => k.id == keyId);
@@ -238,6 +266,7 @@ class P2PKProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('[P2PKProvider] Error cargando claves: $e');
       _keys = [];
+      _primaryKey = null;
     }
   }
 

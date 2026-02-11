@@ -485,5 +485,10 @@
   "scanLightningInvoiceHint": "Lightning 인보이스 스캔 (lnbc...)",
   "addMintQuestion": "이 mint를 추가하시겠습니까?",
   "cameraPermissionDenied": "카메라 권한이 거부되었습니다",
-  "paymentRequestNotSupported": "결제 요청은 아직 지원되지 않습니다"
+  "paymentRequestNotSupported": "결제 요청은 아직 지원되지 않습니다",
+  "p2pkErrorMaxKeysReached": "가져온 키의 최대 개수에 도달했습니다 (10)",
+  "p2pkErrorInvalidNsec": "유효하지 않은 nsec",
+  "p2pkErrorKeyAlreadyExists": "이 키는 이미 존재합니다",
+  "p2pkErrorKeyNotFound": "키를 찾을 수 없습니다",
+  "p2pkErrorCannotDeletePrimary": "기본 키는 삭제할 수 없습니다"
 }

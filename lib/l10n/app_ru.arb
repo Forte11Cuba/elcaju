@@ -485,5 +485,10 @@
   "scanLightningInvoiceHint": "Сканируйте Lightning счёт (lnbc...)",
   "addMintQuestion": "Добавить этот mint?",
   "cameraPermissionDenied": "Доступ к камере запрещён",
-  "paymentRequestNotSupported": "Запросы на оплату пока не поддерживаются"
+  "paymentRequestNotSupported": "Запросы на оплату пока не поддерживаются",
+  "p2pkErrorMaxKeysReached": "Достигнуто максимальное количество импортированных ключей (10)",
+  "p2pkErrorInvalidNsec": "Недействительный nsec",
+  "p2pkErrorKeyAlreadyExists": "Этот ключ уже существует",
+  "p2pkErrorKeyNotFound": "Ключ не найден",
+  "p2pkErrorCannotDeletePrimary": "Невозможно удалить основной ключ"
 }

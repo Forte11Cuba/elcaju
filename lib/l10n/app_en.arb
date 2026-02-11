@@ -391,5 +391,10 @@
   "p2pkEnterPrivateKey": "Enter private key (nsec)",
   "p2pkDeleteTitle": "Delete key",
   "p2pkDeleteConfirm": "Delete this key? You won't be able to receive tokens locked to it.",
-  "p2pkRequiresConnection": "P2PK requires connection to the mint"
+  "p2pkRequiresConnection": "P2PK requires connection to the mint",
+  "p2pkErrorMaxKeysReached": "Maximum imported keys reached (10)",
+  "p2pkErrorInvalidNsec": "Invalid nsec",
+  "p2pkErrorKeyAlreadyExists": "This key already exists",
+  "p2pkErrorKeyNotFound": "Key not found",
+  "p2pkErrorCannotDeletePrimary": "Cannot delete primary key"
 }

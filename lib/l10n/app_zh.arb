@@ -485,5 +485,10 @@
   "scanLightningInvoiceHint": "扫描闪电发票（lnbc...）",
   "addMintQuestion": "添加此铸造厂？",
   "cameraPermissionDenied": "相机权限被拒绝",
-  "paymentRequestNotSupported": "付款请求尚不支持"
+  "paymentRequestNotSupported": "付款请求尚不支持",
+  "p2pkErrorMaxKeysReached": "已达到导入密钥的最大数量（10）",
+  "p2pkErrorInvalidNsec": "无效的nsec",
+  "p2pkErrorKeyAlreadyExists": "此密钥已存在",
+  "p2pkErrorKeyNotFound": "未找到密钥",
+  "p2pkErrorCannotDeletePrimary": "无法删除主密钥"
 }
