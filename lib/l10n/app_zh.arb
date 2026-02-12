@@ -487,6 +487,7 @@
   "cameraPermissionDenied": "相机权限被拒绝",
   "paymentRequestNotSupported": "付款请求尚不支持",
   "p2pkTitle": "P2PK密钥",
+  "p2pkSettingsDescription": "接收锁定的ecash",
   "p2pkExperimental": "P2PK是实验性功能。请谨慎使用。",
   "p2pkExperimentalShort": "实验性",
   "p2pkPrimaryKey": "主密钥",

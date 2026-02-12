@@ -487,6 +487,7 @@
   "cameraPermissionDenied": "Ruhusa ya kamera imekataliwa",
   "paymentRequestNotSupported": "Maombi ya malipo bado hayatumiki",
   "p2pkTitle": "Funguo za P2PK",
+  "p2pkSettingsDescription": "Pokea ecash iliyofungwa",
   "p2pkExperimental": "P2PK ni ya majaribio. Tumia kwa uangalifu.",
   "p2pkExperimentalShort": "Majaribio",
   "p2pkPrimaryKey": "Ufunguo Mkuu",

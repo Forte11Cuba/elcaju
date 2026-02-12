@@ -487,6 +487,7 @@
   "cameraPermissionDenied": "カメラの許可が拒否されました",
   "paymentRequestNotSupported": "支払いリクエストはまだサポートされていません",
   "p2pkTitle": "P2PK鍵",
+  "p2pkSettingsDescription": "ロックされたecashを受け取る",
   "p2pkExperimental": "P2PKは実験的機能です。注意してご使用ください。",
   "p2pkExperimentalShort": "実験的",
   "p2pkPrimaryKey": "プライマリ鍵",
