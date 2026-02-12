@@ -13,6 +13,7 @@ import '../../widgets/common/glass_card.dart';
 import '../2_onboarding/backup_seed_screen.dart';
 import 'mints_screen.dart';
 import 'language_screen.dart';
+import 'p2pk_keys_screen.dart';
 
 /// Pantalla de configuración
 class SettingsScreen extends StatefulWidget {
@@ -94,6 +95,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       subtitle: l10n.scanMintsWithSeed,
                       onTap: () => _showRecoverTokensDialog(context, settingsProvider),
                     ),
+                    _buildP2PKTile(l10n),
 
                     const SizedBox(height: AppDimensions.paddingLarge),
 
@@ -220,6 +222,100 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: AppColors.textSecondary.withValues(alpha: 0.5),
               size: 20,
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildP2PKTile(L10n l10n) {
+    return GlassCard(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const P2PKKeysScreen(),
+          ),
+        );
+      },
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.paddingMedium,
+        vertical: AppDimensions.paddingMedium,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(LucideIcons.keyRound, color: AppColors.textSecondary, size: 20),
+          ),
+          const SizedBox(width: AppDimensions.paddingMedium),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Título con badge experimental
+                Row(
+                  children: [
+                    Text(
+                      l10n.p2pkTitle,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            LucideIcons.flaskConical,
+                            color: AppColors.error,
+                            size: 12,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            l10n.p2pkExperimentalShort,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                // Descripción normal
+                Text(
+                  l10n.p2pkSettingsDescription,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            LucideIcons.chevronRight,
+            color: AppColors.textSecondary.withValues(alpha: 0.5),
+            size: 20,
+          ),
         ],
       ),
     );

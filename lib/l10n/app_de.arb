@@ -487,6 +487,7 @@
   "cameraPermissionDenied": "Kamera-Berechtigung verweigert",
   "paymentRequestNotSupported": "Zahlungsanfragen werden noch nicht unterstützt",
   "p2pkTitle": "P2PK-Schlüssel",
+  "p2pkSettingsDescription": "Gesperrtes ecash empfangen",
   "p2pkExperimental": "P2PK ist experimentell. Mit Vorsicht verwenden.",
   "p2pkExperimentalShort": "Experimentell",
   "p2pkPrimaryKey": "Primärschlüssel",

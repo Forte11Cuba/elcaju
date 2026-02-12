@@ -368,6 +368,7 @@
   "paymentRequestNotSupported": "Payment requests are not yet supported",
 
   "p2pkTitle": "P2PK Keys",
+  "p2pkSettingsDescription": "Receive locked ecash",
   "p2pkExperimental": "P2PK is experimental. Use with caution.",
   "p2pkExperimentalShort": "Experimental",
   "p2pkPrimaryKey": "Primary Key",

@@ -784,8 +784,9 @@ class WalletProvider extends ChangeNotifier {
   /// Reclama un token Cashu detectando automáticamente su unidad.
   /// Si el mint del token es diferente al activo, lo agrega.
   /// NO cambia la unidad activa (comportamiento similar a cashu.me).
+  /// Si el token es P2PK, pasar la clave privada en p2pkPrivateKey.
   /// Retorna monto recibido.
-  Future<BigInt> receiveToken(String encodedToken) async {
+  Future<BigInt> receiveToken(String encodedToken, {String? p2pkPrivateKey}) async {
     // Parsear token (incluye detección de unidad)
     final tokenInfo = parseToken(encodedToken);
     if (tokenInfo == null) {
@@ -802,13 +803,13 @@ class WalletProvider extends ChangeNotifier {
       // Intentar detectar unidad de nuevo ahora que tenemos keysets
       final detectedUnit = detectTokenUnit(encodedToken);
       if (detectedUnit != null) {
-        return await _receiveWithUnit(encodedToken, tokenMint, detectedUnit);
+        return await _receiveWithUnit(encodedToken, tokenMint, detectedUnit, p2pkPrivateKey);
       }
     }
 
     // Si tenemos unidad detectada, usarla
     if (tokenInfo.unit != null) {
-      return await _receiveWithUnit(encodedToken, tokenMint, tokenInfo.unit!);
+      return await _receiveWithUnit(encodedToken, tokenMint, tokenInfo.unit!, p2pkPrivateKey);
     }
 
     // Fallback: intentar con cada unidad del mint hasta que funcione
@@ -817,7 +818,7 @@ class WalletProvider extends ChangeNotifier {
 
     for (final unit in units) {
       try {
-        return await _receiveWithUnit(encodedToken, tokenMint, unit);
+        return await _receiveWithUnit(encodedToken, tokenMint, unit, p2pkPrivateKey);
       } catch (e) {
         lastError = e as Exception;
         debugPrint('Receive falló con unidad $unit: $e');
@@ -835,10 +836,17 @@ class WalletProvider extends ChangeNotifier {
     String encodedToken,
     String mintUrl,
     String unit,
+    String? p2pkPrivateKey,
   ) async {
     final wallet = await getWallet(mintUrl, unit);
     final token = Token.parse(encoded: encodedToken);
-    final amount = await wallet.receive(token: token);
+
+    // Si hay clave P2PK, usarla para desbloquear el token
+    final opts = p2pkPrivateKey != null
+        ? ReceiveOptions(signingKeys: [p2pkPrivateKey])
+        : null;
+
+    final amount = await wallet.receive(token: token, opts: opts);
 
     // Guardar metadata para la transacción recién creada
     await _saveMetaForRecentReceive(wallet, encodedToken);
@@ -873,6 +881,7 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Reclama un token P2PK (bloqueado a una clave pública).
+  /// Usa la unidad del token automáticamente (no requiere cambiar unidad activa).
   Future<BigInt> receiveP2pkToken(
     String encodedToken,
     List<String> signingKeys,
@@ -882,20 +891,14 @@ class WalletProvider extends ChangeNotifier {
       throw Exception('Token inválido');
     }
 
-    // Cambiar al mint del token
+    // Agregar mint si no existe
     if (!_mintUnits.containsKey(tokenInfo.mintUrl)) {
       await addMint(tokenInfo.mintUrl);
     }
 
-    _activeMintUrl = tokenInfo.mintUrl;
-
-    // Verificar si la unidad activa es soportada
-    final units = _mintUnits[tokenInfo.mintUrl]!;
-    if (!units.contains(_activeUnit)) {
-      _activeUnit = units.first;
-    }
-
-    final wallet = await getWallet(tokenInfo.mintUrl, _activeUnit);
+    // Usar la unidad del token (fallback a 'sat' si no especificada)
+    final tokenUnit = tokenInfo.unit ?? 'sat';
+    final wallet = await getWallet(tokenInfo.mintUrl, tokenUnit);
     final token = Token.parse(encoded: encodedToken);
 
     final amount = await wallet.receive(
@@ -994,6 +997,8 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Envía tokens P2PK.
+  /// NOTA: Bug conocido en CDK - solo funciona el primer envío después de iniciar la app.
+  /// Ver project_context/P2PK_SEND_BUG.md
   Future<String> sendTokensP2pk(
     BigInt amount,
     String pubkey,

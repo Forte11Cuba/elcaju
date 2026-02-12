@@ -487,6 +487,7 @@
   "cameraPermissionDenied": "Доступ к камере запрещён",
   "paymentRequestNotSupported": "Запросы на оплату пока не поддерживаются",
   "p2pkTitle": "Ключи P2PK",
+  "p2pkSettingsDescription": "Получить заблокированный ecash",
   "p2pkExperimental": "P2PK экспериментальный. Используйте с осторожностью.",
   "p2pkExperimentalShort": "Экспериментальный",
   "p2pkPrimaryKey": "Основной ключ",
