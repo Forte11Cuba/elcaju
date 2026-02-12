@@ -922,20 +922,11 @@ class WalletProvider extends ChangeNotifier {
 
   /// Prepara un envío P2PK (bloqueado a una clave pública).
   Future<PreparedSend> prepareSendP2pk(BigInt amount, String pubkey) async {
-    debugPrint('[WalletProvider] prepareSendP2pk: amount=$amount, pubkey=${pubkey.length > 16 ? pubkey.substring(0, 16) : pubkey}...');
     final wallet = await getActiveWallet();
-    debugPrint('[WalletProvider] Got wallet, calling prepareSend with P2PK...');
-    try {
-      final prepared = await wallet.prepareSend(
-        amount: amount,
-        opts: SendOptions(pubkey: pubkey),
-      );
-      debugPrint('[WalletProvider] prepareSendP2pk SUCCESS');
-      return prepared;
-    } catch (e) {
-      debugPrint('[WalletProvider] prepareSendP2pk ERROR: $e');
-      rethrow;
-    }
+    return await wallet.prepareSend(
+      amount: amount,
+      opts: SendOptions(pubkey: pubkey),
+    );
   }
 
   /// Confirma un envío preparado y retorna el token encoded.
@@ -997,15 +988,47 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Envía tokens P2PK.
-  /// NOTA: Bug conocido en CDK - solo funciona el primer envío después de iniciar la app.
-  /// Ver project_context/P2PK_SEND_BUG.md
-  Future<String> sendTokensP2pk(
-    BigInt amount,
-    String pubkey,
-    String? memo,
-  ) async {
+  /// Workaround CDK bug: limpia txs pending antes de enviar.
+  /// Ver: https://github.com/cashubtc/cdk-flutter/issues/3
+  Future<String> sendTokensP2pk(BigInt amount, String pubkey, String? memo) async {
+    // Workaround CDK bug: limpiar txs pending y proofs reservados antes de P2PK send
+    await _settlePendingTransactions();
+
     final prepared = await prepareSendP2pk(amount, pubkey);
-    return await confirmSend(prepared, memo);
+    try {
+      return await confirmSend(prepared, memo);
+    } catch (e) {
+      // Liberar proofs reservados si el envío falla
+      try {
+        await cancelSend(prepared);
+      } catch (_) {}
+      rethrow;
+    }
+  }
+
+  /// Intenta liquidar transacciones pending sincronizando con el mint.
+  /// Workaround para bug de CDK donde P2PK sends pending bloquean envíos subsiguientes.
+  Future<void> _settlePendingTransactions() async {
+    try {
+      final wallet = await getActiveWallet();
+      await wallet.checkPendingTransactions();
+      await wallet.reclaimReserved();
+    } catch (e) {
+      debugPrint('settlePendingTransactions failed (may be offline): $e');
+    }
+  }
+
+  /// Verifica si hay transacciones salientes pendientes en el wallet activo.
+  Future<bool> hasPendingOutgoingTransactions() async {
+    try {
+      final wallet = await getActiveWallet();
+      final txs = await wallet.listTransactions();
+      return txs.any((tx) =>
+        tx.direction == TransactionDirection.outgoing &&
+        tx.status == TransactionStatus.pending);
+    } catch (_) {
+      return false;
+    }
   }
 
   // ============================================================

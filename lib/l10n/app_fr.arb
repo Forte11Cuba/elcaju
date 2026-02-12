@@ -489,6 +489,7 @@
   "p2pkTitle": "Clés P2PK",
   "p2pkSettingsDescription": "Recevoir ecash verrouillé",
   "p2pkExperimental": "P2PK est expérimental. Utiliser avec prudence.",
+  "p2pkPendingSendWarning": "Vous avez un envoi P2PK en attente. Allez dans l'historique et actualisez après que le destinataire a réclamé le jeton.",
   "p2pkExperimentalShort": "Expérimental",
   "p2pkPrimaryKey": "Clé Principale",
   "p2pkDerived": "Dérivée",

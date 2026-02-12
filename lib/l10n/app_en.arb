@@ -370,6 +370,7 @@
   "p2pkTitle": "P2PK Keys",
   "p2pkSettingsDescription": "Receive locked ecash",
   "p2pkExperimental": "P2PK is experimental. Use with caution.",
+  "p2pkPendingSendWarning": "You have a pending P2PK send. Go to history and refresh after the recipient claims the token.",
   "p2pkExperimentalShort": "Experimental",
   "p2pkPrimaryKey": "Primary Key",
   "p2pkDerived": "Derived",

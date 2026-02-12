@@ -489,6 +489,7 @@
   "p2pkTitle": "P2PK 키",
   "p2pkSettingsDescription": "잠긴 ecash 받기",
   "p2pkExperimental": "P2PK는 실험적 기능입니다. 주의하여 사용하세요.",
+  "p2pkPendingSendWarning": "대기 중인 P2PK 전송이 있습니다. 수신자가 토큰을 수령한 후 기록에서 새로고침하세요.",
   "p2pkExperimentalShort": "실험적",
   "p2pkPrimaryKey": "기본 키",
   "p2pkDerived": "파생됨",
