@@ -500,7 +500,14 @@ class _P2PKKeysScreenState extends State<P2PKKeysScreen> {
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
+        builder: (context, setDialogState) {
+          final nsecBorder = OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: errorMessage != null
+                ? const BorderSide(color: AppColors.error)
+                : BorderSide.none,
+          );
+          return AlertDialog(
           backgroundColor: AppColors.deepVoidPurple,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
@@ -569,12 +576,9 @@ class _P2PKKeysScreenState extends State<P2PKKeysScreen> {
                     ),
                     filled: true,
                     fillColor: Colors.white.withValues(alpha: 0.05),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: errorMessage != null
-                          ? const BorderSide(color: AppColors.error)
-                          : BorderSide.none,
-                    ),
+                    border: nsecBorder,
+                    enabledBorder: nsecBorder,
+                    focusedBorder: nsecBorder,
                     prefixIcon: Icon(
                       LucideIcons.keyRound,
                       color: AppColors.textSecondary,
@@ -669,7 +673,8 @@ class _P2PKKeysScreenState extends State<P2PKKeysScreen> {
               ),
             ),
           ],
-        ),
+        );
+        },
       ),
     );
   }
