@@ -489,6 +489,7 @@
   "p2pkTitle": "Funguo za P2PK",
   "p2pkSettingsDescription": "Pokea ecash iliyofungwa",
   "p2pkExperimental": "P2PK ni ya majaribio. Tumia kwa uangalifu.",
+  "p2pkPendingSendWarning": "Una usafirishaji wa P2PK unaosubiri. Nenda kwenye historia na usasishe baada ya mpokeaji kudai tokeni.",
   "p2pkExperimentalShort": "Majaribio",
   "p2pkPrimaryKey": "Ufunguo Mkuu",
   "p2pkDerived": "Iliyotokana",

@@ -572,6 +572,8 @@ class _SendScreenState extends State<SendScreen> {
   }
 
   Future<void> _createToken() async {
+    final l10n = L10n.of(context)!;
+
     setState(() {
       _isProcessing = true;
       _errorMessage = null;
@@ -588,15 +590,23 @@ class _SendScreenState extends State<SendScreen> {
 
       // P2PK: bloquear a clave pública si está habilitado
       if (_useP2PK && _pubkeyController.text.isNotEmpty) {
+        // Verificar si hay txs P2PK pending (workaround CDK bug)
+        final hasPending = await walletProvider.hasPendingOutgoingTransactions();
+        if (hasPending) {
+          if (!mounted) return;
+          setState(() {
+            _errorMessage = l10n.p2pkPendingSendWarning;
+            _isProcessing = false;
+          });
+          return;
+        }
+
         // Usar normalizeToCompressedHex para obtener formato SEC1 (66 chars)
         final pubkeyHex = NostrUtils.normalizeToCompressedHex(_pubkeyController.text);
-        debugPrint('[SendScreen] P2PK enabled, pubkeyHex: $pubkeyHex');
         if (pubkeyHex == null) {
-          throw Exception(L10n.of(context)!.p2pkInvalidPubkey);
+          throw Exception(l10n.p2pkInvalidPubkey);
         }
-        debugPrint('[SendScreen] Calling sendTokensP2pk with amount: $amount, pubkey: ${pubkeyHex.length > 16 ? pubkeyHex.substring(0, 16) : pubkeyHex}...');
         token = await walletProvider.sendTokensP2pk(amount, pubkeyHex, memo);
-        debugPrint('[SendScreen] Token P2PK creado exitosamente!');
       } else {
         debugPrint('[SendScreen] Sending normal token, amount: $amount');
         token = await walletProvider.sendTokens(amount, memo);
@@ -631,14 +641,15 @@ class _SendScreenState extends State<SendScreen> {
         return;
       }
 
-      final l10n = L10n.of(context)!;
-      setState(() {
-        if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
-          _errorMessage = l10n.insufficientBalance;
-        } else {
-          _errorMessage = l10n.tokenCreationError(e.toString());
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
+            _errorMessage = l10n.insufficientBalance;
+          } else {
+            _errorMessage = l10n.tokenCreationError(e.toString());
+          }
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {

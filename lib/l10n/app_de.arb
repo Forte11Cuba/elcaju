@@ -489,6 +489,7 @@
   "p2pkTitle": "P2PK-Schlüssel",
   "p2pkSettingsDescription": "Gesperrtes ecash empfangen",
   "p2pkExperimental": "P2PK ist experimentell. Mit Vorsicht verwenden.",
+  "p2pkPendingSendWarning": "Du hast einen ausstehenden P2PK-Versand. Gehe zum Verlauf und aktualisiere, nachdem der Empfänger den Token eingelöst hat.",
   "p2pkExperimentalShort": "Experimentell",
   "p2pkPrimaryKey": "Primärschlüssel",
   "p2pkDerived": "Abgeleitet",

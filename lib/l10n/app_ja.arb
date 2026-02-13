@@ -489,6 +489,7 @@
   "p2pkTitle": "P2PK鍵",
   "p2pkSettingsDescription": "ロックされたecashを受け取る",
   "p2pkExperimental": "P2PKは実験的機能です。注意してご使用ください。",
+  "p2pkPendingSendWarning": "保留中のP2PK送信があります。受取人がトークンを受け取った後、履歴で更新してください。",
   "p2pkExperimentalShort": "実験的",
   "p2pkPrimaryKey": "プライマリ鍵",
   "p2pkDerived": "派生",

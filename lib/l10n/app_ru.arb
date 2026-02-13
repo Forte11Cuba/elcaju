@@ -489,6 +489,7 @@
   "p2pkTitle": "Ключи P2PK",
   "p2pkSettingsDescription": "Получить заблокированный ecash",
   "p2pkExperimental": "P2PK экспериментальный. Используйте с осторожностью.",
+  "p2pkPendingSendWarning": "У вас есть ожидающая отправка P2PK. Перейдите в историю и обновите после того, как получатель заберёт токен.",
   "p2pkExperimentalShort": "Экспериментальный",
   "p2pkPrimaryKey": "Основной ключ",
   "p2pkDerived": "Производный",

@@ -490,6 +490,7 @@
   "p2pkTitle": "Claves P2PK",
   "p2pkSettingsDescription": "Recibir ecash bloqueado",
   "p2pkExperimental": "P2PK es experimental. Úsala con precaución.",
+  "p2pkPendingSendWarning": "Tienes un envío P2PK pendiente. Ve al historial y presiona actualizar después de que el destinatario reclame el token.",
   "p2pkExperimentalShort": "Experimental",
   "p2pkPrimaryKey": "Clave Principal",
   "p2pkDerived": "Derivada",

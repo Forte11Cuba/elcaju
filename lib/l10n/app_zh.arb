@@ -489,6 +489,7 @@
   "p2pkTitle": "P2PK密钥",
   "p2pkSettingsDescription": "接收锁定的ecash",
   "p2pkExperimental": "P2PK是实验性功能。请谨慎使用。",
+  "p2pkPendingSendWarning": "您有一笔待处理的P2PK发送。在收款人领取代币后，请前往历史记录刷新。",
   "p2pkExperimentalShort": "实验性",
   "p2pkPrimaryKey": "主密钥",
   "p2pkDerived": "派生的",

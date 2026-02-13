@@ -489,6 +489,7 @@
   "p2pkTitle": "Chiavi P2PK",
   "p2pkSettingsDescription": "Ricevi ecash bloccato",
   "p2pkExperimental": "P2PK è sperimentale. Usare con cautela.",
+  "p2pkPendingSendWarning": "Hai un invio P2PK in sospeso. Vai alla cronologia e aggiorna dopo che il destinatario ha riscattato il token.",
   "p2pkExperimentalShort": "Sperimentale",
   "p2pkPrimaryKey": "Chiave Principale",
   "p2pkDerived": "Derivata",
