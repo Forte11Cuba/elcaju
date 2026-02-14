@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,7 @@ import '../data/transaction_meta_storage.dart';
 import '../data/pending_token.dart';
 import '../data/pending_token_storage.dart';
 import '../core/utils/keyset_debug.dart';
+import '../widgets/effects/cashu_confetti.dart';
 
 /// Helper class para info de token parseado
 class TokenInfo {
@@ -40,6 +42,9 @@ class WalletProvider extends ChangeNotifier {
   /// Storage para tokens pendientes de reclamar (Receive Later)
   final PendingTokenStorage _pendingTokenStorage = PendingTokenStorage();
 
+  /// Controller global de confetti para celebrar recepciones
+  final CashuConfettiController confettiController = CashuConfettiController();
+
   /// Generador de UUIDs
   static const _uuid = Uuid();
 
@@ -68,6 +73,7 @@ class WalletProvider extends ChangeNotifier {
   static const _mintsKey = 'wallet_mints';
   static const _activeMintKey = 'wallet_active_mint';
   static const _activeUnitKey = 'wallet_active_unit';
+  static const _pendingMintInvoicesKey = 'pending_mint_invoices';
 
   /// Mint de Cuba Bitcoin - siempre aparece primero en la lista
   static const cubaBitcoinMint = 'https://mint.cubabitcoin.org';
@@ -850,17 +856,50 @@ class WalletProvider extends ChangeNotifier {
     // DEBUG: counters antes de receive
     await KeysetDebug.logCounters('BEFORE receive ($unit)');
 
+    // DEBUG: transacciones ANTES del receive
+    await _debugLogTransactions(wallet, 'BEFORE receive');
+
     final amount = await wallet.receive(token: token, opts: opts);
 
     // DEBUG: counters después de receive
     await KeysetDebug.logCounters('AFTER receive ($unit)');
 
+    // DEBUG: transacciones DESPUÉS del receive (antes de checkPending)
+    await _debugLogTransactions(wallet, 'AFTER receive (before checkPending)');
+
     // Guardar metadata para la transacción recién creada
     await _saveMetaForRecentReceive(wallet, encodedToken);
 
+    // Verificar transacciones pendientes para actualizar outgoing pending → settled
+    try {
+      await wallet.checkPendingTransactions();
+    } catch (e) {
+      debugPrint('Check pending after receive failed: $e');
+    }
+
+    // DEBUG: transacciones DESPUÉS de checkPending
+    await _debugLogTransactions(wallet, 'AFTER checkPending');
+
     debugPrint('Token recibido: $amount $unit en $mintUrl');
+    confettiController.fire();
     notifyListeners();
     return amount;
+  }
+
+  /// DEBUG: Lista todas las transacciones de un wallet para diagnóstico.
+  Future<void> _debugLogTransactions(Wallet wallet, String label) async {
+    try {
+      final allTxs = await wallet.listTransactions();
+      debugPrint('[TX DEBUG] ===== $label =====');
+      debugPrint('[TX DEBUG] Total transacciones: ${allTxs.length}');
+      for (final tx in allTxs) {
+        final dir = tx.direction == TransactionDirection.incoming ? 'IN' : 'OUT';
+        final status = tx.status == TransactionStatus.pending ? 'PENDING' : 'SETTLED';
+        debugPrint('[TX DEBUG]   $dir ${tx.amount} ${tx.unit} [$status] fee=${tx.fee} id=${tx.id.substring(0, 16)}...');
+      }
+    } catch (e) {
+      debugPrint('[TX DEBUG] Error listando transacciones: $e');
+    }
   }
 
   /// Guarda metadata para la transacción de receive más reciente.
@@ -1095,34 +1134,161 @@ class WalletProvider extends ChangeNotifier {
   // MINT (Depositar via Lightning)
   // ============================================================
 
+  /// Suscripción activa al stream de mint (vive en el provider, no en la UI).
+  StreamSubscription<MintQuote>? _activeMintSubscription;
+
+  /// Controller del stream actual de mint (para cerrar al iniciar uno nuevo).
+  StreamController<MintQuote>? _activeMintController;
+
   /// Inicia un depósito via Lightning.
   /// Retorna Stream con estados: unpaid -> paid -> issued.
-  /// Guarda metadata type=lightning cuando se completa.
-  Stream<MintQuote> mintTokens(BigInt amount, String? description) {
+  /// La suscripción al CDK vive en el provider para que los side effects
+  /// (guardar metadata, confetti) ocurran aunque la UI se cierre.
+  Future<Stream<MintQuote>> mintTokens(BigInt amount, String? description) async {
     final wallet = activeWallet;
     if (wallet == null) {
       throw Exception('No hay wallet activo');
     }
 
+    final mintUrl = _activeMintUrl!;
+    final unit = _activeUnit;
     String? invoiceBolt11;
 
-    // Wrapper del stream para capturar el invoice y guardar metadata
-    return wallet.mint(
+    // Cerrar controller anterior si existe (evitar leak)
+    if (_activeMintController != null && !_activeMintController!.isClosed) {
+      _activeMintController!.close();
+    }
+
+    // StreamController que la UI puede escuchar y cancelar libremente
+    final controller = StreamController<MintQuote>();
+    _activeMintController = controller;
+
+    // Cancelar suscripción anterior si existe (await evita race de callbacks)
+    await _activeMintSubscription?.cancel();
+    _activeMintSubscription = null;
+
+    // Suscribirse al stream del CDK desde el provider (persiste sin UI)
+    _activeMintSubscription = wallet.mint(
       amount: amount,
       description: description,
-    ).map((quote) {
-      // Capturar el invoice cuando está en estado unpaid
-      if (quote.state == MintQuoteState.unpaid) {
-        invoiceBolt11 = quote.request;
+    ).listen(
+      (quote) {
+        // Guardar invoice temprano en SharedPreferences
+        if (quote.state == MintQuoteState.unpaid) {
+          invoiceBolt11 = quote.request;
+          _savePendingMintInvoice(quote.id, quote.request, mintUrl, unit, amount);
+        }
+
+        // Cuando se completa, guardar metadata, confetti, limpiar pending
+        if (quote.state == MintQuoteState.issued && invoiceBolt11 != null) {
+          _saveMintMetadata(wallet, invoiceBolt11!);
+          _removePendingMintInvoice(quote.id);
+        }
+
+        // Reenviar a la UI (si sigue escuchando)
+        if (!controller.isClosed) {
+          controller.add(quote);
+        }
+      },
+      onError: (error) {
+        if (!controller.isClosed) {
+          controller.addError(error);
+        }
+      },
+      onDone: () {
+        _activeMintSubscription = null;
+        if (!controller.isClosed) {
+          controller.close();
+        }
+      },
+    );
+
+    return controller.stream;
+  }
+
+  /// Guarda un invoice de mint pendiente para recuperarlo después.
+  Future<void> _savePendingMintInvoice(
+    String quoteId, String invoice, String mintUrl, String unit, BigInt amount,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_pendingMintInvoicesKey) ?? '{}';
+      final map = Map<String, dynamic>.from(jsonDecode(jsonStr));
+      map[quoteId] = {
+        'invoice': invoice,
+        'mintUrl': mintUrl,
+        'unit': unit,
+        'amount': amount.toString(),
+        'createdAt': DateTime.now().toIso8601String(),
+      };
+      await prefs.setString(_pendingMintInvoicesKey, jsonEncode(map));
+      debugPrint('Pending mint invoice guardado: $quoteId');
+    } catch (e) {
+      debugPrint('Error guardando pending mint invoice: $e');
+    }
+  }
+
+  /// Elimina un invoice de mint pendiente (ya fue procesado).
+  Future<void> _removePendingMintInvoice(String quoteId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_pendingMintInvoicesKey) ?? '{}';
+      final map = Map<String, dynamic>.from(jsonDecode(jsonStr));
+      map.remove(quoteId);
+      await prefs.setString(_pendingMintInvoicesKey, jsonEncode(map));
+      debugPrint('Pending mint invoice eliminado: $quoteId');
+    } catch (e) {
+      debugPrint('Error eliminando pending mint invoice: $e');
+    }
+  }
+
+  /// TTL para invoices de mint pendientes (24 horas).
+  static const _pendingMintInvoiceTtl = Duration(hours: 24);
+
+  /// Obtiene todos los invoices de mint pendientes, limpiando expirados.
+  Future<Map<String, dynamic>> _getPendingMintInvoices() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_pendingMintInvoicesKey) ?? '{}';
+      final map = Map<String, dynamic>.from(jsonDecode(jsonStr));
+
+      // Filtrar expirados
+      final now = DateTime.now();
+      final expired = <String>[];
+      for (final entry in map.entries) {
+        final data = Map<String, dynamic>.from(entry.value);
+        final createdAt = DateTime.tryParse(data['createdAt'] ?? '');
+        if (createdAt == null || now.difference(createdAt) > _pendingMintInvoiceTtl) {
+          expired.add(entry.key);
+        }
       }
 
-      // Cuando se completa, guardar metadata
-      if (quote.state == MintQuoteState.issued && invoiceBolt11 != null) {
-        _saveMintMetadata(wallet, invoiceBolt11!);
+      // Limpiar expirados si hay
+      if (expired.isNotEmpty) {
+        for (final key in expired) {
+          map.remove(key);
+        }
+        await prefs.setString(_pendingMintInvoicesKey, jsonEncode(map));
+        debugPrint('Pending mint invoices expirados eliminados: ${expired.length}');
       }
 
-      return quote;
-    });
+      return map;
+    } catch (e) {
+      return {};
+    }
+  }
+
+  /// Busca un invoice pendiente que coincida con un mintUrl y unit.
+  /// Retorna el invoice string o null.
+  Future<String?> findPendingMintInvoice(String mintUrl, String unit) async {
+    final pending = await _getPendingMintInvoices();
+    for (final entry in pending.values) {
+      final data = Map<String, dynamic>.from(entry);
+      if (data['mintUrl'] == mintUrl && data['unit'] == unit) {
+        return data['invoice'] as String?;
+      }
+    }
+    return null;
   }
 
   /// Guarda metadata para una transacción de mint (Lightning deposit).
@@ -1143,6 +1309,8 @@ class WalletProvider extends ChangeNotifier {
           ),
         );
         debugPrint('Mint metadata guardada para tx ${recentTx.id}');
+        confettiController.fire();
+        notifyListeners();
       }
     } catch (e) {
       debugPrint('Error guardando mint metadata: $e');
@@ -1240,8 +1408,20 @@ class WalletProvider extends ChangeNotifier {
 
   /// Obtiene el tipo de una transacción (cashu o lightning).
   /// Busca primero en metadata del CDK, luego en storage local.
+  /// Si no hay metadata y es incoming, asume Lightning (los receives Cashu
+  /// siempre guardan metadata inmediatamente).
+  /// Limitación conocida: transacciones anteriores al sistema de metadata
+  /// o donde el guardado falló silenciosamente serían clasificadas como Lightning.
   TransactionType getTransactionType(Transaction tx) {
-    return _txMetaStorage.getType(tx.id, tx.metadata);
+    final type = _txMetaStorage.getType(tx.id, tx.metadata);
+    // Si el storage devuelve cashu por defecto pero no tiene metadata real,
+    // y la transacción es incoming → probablemente es Lightning
+    if (!_txMetaStorage.has(tx.id) &&
+        tx.metadata['type'] == null &&
+        tx.direction == TransactionDirection.incoming) {
+      return TransactionType.lightning;
+    }
+    return type;
   }
 
   /// Obtiene metadata adicional de una transacción.
@@ -1260,6 +1440,7 @@ class WalletProvider extends ChangeNotifier {
 
   /// Verifica proofs pendientes en todos los wallets.
   /// Llamar en background al iniciar la app.
+  /// También vincula transacciones incoming sin metadata con invoices pendientes.
   Future<void> checkPendingTransactions() async {
     for (final wallet in _wallets.values) {
       try {
@@ -1268,6 +1449,59 @@ class WalletProvider extends ChangeNotifier {
         // Silencioso - puede fallar offline
         debugPrint('Check pending failed: $e');
       }
+    }
+
+    // Vincular transacciones incoming sin metadata con pending invoices
+    await _matchPendingMintInvoices();
+  }
+
+  /// Busca transacciones incoming sin metadata y las vincula con
+  /// invoices de mint pendientes guardados en SharedPreferences.
+  Future<void> _matchPendingMintInvoices() async {
+    try {
+      final pending = await _getPendingMintInvoices();
+      if (pending.isEmpty) return;
+
+      // Obtener todas las transacciones incoming
+      final allTxs = await getAllTransactions(
+        direction: TransactionDirection.incoming,
+      );
+
+      for (final tx in allTxs) {
+        // Solo procesar transacciones sin metadata
+        if (_txMetaStorage.has(tx.id)) continue;
+
+        // Buscar un pending invoice que coincida con mintUrl, unit y amount
+        String? matchedQuoteId;
+        String? matchedInvoice;
+
+        for (final entry in pending.entries) {
+          final data = Map<String, dynamic>.from(entry.value);
+          if (data['mintUrl'] == tx.mintUrl && data['unit'] == tx.unit && data['amount'] == tx.amount.toString()) {
+            matchedQuoteId = entry.key;
+            matchedInvoice = data['invoice'] as String?;
+            break;
+          }
+        }
+
+        if (matchedQuoteId != null && matchedInvoice != null) {
+          await _txMetaStorage.save(
+            tx.id,
+            TransactionMeta(
+              type: TransactionType.lightning,
+              invoice: matchedInvoice,
+            ),
+          );
+          // Limpiar el pending invoice ya vinculado
+          await _removePendingMintInvoice(matchedQuoteId);
+          pending.remove(matchedQuoteId);
+          debugPrint('Matched pending mint invoice → tx ${tx.id}');
+          confettiController.fire();
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      debugPrint('Error matching pending mint invoices: $e');
     }
   }
 
@@ -1603,5 +1837,15 @@ class WalletProvider extends ChangeNotifier {
       notifyListeners();
     }
     return cleaned;
+  }
+
+  @override
+  void dispose() {
+    _activeMintSubscription?.cancel();
+    if (_activeMintController != null && !_activeMintController!.isClosed) {
+      _activeMintController!.close();
+    }
+    confettiController.dispose();
+    super.dispose();
   }
 }

@@ -9,6 +9,7 @@ import 'providers/wallet_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/price_provider.dart';
 import 'providers/p2pk_provider.dart';
+import 'widgets/effects/cashu_confetti.dart';
 import 'screens/1_splash/splash_screen.dart';
 
 void main() async {
@@ -82,6 +83,14 @@ class ElCajuApp extends StatelessWidget {
         Locale('sw'), // Kiswahili
       ],
       locale: Locale(settingsProvider.locale),
+
+      builder: (context, child) {
+        final walletProvider = context.read<WalletProvider>();
+        return CashuConfetti(
+          controller: walletProvider.confettiController,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
 
       home: const SplashScreen(),
     );

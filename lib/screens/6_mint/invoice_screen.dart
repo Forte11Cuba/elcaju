@@ -11,7 +11,6 @@ import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
-import '../../widgets/effects/cashu_confetti.dart';
 import '../../providers/wallet_provider.dart';
 
 /// Estados del proceso de mint
@@ -39,7 +38,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String? _invoice;
   String? _errorMessage;
   StreamSubscription<MintQuote>? _mintSubscription;
-  final CashuConfettiController _confettiController = CashuConfettiController();
 
   @override
   void initState() {
@@ -50,15 +48,14 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   @override
   void dispose() {
     _mintSubscription?.cancel();
-    _confettiController.dispose();
     super.dispose();
   }
 
-  void _startMintProcess() {
+  Future<void> _startMintProcess() async {
     final walletProvider = context.read<WalletProvider>();
 
     try {
-      final mintStream = walletProvider.mintTokens(
+      final mintStream = await walletProvider.mintTokens(
         widget.amount,
         widget.description,
       );
@@ -107,8 +104,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   void _onMintCompleted() {
-    // Disparar confetti inmediatamente
-    _confettiController.fire();
+    // Confetti se dispara globalmente desde WalletProvider._saveMintMetadata
 
     // Esperar a que termine el confetti antes de navegar
     Future.delayed(const Duration(seconds: 3), () {
@@ -133,25 +129,19 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CashuConfetti(
-      controller: _confettiController,
-      child: GradientBackground(
-        child: PopScope(
-          canPop: _status == MintStatus.issued || _status == MintStatus.error,
-          child: Scaffold(
+    return GradientBackground(
+        child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: (_status == MintStatus.issued || _status == MintStatus.error)
-                  ? IconButton(
-                      icon: const Icon(
-                        LucideIcons.arrowLeft,
-                        color: Colors.white,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    )
-                  : null,
+              leading: IconButton(
+                icon: const Icon(
+                  LucideIcons.arrowLeft,
+                  color: Colors.white,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
               title: Text(
                 L10n.of(context)!.payInvoiceTitle,
                 style: const TextStyle(
@@ -181,9 +171,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 child: _buildContent(),
               ),
             ),
-          ),
         ),
-      ),
     );
   }
 

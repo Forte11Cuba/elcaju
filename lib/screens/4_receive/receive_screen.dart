@@ -11,7 +11,6 @@ import '../../core/utils/nostr_utils.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
-import '../../widgets/effects/cashu_confetti.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/p2pk_provider.dart';
 import '../10_scanner/scan_screen.dart';
@@ -29,8 +28,6 @@ class ReceiveScreen extends StatefulWidget {
 
 class _ReceiveScreenState extends State<ReceiveScreen> {
   final TextEditingController _tokenController = TextEditingController();
-  final CashuConfettiController _confettiController = CashuConfettiController();
-
   // Estado del token
   bool _isValidToken = false;
   bool _isProcessing = false;
@@ -65,15 +62,12 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   void dispose() {
     _tokenController.dispose();
     _manualKeyController.dispose();
-    _confettiController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return CashuConfetti(
-      controller: _confettiController,
-      child: GradientBackground(
+    return GradientBackground(
         child: Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
@@ -96,7 +90,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
             child: _showSuccess ? _buildSuccessView() : _buildReceiveForm(),
           ),
         ),
-      ),
     );
   }
 
@@ -1027,8 +1020,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           _isProcessing = false;
         });
 
-        // Disparar confetti
-        _confettiController.fire();
+        // Confetti se dispara globalmente desde WalletProvider.receiveToken
       }
     } catch (e) {
       if (!mounted) return;
