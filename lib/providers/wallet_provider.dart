@@ -10,6 +10,7 @@ import 'package:uuid/uuid.dart';
 import '../data/transaction_meta_storage.dart';
 import '../data/pending_token.dart';
 import '../data/pending_token_storage.dart';
+import '../core/utils/keyset_debug.dart';
 
 /// Helper class para info de token parseado
 class TokenInfo {
@@ -846,7 +847,13 @@ class WalletProvider extends ChangeNotifier {
         ? ReceiveOptions(signingKeys: [p2pkPrivateKey])
         : null;
 
+    // DEBUG: counters antes de receive
+    await KeysetDebug.logCounters('BEFORE receive ($unit)');
+
     final amount = await wallet.receive(token: token, opts: opts);
+
+    // DEBUG: counters después de receive
+    await KeysetDebug.logCounters('AFTER receive ($unit)');
 
     // Guardar metadata para la transacción recién creada
     await _saveMetaForRecentReceive(wallet, encodedToken);
@@ -983,38 +990,91 @@ class WalletProvider extends ChangeNotifier {
 
   /// Método de conveniencia: prepara y confirma en un solo paso.
   Future<String> sendTokens(BigInt amount, String? memo) async {
+    final wallet = await getActiveWallet();
+    final balanceBefore = await wallet.balance();
+    debugPrint('[SEND DEBUG] Normal send - balance=$balanceBefore, amount=$amount');
+    await KeysetDebug.logCounters('BEFORE normal send');
     final prepared = await prepareSend(amount);
-    return await confirmSend(prepared, memo);
+    debugPrint('[SEND DEBUG] prepareSend OK - fee=${prepared.fee}');
+    final token = await confirmSend(prepared, memo);
+    final balanceAfter = await wallet.balance();
+    debugPrint('[SEND DEBUG] confirmSend OK - balance after=$balanceAfter');
+    await KeysetDebug.logCounters('AFTER normal send');
+    return token;
   }
 
-  /// Envía tokens P2PK.
-  /// Workaround CDK bug: limpia txs pending antes de enviar.
-  /// Ver: https://github.com/cashubtc/cdk-flutter/issues/3
-  Future<String> sendTokensP2pk(BigInt amount, String pubkey, String? memo) async {
-    // Workaround CDK bug: limpiar txs pending y proofs reservados antes de P2PK send
-    await _settlePendingTransactions();
+  /// Verifica si el mint activo soporta P2PK sin el bug de fees.
+  /// Bug CDK: prepare_send con P2PK (force_swap=true) no reserva proofs
+  /// para el swap fee. Solo mints con ppk=0 funcionan correctamente.
+  /// Ver P2PK_SEND_BUG.md para análisis completo.
+  Future<void> _checkP2pkMintCompatibility() async {
+    final mintUrl = _activeMintUrl!;
+    final unit = _activeUnit;
+    final ppk = await KeysetDebug.getInputFeePpk(mintUrl, unit);
 
-    final prepared = await prepareSendP2pk(amount, pubkey);
-    try {
-      return await confirmSend(prepared, memo);
-    } catch (e) {
-      // Liberar proofs reservados si el envío falla
-      try {
-        await cancelSend(prepared);
-      } catch (_) {}
-      rethrow;
+    debugPrint('[P2PK] mintUrl=$mintUrl, unit=$unit, ppk=$ppk');
+
+    if (ppk > 0) {
+      throw Exception(
+        'P2PK no disponible en este mint. '
+        'El mint $mintUrl cobra input fees (ppk=$ppk) y CDK tiene un bug '
+        'que impide P2PK sends en mints con fees. '
+        'Usa un mint con ppk=0 (ej: mint.cubabitcoin.org).',
+      );
     }
   }
 
-  /// Intenta liquidar transacciones pending sincronizando con el mint.
-  /// Workaround para bug de CDK donde P2PK sends pending bloquean envíos subsiguientes.
-  Future<void> _settlePendingTransactions() async {
+  /// Envía tokens P2PK (bloqueados a una clave pública).
+  /// Solo funciona en mints con ppk=0 debido a bug en CDK core.
+  /// Ver P2PK_SEND_BUG.md para detalles.
+  Future<String> sendTokensP2pk(BigInt amount, String pubkey, String? memo) async {
+    final wallet = await getActiveWallet();
+
+    // Verificar compatibilidad del mint con P2PK
+    await _checkP2pkMintCompatibility();
+
+    // DEBUG: estado antes del P2PK send
+    final balanceBefore = await wallet.balance();
+    debugPrint('[P2PK DEBUG] ===== BEFORE P2PK SEND =====');
+    debugPrint('[P2PK DEBUG] Balance: $balanceBefore');
+    debugPrint('[P2PK DEBUG] Amount to send: $amount');
+    debugPrint('[P2PK DEBUG] Pubkey: ${pubkey.length > 16 ? pubkey.substring(0, 16) : pubkey}...');
+
+    // DEBUG: counters antes de prepareSend
+    await KeysetDebug.logCounters('BEFORE P2PK prepareSend');
+
+    // Paso 1: prepareSend P2PK
+    debugPrint('[P2PK DEBUG] Calling prepareSendP2pk...');
+    final prepared = await prepareSendP2pk(amount, pubkey);
+    debugPrint('[P2PK DEBUG] prepareSendP2pk OK - fee=${prepared.fee}');
+
+    final balanceAfterPrepare = await wallet.balance();
+    debugPrint('[P2PK DEBUG] Balance after prepare: $balanceAfterPrepare');
+
+    // DEBUG: counters después de prepareSend
+    await KeysetDebug.logCounters('AFTER P2PK prepareSend');
+
+    // Paso 2: confirmSend
+    debugPrint('[P2PK DEBUG] Calling confirmSend...');
     try {
-      final wallet = await getActiveWallet();
-      await wallet.checkPendingTransactions();
-      await wallet.reclaimReserved();
+      final token = await confirmSend(prepared, memo);
+      final balanceAfterSend = await wallet.balance();
+      debugPrint('[P2PK DEBUG] confirmSend OK!');
+      debugPrint('[P2PK DEBUG] Balance after send: $balanceAfterSend');
+
+      // DEBUG: counters después de send exitoso
+      await KeysetDebug.logCounters('AFTER P2PK send OK');
+
+      return token;
     } catch (e) {
-      debugPrint('settlePendingTransactions failed (may be offline): $e');
+      final balanceAfterError = await wallet.balance();
+      debugPrint('[P2PK DEBUG] confirmSend FAILED: $e');
+      debugPrint('[P2PK DEBUG] Balance after error: $balanceAfterError');
+
+      // DEBUG: counters después de send fallido
+      await KeysetDebug.logCounters('AFTER P2PK send FAILED');
+
+      rethrow;
     }
   }
 

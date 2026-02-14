@@ -501,7 +501,7 @@
   "p2pkImportNsec": "Ingiza nsec",
   "p2pkImport": "Ingiza",
   "p2pkEnterLabel": "Jina la ufunguo huu",
-  "p2pkLockToKey": "Funga kwa ufunguo wa umma",
+  "p2pkLockToKey": "Tuma kwa saini ya P2PK",
   "p2pkLockDescription": "Mpokeaji pekee anaweza kudai",
   "p2pkReceiverPubkey": "npub1... au hex (herufi 64/66)",
   "p2pkInvalidPubkey": "Ufunguo wa umma batili",
@@ -517,5 +517,6 @@
   "p2pkErrorInvalidNsec": "nsec batili",
   "p2pkErrorKeyAlreadyExists": "Ufunguo huu tayari upo",
   "p2pkErrorKeyNotFound": "Ufunguo haujapatikana",
-  "p2pkErrorCannotDeletePrimary": "Haiwezekani kufuta ufunguo mkuu"
+  "p2pkErrorCannotDeletePrimary": "Haiwezekani kufuta ufunguo mkuu",
+  "p2pkSendComingSoon": "Inakuja hivi karibuni"
 }

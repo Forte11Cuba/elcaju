@@ -501,7 +501,7 @@
   "p2pkImportNsec": "Importa nsec",
   "p2pkImport": "Importa",
   "p2pkEnterLabel": "Nome per questa chiave",
-  "p2pkLockToKey": "Blocca a chiave pubblica",
+  "p2pkLockToKey": "Invio con firma P2PK",
   "p2pkLockDescription": "Solo il destinatario può riscattare",
   "p2pkReceiverPubkey": "npub1... o hex (64/66 caratteri)",
   "p2pkInvalidPubkey": "Chiave pubblica non valida",
@@ -517,5 +517,6 @@
   "p2pkErrorInvalidNsec": "nsec non valido",
   "p2pkErrorKeyAlreadyExists": "Questa chiave esiste già",
   "p2pkErrorKeyNotFound": "Chiave non trovata",
-  "p2pkErrorCannotDeletePrimary": "Impossibile eliminare la chiave principale"
+  "p2pkErrorCannotDeletePrimary": "Impossibile eliminare la chiave principale",
+  "p2pkSendComingSoon": "Disponibile prossimamente"
 }

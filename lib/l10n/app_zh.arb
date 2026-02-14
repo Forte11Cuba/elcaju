@@ -501,7 +501,7 @@
   "p2pkImportNsec": "导入nsec",
   "p2pkImport": "导入",
   "p2pkEnterLabel": "此密钥的名称",
-  "p2pkLockToKey": "锁定到公钥",
+  "p2pkLockToKey": "P2PK签名发送",
   "p2pkLockDescription": "只有接收者可以领取",
   "p2pkReceiverPubkey": "npub1... 或 hex（64/66字符）",
   "p2pkInvalidPubkey": "无效的公钥",
@@ -517,5 +517,6 @@
   "p2pkErrorInvalidNsec": "无效的nsec",
   "p2pkErrorKeyAlreadyExists": "此密钥已存在",
   "p2pkErrorKeyNotFound": "未找到密钥",
-  "p2pkErrorCannotDeletePrimary": "无法删除主密钥"
+  "p2pkErrorCannotDeletePrimary": "无法删除主密钥",
+  "p2pkSendComingSoon": "即将推出"
 }

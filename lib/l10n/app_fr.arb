@@ -501,7 +501,7 @@
   "p2pkImportNsec": "Importer nsec",
   "p2pkImport": "Importer",
   "p2pkEnterLabel": "Nom pour cette clé",
-  "p2pkLockToKey": "Verrouiller à la clé publique",
+  "p2pkLockToKey": "Envoi avec signature P2PK",
   "p2pkLockDescription": "Seul le destinataire peut réclamer",
   "p2pkReceiverPubkey": "npub1... ou hex (64/66 caractères)",
   "p2pkInvalidPubkey": "Clé publique invalide",
@@ -517,5 +517,6 @@
   "p2pkErrorInvalidNsec": "nsec invalide",
   "p2pkErrorKeyAlreadyExists": "Cette clé existe déjà",
   "p2pkErrorKeyNotFound": "Clé non trouvée",
-  "p2pkErrorCannotDeletePrimary": "Impossible de supprimer la clé principale"
+  "p2pkErrorCannotDeletePrimary": "Impossible de supprimer la clé principale",
+  "p2pkSendComingSoon": "Bientôt disponible"
 }

@@ -501,7 +501,7 @@
   "p2pkImportNsec": "nsecをインポート",
   "p2pkImport": "インポート",
   "p2pkEnterLabel": "この鍵の名前",
-  "p2pkLockToKey": "公開鍵にロック",
+  "p2pkLockToKey": "P2PK署名で送信",
   "p2pkLockDescription": "受取人のみが請求可能",
   "p2pkReceiverPubkey": "npub1... または hex（64/66文字）",
   "p2pkInvalidPubkey": "無効な公開鍵",
@@ -517,5 +517,6 @@
   "p2pkErrorInvalidNsec": "無効なnsec",
   "p2pkErrorKeyAlreadyExists": "この鍵は既に存在します",
   "p2pkErrorKeyNotFound": "鍵が見つかりません",
-  "p2pkErrorCannotDeletePrimary": "プライマリ鍵は削除できません"
+  "p2pkErrorCannotDeletePrimary": "プライマリ鍵は削除できません",
+  "p2pkSendComingSoon": "近日公開"
 }
