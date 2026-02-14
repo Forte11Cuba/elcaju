@@ -53,7 +53,17 @@ class KeysetDebug {
   }
 
   /// Lee el input_fee_ppk del keyset activo para un mint y unidad.
-  /// Retorna 0 si no se encuentra o hay error.
+  ///
+  /// IMPORTANTE: Lee directamente del schema interno de CDK (tabla `keyset`,
+  /// columna `input_fee_ppk`). Escrito para CDK 0.13.4 (cdk-flutter actual).
+  /// Si CDK cambia el schema (ej: en 0.14.x con rusqlite), este query puede
+  /// fallar. En caso de error retorna -1 (asume fees > 0) para bloquear P2PK
+  /// de forma segura — nunca retornar 0 en error porque permitiria P2PK en
+  /// mints con fees, causando perdida de fondos.
+  ///
+  /// TODO: Revisar este codigo al actualizar cdk-flutter a CDK 0.14.x.
+  /// Idealmente cdk-flutter deberia exponer getActiveKeyset().inputFeePpk
+  /// via API publica en lugar de leer SQLite directamente.
   static Future<int> getInputFeePpk(String mintUrl, String unit) async {
     try {
       final db = await _getDb();
@@ -61,11 +71,15 @@ class KeysetDebug {
         'SELECT input_fee_ppk FROM keyset WHERE active=1 AND unit=? AND mint_url=?',
         [unit, mintUrl],
       );
-      if (rows.isEmpty) return 0;
+      if (rows.isEmpty) {
+        debugPrint('[KEYSET DEBUG] No active keyset found for $mintUrl/$unit');
+        return -1;
+      }
       return (rows.first['input_fee_ppk'] as int?) ?? 0;
     } catch (e) {
       debugPrint('[KEYSET DEBUG] Error leyendo input_fee_ppk: $e');
-      return 0;
+      // Fail-safe: asumir fees > 0 para bloquear P2PK ante schema desconocido
+      return -1;
     }
   }
 

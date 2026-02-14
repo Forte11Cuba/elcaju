@@ -1038,7 +1038,7 @@ class WalletProvider extends ChangeNotifier {
     debugPrint('[P2PK DEBUG] ===== BEFORE P2PK SEND =====');
     debugPrint('[P2PK DEBUG] Balance: $balanceBefore');
     debugPrint('[P2PK DEBUG] Amount to send: $amount');
-    debugPrint('[P2PK DEBUG] Pubkey: ${pubkey.substring(0, 16)}...');
+    debugPrint('[P2PK DEBUG] Pubkey: ${pubkey.length > 16 ? pubkey.substring(0, 16) : pubkey}...');
 
     // DEBUG: counters antes de prepareSend
     await KeysetDebug.logCounters('BEFORE P2PK prepareSend');
