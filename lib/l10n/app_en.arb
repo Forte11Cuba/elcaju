@@ -382,7 +382,7 @@
   "p2pkImportNsec": "Import nsec",
   "p2pkImport": "Import",
   "p2pkEnterLabel": "Name for this key",
-  "p2pkLockToKey": "Lock to public key",
+  "p2pkLockToKey": "Send with P2PK signature",
   "p2pkLockDescription": "Only the recipient can claim",
   "p2pkReceiverPubkey": "npub1... or hex (64/66 chars)",
   "p2pkInvalidPubkey": "Invalid public key",
@@ -398,5 +398,6 @@
   "p2pkErrorInvalidNsec": "Invalid nsec",
   "p2pkErrorKeyAlreadyExists": "This key already exists",
   "p2pkErrorKeyNotFound": "Key not found",
-  "p2pkErrorCannotDeletePrimary": "Cannot delete primary key"
+  "p2pkErrorCannotDeletePrimary": "Cannot delete primary key",
+  "p2pkSendComingSoon": "Coming soon"
 }

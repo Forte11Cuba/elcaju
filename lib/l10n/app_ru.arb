@@ -501,7 +501,7 @@
   "p2pkImportNsec": "Импортировать nsec",
   "p2pkImport": "Импортировать",
   "p2pkEnterLabel": "Имя для этого ключа",
-  "p2pkLockToKey": "Заблокировать на публичный ключ",
+  "p2pkLockToKey": "Отправка с подписью P2PK",
   "p2pkLockDescription": "Только получатель может получить",
   "p2pkReceiverPubkey": "npub1... или hex (64/66 символов)",
   "p2pkInvalidPubkey": "Недействительный публичный ключ",
@@ -517,5 +517,6 @@
   "p2pkErrorInvalidNsec": "Недействительный nsec",
   "p2pkErrorKeyAlreadyExists": "Этот ключ уже существует",
   "p2pkErrorKeyNotFound": "Ключ не найден",
-  "p2pkErrorCannotDeletePrimary": "Невозможно удалить основной ключ"
+  "p2pkErrorCannotDeletePrimary": "Невозможно удалить основной ключ",
+  "p2pkSendComingSoon": "Скоро будет доступно"
 }

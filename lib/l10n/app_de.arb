@@ -501,7 +501,7 @@
   "p2pkImportNsec": "nsec importieren",
   "p2pkImport": "Importieren",
   "p2pkEnterLabel": "Name für diesen Schlüssel",
-  "p2pkLockToKey": "An öffentlichen Schlüssel sperren",
+  "p2pkLockToKey": "Senden mit P2PK-Signatur",
   "p2pkLockDescription": "Nur der Empfänger kann einlösen",
   "p2pkReceiverPubkey": "npub1... oder hex (64/66 Zeichen)",
   "p2pkInvalidPubkey": "Ungültiger öffentlicher Schlüssel",
@@ -517,5 +517,6 @@
   "p2pkErrorInvalidNsec": "Ungültiger nsec",
   "p2pkErrorKeyAlreadyExists": "Dieser Schlüssel existiert bereits",
   "p2pkErrorKeyNotFound": "Schlüssel nicht gefunden",
-  "p2pkErrorCannotDeletePrimary": "Primärschlüssel kann nicht gelöscht werden"
+  "p2pkErrorCannotDeletePrimary": "Primärschlüssel kann nicht gelöscht werden",
+  "p2pkSendComingSoon": "Demnächst verfügbar"
 }
