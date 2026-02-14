@@ -704,12 +704,30 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
     final meta = widget.walletProvider.getTransactionMeta(widget.transaction.id);
     _tokenOrInvoice = meta?.token ?? meta?.invoice;
 
+    // Si es Lightning incoming sin invoice, buscar en pending mint invoices
+    if (_tokenOrInvoice == null && _isLightning && _isIncoming) {
+      _loadPendingMintInvoice();
+    }
+
     // Mostrar QR para todo EXCEPTO Lightning saliente
     _shouldShowQR = !_isLightning || _isIncoming;
 
     // Inicializar QR dinámico si es token Cashu
     if (_tokenOrInvoice != null && !_isLightning && _shouldShowQR) {
       _encodeTokenToUR();
+    }
+  }
+
+  /// Busca el invoice en pending mint invoices si no hay metadata.
+  Future<void> _loadPendingMintInvoice() async {
+    final invoice = await widget.walletProvider.findPendingMintInvoice(
+      widget.transaction.mintUrl,
+      widget.transaction.unit,
+    );
+    if (invoice != null && mounted) {
+      setState(() {
+        _tokenOrInvoice = invoice;
+      });
     }
   }
 

@@ -9,7 +9,6 @@ import '../../core/utils/incoming_data_parser.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/animated_action_button.dart';
-import '../../widgets/effects/cashu_confetti.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../4_receive/receive_screen.dart';
@@ -34,9 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // Estado local
   bool _isBalanceVisible = true;
 
-  // Controller para el efecto confeti
-  final CashuConfettiController _confettiController = CashuConfettiController();
-
   @override
   void initState() {
     super.initState();
@@ -46,11 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    _confettiController.dispose();
-    super.dispose();
-  }
+  /// Dispara confetti global desde WalletProvider
+  void _fireConfetti() => context.read<WalletProvider>().confettiController.fire();
 
   /// Verifica y reclama automáticamente tokens pendientes
   Future<void> _checkPendingTokens() async {
@@ -64,9 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final unit = (result['unit'] as String?) ?? walletProvider.activeUnit;
 
       if (claimed > 0 && mounted) {
-        // Disparar confetti
-        _confettiController.fire();
-
+        // Confetti se dispara globalmente desde WalletProvider.receiveToken
         // Mostrar snackbar
         final l10n = L10n.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -84,9 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CashuConfetti(
-      controller: _confettiController,
-      child: GradientBackground(
+    return GradientBackground(
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: SafeArea(
@@ -122,7 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 
@@ -161,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // El Caju (derecha) - toca para confeti
           GestureDetector(
-            onTap: () => _confettiController.fire(),
+            onTap: () => _fireConfetti(),
             child: Image.asset(
               'assets/img/elcajucubano.png',
               width: 56,
