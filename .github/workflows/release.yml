@@ -30,7 +30,7 @@ jobs:
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
 
       - name: Install Android NDK
         run: echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.0.12077973"
@@ -41,16 +41,21 @@ jobs:
       - name: Generate localizations
         run: flutter gen-l10n
 
-      - name: Build release APK
-        run: flutter build apk --release
+      - name: Build release APKs
+        run: flutter build apk --release --split-per-abi
 
-      - name: Rename APK
+      - name: Rename APKs
         run: |
-          mv build/app/outputs/flutter-apk/app-release.apk \
-             build/app/outputs/flutter-apk/elcaju-${{ github.ref_name }}.apk
+          cd build/app/outputs/flutter-apk
+          mv app-arm64-v8a-release.apk elcaju-${{ github.ref_name }}-arm64.apk
+          mv app-armeabi-v7a-release.apk elcaju-${{ github.ref_name }}-armeabi-v7a.apk
+          mv app-x86_64-release.apk elcaju-${{ github.ref_name }}-x86_64.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/app/outputs/flutter-apk/elcaju-${{ github.ref_name }}.apk
+          files: |
+            build/app/outputs/flutter-apk/elcaju-${{ github.ref_name }}-arm64.apk
+            build/app/outputs/flutter-apk/elcaju-${{ github.ref_name }}-armeabi-v7a.apk
+            build/app/outputs/flutter-apk/elcaju-${{ github.ref_name }}-x86_64.apk
           generate_release_notes: true
