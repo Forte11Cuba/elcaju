@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' hide WalletProvider;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:elcaju/l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/wallet_provider.dart';
 import 'providers/settings_provider.dart';

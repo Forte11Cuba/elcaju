@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:cdk_flutter/cdk_flutter.dart' show MintInfo, ContactInfo;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:elcaju/l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/utils/formatters.dart';
 import '../../widgets/common/gradient_background.dart';
