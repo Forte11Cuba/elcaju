@@ -279,13 +279,16 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
 
                 if (_isRestoring && _statusMessage != null) ...[
                   const SizedBox(height: AppDimensions.paddingMedium),
-                  Text(
-                    _statusMessage!,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      color: AppColors.textSecondary.withValues(alpha: 0.8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      _statusMessage!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        color: AppColors.textSecondary.withValues(alpha: 0.8),
+                      ),
                     ),
                   ),
                 ],

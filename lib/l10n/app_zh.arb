@@ -52,7 +52,7 @@
     }
   },
   "needWords": "（需要12或24个）",
-  "restoreScanningMint": "正在扫描铸币厂中的现有代币...",
+  "restoreScanningMint": "正在扫描铸造厂中的现有代币...",
   "restoreError": "恢复错误：{error}",
   "@restoreError": {
     "placeholders": {
