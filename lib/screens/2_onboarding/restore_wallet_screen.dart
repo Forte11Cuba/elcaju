@@ -25,6 +25,7 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
   final FocusNode _focusNode = FocusNode();
   bool _isRestoring = false;
   String? _errorMessage;
+  String? _statusMessage;
 
   int get _wordCount {
     final text = _seedController.text.trim();
@@ -73,6 +74,21 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
         await p2pkProvider.initialize(mnemonic);
       } catch (e) {
         debugPrint('[RestoreWalletScreen] Error initializing P2PK (non-fatal): $e');
+      }
+
+      // Escanear mint activo para recuperar tokens existentes (NUT-13)
+      final activeMint = walletProvider.activeMintUrl;
+      if (activeMint != null && mounted) {
+        final l10n = L10n.of(context)!;
+        setState(() {
+          _statusMessage = l10n.restoreScanningMint;
+        });
+
+        try {
+          await walletProvider.restoreFromMint(activeMint);
+        } catch (e) {
+          debugPrint('[RestoreWalletScreen] Error scanning mint (non-fatal): $e');
+        }
       }
 
       if (mounted) {
@@ -260,6 +276,22 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
                       ? _restoreWallet
                       : null,
                 ),
+
+                if (_isRestoring && _statusMessage != null) ...[
+                  const SizedBox(height: AppDimensions.paddingMedium),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      _statusMessage!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        color: AppColors.textSecondary.withValues(alpha: 0.8),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

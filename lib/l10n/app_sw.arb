@@ -52,6 +52,7 @@
     }
   },
   "needWords": "(unahitaji 12 au 24)",
+  "restoreScanningMint": "Inatafuta tokeni zilizopo kwenye mint...",
   "restoreError": "Hitilafu ya kurejesha: {error}",
   "@restoreError": {
     "placeholders": {

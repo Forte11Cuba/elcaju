@@ -131,6 +131,9 @@ class L10nKo extends L10n {
   String get needWords => '(12개 또는 24개 필요)';
 
   @override
+  String get restoreScanningMint => '민트에서 기존 토큰 검색 중...';
+
+  @override
   String restoreError(String error) {
     return '복구 오류: $error';
   }

@@ -52,6 +52,7 @@
     }
   },
   "needWords": "(servono 12 o 24)",
+  "restoreScanningMint": "Scansione del mint per token esistenti...",
   "restoreError": "Errore di ripristino: {error}",
   "@restoreError": {
     "placeholders": {

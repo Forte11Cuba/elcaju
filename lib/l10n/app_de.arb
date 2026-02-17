@@ -52,6 +52,7 @@
     }
   },
   "needWords": "(du brauchst 12 oder 24)",
+  "restoreScanningMint": "Mint wird nach vorhandenen Token durchsucht...",
   "restoreError": "Wiederherstellungsfehler: {error}",
   "@restoreError": {
     "placeholders": {

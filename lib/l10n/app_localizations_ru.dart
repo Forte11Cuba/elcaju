@@ -131,6 +131,9 @@ class L10nRu extends L10n {
   String get needWords => '(нужно 12 или 24)';
 
   @override
+  String get restoreScanningMint => 'Сканирование минта на наличие токенов...';
+
+  @override
   String restoreError(String error) {
     return 'Ошибка восстановления: $error';
   }

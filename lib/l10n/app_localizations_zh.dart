@@ -131,6 +131,9 @@ class L10nZh extends L10n {
   String get needWords => '（需要12或24个）';
 
   @override
+  String get restoreScanningMint => '正在扫描铸造厂中的现有代币...';
+
+  @override
   String restoreError(String error) {
     return '恢复错误：$error';
   }

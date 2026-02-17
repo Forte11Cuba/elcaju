@@ -353,6 +353,12 @@ abstract class L10n {
   /// **'(necesitas 12 o 24)'**
   String get needWords;
 
+  /// No description provided for @restoreScanningMint.
+  ///
+  /// In es, this message translates to:
+  /// **'Escaneando mint en busca de tokens...'**
+  String get restoreScanningMint;
+
   /// No description provided for @restoreError.
   ///
   /// In es, this message translates to:

@@ -131,6 +131,9 @@ class L10nSw extends L10n {
   String get needWords => '(unahitaji 12 au 24)';
 
   @override
+  String get restoreScanningMint => 'Inatafuta tokeni zilizopo kwenye mint...';
+
+  @override
   String restoreError(String error) {
     return 'Hitilafu ya kurejesha: $error';
   }
