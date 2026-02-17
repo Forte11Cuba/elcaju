@@ -131,6 +131,9 @@ class L10nEn extends L10n {
   String get needWords => '(you need 12 or 24)';
 
   @override
+  String get restoreScanningMint => 'Scanning mint for existing tokens...';
+
+  @override
   String restoreError(String error) {
     return 'Restore error: $error';
   }

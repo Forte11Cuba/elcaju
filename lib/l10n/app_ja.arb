@@ -52,6 +52,7 @@
     }
   },
   "needWords": "（12語または24語が必要）",
+  "restoreScanningMint": "ミントで既存のトークンをスキャン中...",
   "restoreError": "復元エラー：{error}",
   "@restoreError": {
     "placeholders": {

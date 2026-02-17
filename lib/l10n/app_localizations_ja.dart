@@ -131,6 +131,9 @@ class L10nJa extends L10n {
   String get needWords => '（12語または24語が必要）';
 
   @override
+  String get restoreScanningMint => 'ミントで既存のトークンをスキャン中...';
+
+  @override
   String restoreError(String error) {
     return '復元エラー：$error';
   }

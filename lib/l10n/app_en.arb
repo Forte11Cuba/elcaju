@@ -47,6 +47,7 @@
   "seedPlaceholder": "word1 word2 word3 ...",
   "wordCount": "{count} words",
   "needWords": "(you need 12 or 24)",
+  "restoreScanningMint": "Scanning mint for existing tokens...",
   "restoreError": "Restore error: {error}",
 
   "homeTitle": "Home",

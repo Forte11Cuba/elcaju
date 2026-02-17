@@ -52,6 +52,7 @@
     }
   },
   "needWords": "(você precisa de 12 ou 24)",
+  "restoreScanningMint": "Escaneando mint em busca de tokens...",
   "restoreError": "Erro ao restaurar: {error}",
   "@restoreError": {
     "placeholders": {

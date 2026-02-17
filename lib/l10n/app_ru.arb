@@ -52,6 +52,7 @@
     }
   },
   "needWords": "(нужно 12 или 24)",
+  "restoreScanningMint": "Сканирование минта на наличие токенов...",
   "restoreError": "Ошибка восстановления: {error}",
   "@restoreError": {
     "placeholders": {
