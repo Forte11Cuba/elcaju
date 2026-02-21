@@ -403,6 +403,7 @@
 
   "offlineSend": "Tuma Nje ya Mtandao",
   "selectAll": "Zote",
+  "deselectAll": "Hakuna",
   "selectNotesToSend": "Chagua noti unazotaka kutuma:",
   "totalToSend": "Jumla ya kutuma",
   "notesSelected": "noti {count} zimechaguliwa",

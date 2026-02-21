@@ -403,6 +403,7 @@
 
   "offlineSend": "离线发送",
   "selectAll": "全部",
+  "deselectAll": "无",
   "selectNotesToSend": "选择要发送的票据：",
   "totalToSend": "发送总额",
   "notesSelected": "已选择 {count} 张票据",

@@ -403,6 +403,7 @@
 
   "offlineSend": "Invio offline",
   "selectAll": "Tutto",
+  "deselectAll": "Nessuno",
   "selectNotesToSend": "Seleziona le note da inviare:",
   "totalToSend": "Totale da inviare",
   "notesSelected": "{count} note selezionate",

@@ -298,6 +298,7 @@
 
   "offlineSend": "Offline Send",
   "selectAll": "All",
+  "deselectAll": "None",
   "selectNotesToSend": "Select the notes you want to send:",
   "totalToSend": "Total to send",
   "notesSelected": "{count} notes selected",

@@ -141,7 +141,9 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
                   size: 20,
                 ),
                 label: Text(
-                  L10n.of(context)!.selectAll,
+                  _selectedIds.length == _availableProofs.length
+                      ? L10n.of(context)!.deselectAll
+                      : L10n.of(context)!.selectAll,
                   style: const TextStyle(
                     color: AppColors.primaryAction,
                     fontFamily: 'Inter',
