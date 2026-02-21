@@ -691,7 +691,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
   // Datos de la transacción
   late final bool _isIncoming;
   late final bool _isLightning;
-  late final String? _tokenOrInvoice;
+  String? _tokenOrInvoice;
   late final bool _shouldShowQR;
 
   @override
