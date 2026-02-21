@@ -63,12 +63,12 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
       final settingsProvider = context.read<SettingsProvider>();
       final p2pkProvider = context.read<P2PKProvider>();
 
-      // Guardar mnemonic de forma segura
-      await settingsProvider.saveMnemonic(mnemonic);
-
-      // Inicializar wallet (esto valida el mnemonic internamente)
-      // Si el mnemonic es inválido, cdk_flutter lanzará una excepción
+      // Inicializar wallet primero (valida el mnemonic internamente).
+      // Si es inválido, cdk_flutter lanzará una excepción antes de persistir.
       await walletProvider.initialize(mnemonic);
+
+      // Solo guardar mnemonic si initialize() pasó sin error
+      await settingsProvider.saveMnemonic(mnemonic);
 
       // Inicializar P2PK (derivar clave principal del mnemonic)
       try {
@@ -100,9 +100,13 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
         );
       }
     } catch (e) {
-      // Revertir el guardado del mnemonic si falló la inicialización
-      final settingsProvider = context.read<SettingsProvider>();
-      await settingsProvider.deleteWallet();
+      // Limpiar cualquier estado parcial si algo falló
+      try {
+        final settingsProvider = context.read<SettingsProvider>();
+        await settingsProvider.deleteWallet();
+      } catch (cleanupError) {
+        debugPrint('Error during restore cleanup: $cleanupError');
+      }
 
       final l10n = L10n.of(context)!;
       setState(() {
