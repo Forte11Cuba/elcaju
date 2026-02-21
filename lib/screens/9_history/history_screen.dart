@@ -693,6 +693,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
   late final bool _isLightning;
   String? _tokenOrInvoice;
   late final bool _shouldShowQR;
+  bool _isLoadingPendingInvoice = false;
 
   @override
   void initState() {
@@ -720,13 +721,15 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
 
   /// Busca el invoice en pending mint invoices si no hay metadata.
   Future<void> _loadPendingMintInvoice() async {
+    setState(() => _isLoadingPendingInvoice = true);
     final invoice = await widget.walletProvider.findPendingMintInvoice(
       widget.transaction.mintUrl,
       widget.transaction.unit,
     );
-    if (invoice != null && mounted) {
+    if (mounted) {
       setState(() {
-        _tokenOrInvoice = invoice;
+        _isLoadingPendingInvoice = false;
+        if (invoice != null) _tokenOrInvoice = invoice;
       });
     }
   }
@@ -869,8 +872,8 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
                   const SizedBox(height: 32),
                 ],
 
-                // Mensaje si no hay token/invoice
-                if (_tokenOrInvoice == null) ...[
+                // Mensaje si no hay token/invoice (ocultar mientras carga)
+                if (_tokenOrInvoice == null && !_isLoadingPendingInvoice) ...[
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
