@@ -57,7 +57,8 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
     });
 
     try {
-      final mnemonic = _seedController.text.trim().toLowerCase();
+      final mnemonic =
+          _seedController.text.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
       final walletProvider = context.read<WalletProvider>();
       final settingsProvider = context.read<SettingsProvider>();
       final p2pkProvider = context.read<P2PKProvider>();
