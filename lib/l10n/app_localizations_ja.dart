@@ -852,6 +852,9 @@ class L10nJa extends L10n {
   String get offlineSend => 'オフライン送金';
 
   @override
+  String get selectAll => 'すべて';
+
+  @override
   String get selectNotesToSend => '送信するノートを選択：';
 
   @override

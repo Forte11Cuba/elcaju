@@ -852,6 +852,9 @@ class L10nSw extends L10n {
   String get offlineSend => 'Tuma Nje ya Mtandao';
 
   @override
+  String get selectAll => 'Zote';
+
+  @override
   String get selectNotesToSend => 'Chagua noti unazotaka kutuma:';
 
   @override

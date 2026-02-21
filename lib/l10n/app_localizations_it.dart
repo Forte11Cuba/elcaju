@@ -852,6 +852,9 @@ class L10nIt extends L10n {
   String get offlineSend => 'Invio offline';
 
   @override
+  String get selectAll => 'Tutto';
+
+  @override
   String get selectNotesToSend => 'Seleziona le note da inviare:';
 
   @override

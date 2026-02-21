@@ -297,6 +297,7 @@
   "delete": "Delete",
 
   "offlineSend": "Offline Send",
+  "selectAll": "All",
   "selectNotesToSend": "Select the notes you want to send:",
   "totalToSend": "Total to send",
   "notesSelected": "{count} notes selected",

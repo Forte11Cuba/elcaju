@@ -852,6 +852,9 @@ class L10nKo extends L10n {
   String get offlineSend => '오프라인 전송';
 
   @override
+  String get selectAll => '전체';
+
+  @override
   String get selectNotesToSend => '보낼 노트를 선택하세요:';
 
   @override

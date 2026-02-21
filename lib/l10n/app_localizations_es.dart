@@ -852,6 +852,9 @@ class L10nEs extends L10n {
   String get offlineSend => 'Envío Offline';
 
   @override
+  String get selectAll => 'Todo';
+
+  @override
   String get selectNotesToSend => 'Selecciona las notas que deseas enviar:';
 
   @override

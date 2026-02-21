@@ -402,6 +402,7 @@
   "delete": "Futa",
 
   "offlineSend": "Tuma Nje ya Mtandao",
+  "selectAll": "Zote",
   "selectNotesToSend": "Chagua noti unazotaka kutuma:",
   "totalToSend": "Jumla ya kutuma",
   "notesSelected": "noti {count} zimechaguliwa",

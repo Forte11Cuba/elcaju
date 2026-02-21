@@ -402,6 +402,7 @@
   "delete": "Eliminar",
 
   "offlineSend": "Envío Offline",
+  "selectAll": "Todo",
   "selectNotesToSend": "Selecciona las notas que deseas enviar:",
   "totalToSend": "Total a enviar",
   "notesSelected": "{count} notas seleccionadas",
