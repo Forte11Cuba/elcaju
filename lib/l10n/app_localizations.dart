@@ -1715,6 +1715,12 @@ abstract class L10n {
   /// **'Envío Offline'**
   String get offlineSend;
 
+  /// No description provided for @selectAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Todo'**
+  String get selectAll;
+
   /// No description provided for @selectNotesToSend.
   ///
   /// In es, this message translates to:

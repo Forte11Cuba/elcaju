@@ -132,12 +132,23 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
           actions: [
             // Botón seleccionar/deseleccionar todos
             if (_availableProofs.isNotEmpty)
-              IconButton(
+              TextButton.icon(
                 icon: Icon(
                   _selectedIds.length == _availableProofs.length
                       ? LucideIcons.checkSquare
                       : LucideIcons.square,
                   color: AppColors.primaryAction,
+                  size: 20,
+                ),
+                label: Text(
+                  _selectedIds.length == _availableProofs.length
+                      ? L10n.of(context)!.deselectAll
+                      : L10n.of(context)!.selectAll,
+                  style: const TextStyle(
+                    color: AppColors.primaryAction,
+                    fontFamily: 'Inter',
+                    fontSize: 13,
+                  ),
                 ),
                 onPressed: _selectedIds.length == _availableProofs.length
                     ? _clearSelection

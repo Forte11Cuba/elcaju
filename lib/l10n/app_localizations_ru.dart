@@ -852,6 +852,9 @@ class L10nRu extends L10n {
   String get offlineSend => 'Офлайн отправка';
 
   @override
+  String get selectAll => 'Все';
+
+  @override
   String get selectNotesToSend => 'Выберите заметки для отправки:';
 
   @override

@@ -402,6 +402,8 @@
   "delete": "削除",
 
   "offlineSend": "オフライン送金",
+  "selectAll": "すべて",
+  "deselectAll": "なし",
   "selectNotesToSend": "送信するノートを選択：",
   "totalToSend": "送金合計",
   "notesSelected": "{count}件のノートを選択",

@@ -402,6 +402,8 @@
   "delete": "Удалить",
 
   "offlineSend": "Офлайн отправка",
+  "selectAll": "Все",
+  "deselectAll": "Ничего",
   "selectNotesToSend": "Выберите заметки для отправки:",
   "totalToSend": "Итого к отправке",
   "notesSelected": "{count} заметок выбрано",

@@ -852,6 +852,9 @@ class L10nZh extends L10n {
   String get offlineSend => '离线发送';
 
   @override
+  String get selectAll => '全部';
+
+  @override
   String get selectNotesToSend => '选择要发送的票据：';
 
   @override

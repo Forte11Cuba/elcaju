@@ -402,6 +402,8 @@
   "delete": "삭제",
 
   "offlineSend": "오프라인 전송",
+  "selectAll": "전체",
+  "deselectAll": "없음",
   "selectNotesToSend": "보낼 노트를 선택하세요:",
   "totalToSend": "보낼 총액",
   "notesSelected": "{count}개 노트 선택됨",
