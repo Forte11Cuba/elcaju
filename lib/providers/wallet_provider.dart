@@ -1038,7 +1038,11 @@ class WalletProvider extends ChangeNotifier {
       debugPrint('[SEND] Send completed');
       return token;
     } catch (e) {
-      await cancelSend(prepared);
+      try {
+        await cancelSend(prepared);
+      } catch (cancelErr) {
+        debugPrint('[SEND] cancelSend failed: $cancelErr');
+      }
       rethrow;
     }
   }
@@ -1055,7 +1059,11 @@ class WalletProvider extends ChangeNotifier {
       debugPrint('[P2PK] Send completed');
       return token;
     } catch (e) {
-      await cancelSend(prepared);
+      try {
+        await cancelSend(prepared);
+      } catch (cancelErr) {
+        debugPrint('[P2PK] cancelSend failed: $cancelErr');
+      }
       rethrow;
     }
   }
