@@ -13,6 +13,7 @@ import '../../widgets/common/primary_button.dart';
 import '../../widgets/common/numpad_widget.dart';
 import '../../providers/wallet_provider.dart';
 import '../../core/utils/nostr_utils.dart';
+import '../../widgets/scanner/qr_scanner_widget.dart';
 import 'share_token_screen.dart';
 import 'offline_send_screen.dart';
 
@@ -350,10 +351,20 @@ class _SendScreenState extends State<SendScreen> {
                       color: Colors.white.withValues(alpha: 0.3),
                     ),
                     border: InputBorder.none,
-                    suffixIcon: IconButton(
-                      icon: const Icon(LucideIcons.clipboard, size: 20),
-                      color: AppColors.textSecondary,
-                      onPressed: _pastePubkey,
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(LucideIcons.clipboard, size: 20),
+                          color: AppColors.textSecondary,
+                          onPressed: _pastePubkey,
+                        ),
+                        IconButton(
+                          icon: const Icon(LucideIcons.scanLine, size: 20),
+                          color: AppColors.textSecondary,
+                          onPressed: _scanPubkey,
+                        ),
+                      ],
                     ),
                     errorText: _pubkeyError,
                     errorStyle: TextStyle(
@@ -391,6 +402,47 @@ class _SendScreenState extends State<SendScreen> {
       _pubkeyController.text = text;
       _validatePubkey(text);
     }
+  }
+
+  Future<void> _scanPubkey() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(LucideIcons.x, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              L10n.of(context)!.scanQrCode,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            centerTitle: true,
+          ),
+          body: QrScannerWidget(
+            onDetect: (data) {
+              final trimmed = data.trim();
+              if (NostrUtils.isValidP2PKPubkey(trimmed)) {
+                Navigator.pop(context, trimmed);
+              }
+            },
+            onError: (error) => debugPrint('[P2PK Scan] $error'),
+          ),
+        ),
+      ),
+    );
+
+    if (!mounted || result == null) return;
+    _pubkeyController.text = result;
+    _validatePubkey(result);
   }
 
   Widget _buildErrorMessage() {
