@@ -385,9 +385,11 @@ class _SendScreenState extends State<SendScreen> {
 
   Future<void> _pastePubkey() async {
     final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
-    if (clipboardData?.text != null) {
-      _pubkeyController.text = clipboardData!.text!;
-      _validatePubkey(clipboardData.text!);
+    if (!mounted) return;
+    final text = clipboardData?.text?.trim();
+    if (text != null && text.isNotEmpty) {
+      _pubkeyController.text = text;
+      _validatePubkey(text);
     }
   }
 

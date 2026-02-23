@@ -1046,7 +1046,7 @@ class WalletProvider extends ChangeNotifier {
   /// Envía tokens P2PK (bloqueados a una clave pública).
   /// CDK 0.15+ con includeFee: true maneja correctamente mints con ppk>0.
   Future<String> sendTokensP2pk(BigInt amount, String pubkey, String? memo) async {
-    debugPrint('[P2PK] Sending $amount to ${pubkey.substring(0, 16)}...');
+    debugPrint('[P2PK] Sending $amount to ${pubkey.length > 16 ? pubkey.substring(0, 16) : pubkey}...');
     final prepared = await prepareSendP2pk(amount, pubkey);
     debugPrint('[P2PK] prepareSend OK - fee=${prepared.fee}');
     final token = await confirmSend(prepared, memo);
