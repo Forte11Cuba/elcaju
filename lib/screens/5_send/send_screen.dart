@@ -362,6 +362,7 @@ class _SendScreenState extends State<SendScreen> {
                         IconButton(
                           icon: const Icon(LucideIcons.scanLine, size: 20),
                           color: AppColors.textSecondary,
+                          tooltip: l10n.scanQrCode,
                           onPressed: _scanPubkey,
                         ),
                       ],
@@ -432,9 +433,25 @@ class _SendScreenState extends State<SendScreen> {
               final trimmed = data.trim();
               if (NostrUtils.isValidP2PKPubkey(trimmed)) {
                 Navigator.pop(context, trimmed);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(L10n.of(context)!.p2pkInvalidPubkey),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
               }
             },
-            onError: (error) => debugPrint('[P2PK Scan] $error'),
+            onError: (error) {
+              debugPrint('[P2PK Scan] $error');
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(L10n.of(context)!.cameraPermissionDenied),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            },
           ),
         ),
       ),
