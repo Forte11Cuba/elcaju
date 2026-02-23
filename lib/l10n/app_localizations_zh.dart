@@ -855,6 +855,9 @@ class L10nZh extends L10n {
   String get selectAll => '全部';
 
   @override
+  String get deselectAll => '无';
+
+  @override
   String get selectNotesToSend => '选择要发送的票据：';
 
   @override
@@ -1091,7 +1094,4 @@ class L10nZh extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => '无法删除主密钥';
-
-  @override
-  String get p2pkSendComingSoon => '即将推出';
 }

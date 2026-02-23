@@ -520,6 +520,5 @@
   "p2pkErrorInvalidNsec": "유효하지 않은 nsec",
   "p2pkErrorKeyAlreadyExists": "이 키는 이미 존재합니다",
   "p2pkErrorKeyNotFound": "키를 찾을 수 없습니다",
-  "p2pkErrorCannotDeletePrimary": "기본 키는 삭제할 수 없습니다",
-  "p2pkSendComingSoon": "곧 출시 예정"
+  "p2pkErrorCannotDeletePrimary": "기본 키는 삭제할 수 없습니다"
 }

@@ -855,6 +855,9 @@ class L10nJa extends L10n {
   String get selectAll => 'すべて';
 
   @override
+  String get deselectAll => 'なし';
+
+  @override
   String get selectNotesToSend => '送信するノートを選択：';
 
   @override
@@ -1091,7 +1094,4 @@ class L10nJa extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => 'プライマリ鍵は削除できません';
-
-  @override
-  String get p2pkSendComingSoon => '近日公開';
 }

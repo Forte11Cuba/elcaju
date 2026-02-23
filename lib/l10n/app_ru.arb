@@ -520,6 +520,5 @@
   "p2pkErrorInvalidNsec": "Недействительный nsec",
   "p2pkErrorKeyAlreadyExists": "Этот ключ уже существует",
   "p2pkErrorKeyNotFound": "Ключ не найден",
-  "p2pkErrorCannotDeletePrimary": "Невозможно удалить основной ключ",
-  "p2pkSendComingSoon": "Скоро будет доступно"
+  "p2pkErrorCannotDeletePrimary": "Невозможно удалить основной ключ"
 }
