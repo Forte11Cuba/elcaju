@@ -728,8 +728,8 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
         widget.transaction.mintUrl,
         widget.transaction.unit,
       );
-    } catch (_) {
-      // findPendingMintInvoice falló; invoice queda null
+    } catch (e, st) {
+      debugPrint('findPendingMintInvoice failed: $e\n$st');
     }
     if (mounted) {
       setState(() {
