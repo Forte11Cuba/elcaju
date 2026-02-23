@@ -1029,29 +1029,43 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Método de conveniencia: prepara y confirma en un solo paso.
+  /// Si confirmSend falla, libera proofs reservados con cancelSend.
   Future<String> sendTokens(BigInt amount, String? memo) async {
-    final wallet = await getActiveWallet();
-    final balanceBefore = await wallet.balance();
-    debugPrint('[SEND DEBUG] Normal send - balance=$balanceBefore, amount=$amount');
-    await KeysetDebug.logCounters('BEFORE normal send');
     final prepared = await prepareSend(amount);
-    debugPrint('[SEND DEBUG] prepareSend OK - fee=${prepared.fee}');
-    final token = await confirmSend(prepared, memo);
-    final balanceAfter = await wallet.balance();
-    debugPrint('[SEND DEBUG] confirmSend OK - balance after=$balanceAfter');
-    await KeysetDebug.logCounters('AFTER normal send');
-    return token;
+    debugPrint('[SEND] prepareSend OK - fee=${prepared.fee}');
+    try {
+      final token = await confirmSend(prepared, memo);
+      debugPrint('[SEND] Send completed');
+      return token;
+    } catch (e) {
+      try {
+        await cancelSend(prepared);
+      } catch (cancelErr) {
+        debugPrint('[SEND] cancelSend failed: $cancelErr');
+      }
+      rethrow;
+    }
   }
 
   /// Envía tokens P2PK (bloqueados a una clave pública).
   /// CDK 0.15+ con includeFee: true maneja correctamente mints con ppk>0.
+  /// Si confirmSend falla, libera proofs reservados con cancelSend.
   Future<String> sendTokensP2pk(BigInt amount, String pubkey, String? memo) async {
     debugPrint('[P2PK] Sending $amount to ${pubkey.length > 16 ? pubkey.substring(0, 16) : pubkey}...');
     final prepared = await prepareSendP2pk(amount, pubkey);
     debugPrint('[P2PK] prepareSend OK - fee=${prepared.fee}');
-    final token = await confirmSend(prepared, memo);
-    debugPrint('[P2PK] Send completed');
-    return token;
+    try {
+      final token = await confirmSend(prepared, memo);
+      debugPrint('[P2PK] Send completed');
+      return token;
+    } catch (e) {
+      try {
+        await cancelSend(prepared);
+      } catch (cancelErr) {
+        debugPrint('[P2PK] cancelSend failed: $cancelErr');
+      }
+      rethrow;
+    }
   }
 
   /// Verifica si hay transacciones salientes pendientes en el wallet activo.
