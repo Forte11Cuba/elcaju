@@ -1721,6 +1721,12 @@ abstract class L10n {
   /// **'Todo'**
   String get selectAll;
 
+  /// No description provided for @deselectAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Ninguno'**
+  String get deselectAll;
+
   /// No description provided for @selectNotesToSend.
   ///
   /// In es, this message translates to:
@@ -2140,12 +2146,6 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'No se puede eliminar la clave principal'**
   String get p2pkErrorCannotDeletePrimary;
-
-  /// No description provided for @p2pkSendComingSoon.
-  ///
-  /// In es, this message translates to:
-  /// **'Disponible próximamente'**
-  String get p2pkSendComingSoon;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

@@ -855,6 +855,9 @@ class L10nKo extends L10n {
   String get selectAll => '전체';
 
   @override
+  String get deselectAll => '없음';
+
+  @override
   String get selectNotesToSend => '보낼 노트를 선택하세요:';
 
   @override
@@ -1091,7 +1094,4 @@ class L10nKo extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => '기본 키는 삭제할 수 없습니다';
-
-  @override
-  String get p2pkSendComingSoon => '곧 출시 예정';
 }

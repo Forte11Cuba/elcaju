@@ -520,6 +520,5 @@
   "p2pkErrorInvalidNsec": "無効なnsec",
   "p2pkErrorKeyAlreadyExists": "この鍵は既に存在します",
   "p2pkErrorKeyNotFound": "鍵が見つかりません",
-  "p2pkErrorCannotDeletePrimary": "プライマリ鍵は削除できません",
-  "p2pkSendComingSoon": "近日公開"
+  "p2pkErrorCannotDeletePrimary": "プライマリ鍵は削除できません"
 }

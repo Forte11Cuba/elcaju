@@ -520,6 +520,5 @@
   "p2pkErrorInvalidNsec": "Ungültiger nsec",
   "p2pkErrorKeyAlreadyExists": "Dieser Schlüssel existiert bereits",
   "p2pkErrorKeyNotFound": "Schlüssel nicht gefunden",
-  "p2pkErrorCannotDeletePrimary": "Primärschlüssel kann nicht gelöscht werden",
-  "p2pkSendComingSoon": "Demnächst verfügbar"
+  "p2pkErrorCannotDeletePrimary": "Primärschlüssel kann nicht gelöscht werden"
 }

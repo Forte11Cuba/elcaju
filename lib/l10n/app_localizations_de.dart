@@ -855,6 +855,9 @@ class L10nDe extends L10n {
   String get selectAll => 'Alle';
 
   @override
+  String get deselectAll => 'Keine';
+
+  @override
   String get selectNotesToSend => 'Wähle die zu sendenden Notizen:';
 
   @override
@@ -1091,7 +1094,4 @@ class L10nDe extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => 'Primärschlüssel kann nicht gelöscht werden';
-
-  @override
-  String get p2pkSendComingSoon => 'Demnächst verfügbar';
 }

@@ -521,6 +521,5 @@
   "p2pkErrorInvalidNsec": "nsec inválido",
   "p2pkErrorKeyAlreadyExists": "Esta clave ya existe",
   "p2pkErrorKeyNotFound": "Clave no encontrada",
-  "p2pkErrorCannotDeletePrimary": "No se puede eliminar la clave principal",
-  "p2pkSendComingSoon": "Disponible próximamente"
+  "p2pkErrorCannotDeletePrimary": "No se puede eliminar la clave principal"
 }

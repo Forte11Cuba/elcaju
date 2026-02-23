@@ -520,6 +520,5 @@
   "p2pkErrorInvalidNsec": "无效的nsec",
   "p2pkErrorKeyAlreadyExists": "此密钥已存在",
   "p2pkErrorKeyNotFound": "未找到密钥",
-  "p2pkErrorCannotDeletePrimary": "无法删除主密钥",
-  "p2pkSendComingSoon": "即将推出"
+  "p2pkErrorCannotDeletePrimary": "无法删除主密钥"
 }

@@ -855,6 +855,9 @@ class L10nRu extends L10n {
   String get selectAll => 'Все';
 
   @override
+  String get deselectAll => 'Ничего';
+
+  @override
   String get selectNotesToSend => 'Выберите заметки для отправки:';
 
   @override
@@ -1091,7 +1094,4 @@ class L10nRu extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => 'Невозможно удалить основной ключ';
-
-  @override
-  String get p2pkSendComingSoon => 'Скоро будет доступно';
 }

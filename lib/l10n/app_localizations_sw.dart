@@ -855,6 +855,9 @@ class L10nSw extends L10n {
   String get selectAll => 'Zote';
 
   @override
+  String get deselectAll => 'Hakuna';
+
+  @override
   String get selectNotesToSend => 'Chagua noti unazotaka kutuma:';
 
   @override
@@ -1091,7 +1094,4 @@ class L10nSw extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => 'Haiwezekani kufuta ufunguo mkuu';
-
-  @override
-  String get p2pkSendComingSoon => 'Inakuja hivi karibuni';
 }

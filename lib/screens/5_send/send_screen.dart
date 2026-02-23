@@ -276,57 +276,98 @@ class _SendScreenState extends State<SendScreen> {
   Widget _buildP2PKSection() {
     final l10n = L10n.of(context)!;
 
-    // P2PK Send deshabilitado temporalmente por bug en CDK (cdk-flutter usa CDK 0.13.4).
-    // Se habilitará cuando cdk-flutter actualice a CDK 0.14.x con el fix de include_fee.
-    const bool p2pkSendEnabled = false;
-
-    return Opacity(
-      opacity: p2pkSendEnabled ? 1.0 : 0.5,
-      child: GlassCard(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.paddingMedium,
-          vertical: AppDimensions.paddingSmall,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        GlassCard(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.paddingMedium,
+            vertical: AppDimensions.paddingSmall,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                LucideIcons.lock,
+                color: _useP2PK ? AppColors.primaryAction : AppColors.textSecondary,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.p2pkLockToKey,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      l10n.p2pkLockDescription,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 12,
+                        color: AppColors.textSecondary.withValues(alpha: 0.7),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: _useP2PK,
+                onChanged: (value) => setState(() => _useP2PK = value),
+                activeColor: AppColors.primaryAction,
+              ),
+            ],
+          ),
         ),
-        child: Row(
-          children: [
-            Icon(
-              LucideIcons.lock,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.p2pkLockToKey,
-                    style: TextStyle(
+
+        // Campo de pubkey cuando P2PK está activo
+        if (_useP2PK) ...[
+          const SizedBox(height: AppDimensions.paddingSmall),
+          GlassCard(
+            padding: const EdgeInsets.all(AppDimensions.paddingSmall),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _pubkeyController,
+                  onChanged: _validatePubkey,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    color: Colors.white,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: l10n.p2pkReceiverPubkey,
+                    hintStyle: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: p2pkSendEnabled ? Colors.white : AppColors.textSecondary,
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
-                  ),
-                  Text(
-                    l10n.p2pkSendComingSoon,
-                    style: TextStyle(
+                    border: InputBorder.none,
+                    suffixIcon: IconButton(
+                      icon: const Icon(LucideIcons.clipboard, size: 20),
+                      color: AppColors.textSecondary,
+                      onPressed: _pastePubkey,
+                    ),
+                    errorText: _pubkeyError,
+                    errorStyle: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 12,
-                      color: AppColors.textSecondary.withValues(alpha: 0.7),
+                      color: AppColors.error,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Switch(
-              value: false,
-              onChanged: null,
-              activeColor: AppColors.primaryAction,
-            ),
-          ],
-        ),
-      ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -344,9 +385,11 @@ class _SendScreenState extends State<SendScreen> {
 
   Future<void> _pastePubkey() async {
     final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
-    if (clipboardData?.text != null) {
-      _pubkeyController.text = clipboardData!.text!;
-      _validatePubkey(clipboardData.text!);
+    if (!mounted) return;
+    final text = clipboardData?.text?.trim();
+    if (text != null && text.isNotEmpty) {
+      _pubkeyController.text = text;
+      _validatePubkey(text);
     }
   }
 
