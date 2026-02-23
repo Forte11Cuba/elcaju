@@ -722,10 +722,15 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
   /// Busca el invoice en pending mint invoices si no hay metadata.
   Future<void> _loadPendingMintInvoice() async {
     setState(() => _isLoadingPendingInvoice = true);
-    final invoice = await widget.walletProvider.findPendingMintInvoice(
-      widget.transaction.mintUrl,
-      widget.transaction.unit,
-    );
+    String? invoice;
+    try {
+      invoice = await widget.walletProvider.findPendingMintInvoice(
+        widget.transaction.mintUrl,
+        widget.transaction.unit,
+      );
+    } catch (_) {
+      // findPendingMintInvoice falló; invoice queda null
+    }
     if (mounted) {
       setState(() {
         _isLoadingPendingInvoice = false;
