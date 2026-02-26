@@ -34,9 +34,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadVersion() async {
-    final info = await PackageInfo.fromPlatform();
-    if (mounted) {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (!mounted) return;
       setState(() => _appVersion = info.version);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _appVersion = '—');
     }
   }
 
@@ -704,10 +708,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             alignment: PlaceholderAlignment.baseline,
             baseline: TextBaseline.alphabetic,
             child: GestureDetector(
-              onTap: () => launchUrl(
-                Uri.parse('https://app.lachispa.me'),
-                mode: LaunchMode.externalApplication,
-              ),
+              onTap: () => _openLaChispa(context),
               child: Text(
                 keyword,
                 style: TextStyle(
@@ -724,6 +725,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _openLaChispa(BuildContext context) async {
+    final url = Uri.parse('https://app.lachispa.me');
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(L10n.of(context)!.couldNotOpenLink),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   /// 4. Abrir GitHub
