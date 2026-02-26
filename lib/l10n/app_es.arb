@@ -296,7 +296,7 @@
     }
   },
   "close": "Cerrar",
-  "aboutDescription": "Un wallet de Cashu con ADN cubano para el mundo entero. Hermano de La Chispa.",
+  "aboutDescription": "Un wallet de Cashu con ADN cubano para el mundo entero. Hermano de LaChispa.",
   "couldNotOpenLink": "No se pudo abrir el enlace",
 
   "deleteWalletQuestion": "¿Borrar wallet?",

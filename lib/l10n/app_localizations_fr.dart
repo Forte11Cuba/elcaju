@@ -665,7 +665,7 @@ class L10nFr extends L10n {
   String get close => 'Fermer';
 
   @override
-  String get aboutDescription => 'Un portefeuille Cashu avec ADN cubain pour le monde entier. Frère de La Chispa.';
+  String get aboutDescription => 'Un portefeuille Cashu avec ADN cubain pour le monde entier. Frère de LaChispa.';
 
   @override
   String get couldNotOpenLink => 'Impossible d\'ouvrir le lien';

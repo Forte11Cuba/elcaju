@@ -1376,7 +1376,7 @@ abstract class L10n {
   /// No description provided for @aboutDescription.
   ///
   /// In es, this message translates to:
-  /// **'Un wallet de Cashu con ADN cubano para el mundo entero. Hermano de La Chispa.'**
+  /// **'Un wallet de Cashu con ADN cubano para el mundo entero. Hermano de LaChispa.'**
   String get aboutDescription;
 
   /// No description provided for @couldNotOpenLink.

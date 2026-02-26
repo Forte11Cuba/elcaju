@@ -665,7 +665,7 @@ class L10nSw extends L10n {
   String get close => 'Funga';
 
   @override
-  String get aboutDescription => 'Pochi ya Cashu yenye DNA ya Cuba kwa ulimwengu wote. Ndugu wa La Chispa.';
+  String get aboutDescription => 'Pochi ya Cashu yenye DNA ya Cuba kwa ulimwengu wote. Ndugu wa LaChispa.';
 
   @override
   String get couldNotOpenLink => 'Haikuweza kufungua kiungo';

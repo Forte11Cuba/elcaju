@@ -665,7 +665,7 @@ class L10nKo extends L10n {
   String get close => '닫기';
 
   @override
-  String get aboutDescription => '전 세계를 위한 쿠바 DNA를 가진 Cashu 지갑. La Chispa의 형제.';
+  String get aboutDescription => '전 세계를 위한 쿠바 DNA를 가진 Cashu 지갑. LaChispa의 형제.';
 
   @override
   String get couldNotOpenLink => '링크를 열 수 없음';
