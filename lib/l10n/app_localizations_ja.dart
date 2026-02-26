@@ -665,7 +665,7 @@ class L10nJa extends L10n {
   String get close => '閉じる';
 
   @override
-  String get aboutDescription => 'キューバのDNAを持つ世界のためのCashuウォレット。La Chispaの兄弟。';
+  String get aboutDescription => 'キューバのDNAを持つ世界のためのCashuウォレット。LaChispaの兄弟。';
 
   @override
   String get couldNotOpenLink => 'リンクを開けませんでした';

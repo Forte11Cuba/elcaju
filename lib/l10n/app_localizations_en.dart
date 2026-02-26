@@ -665,7 +665,7 @@ class L10nEn extends L10n {
   String get close => 'Close';
 
   @override
-  String get aboutDescription => 'A Cashu wallet with Cuban DNA for the entire world. Brother of La Chispa.';
+  String get aboutDescription => 'A Cashu wallet with Cuban DNA for the entire world. Brother of LaChispa.';
 
   @override
   String get couldNotOpenLink => 'Could not open link';

@@ -665,7 +665,7 @@ class L10nPt extends L10n {
   String get close => 'Fechar';
 
   @override
-  String get aboutDescription => 'Uma wallet Cashu com DNA cubano para o mundo inteiro. Irmã de La Chispa.';
+  String get aboutDescription => 'Uma wallet Cashu com DNA cubano para o mundo inteiro. Irmã de LaChispa.';
 
   @override
   String get couldNotOpenLink => 'Não foi possível abrir o link';

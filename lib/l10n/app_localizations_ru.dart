@@ -665,7 +665,7 @@ class L10nRu extends L10n {
   String get close => 'Закрыть';
 
   @override
-  String get aboutDescription => 'Cashu кошелёк с кубинской ДНК для всего мира. Брат La Chispa.';
+  String get aboutDescription => 'Cashu кошелёк с кубинской ДНК для всего мира. Брат LaChispa.';
 
   @override
   String get couldNotOpenLink => 'Не удалось открыть ссылку';

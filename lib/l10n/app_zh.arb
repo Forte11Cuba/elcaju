@@ -296,7 +296,7 @@
     }
   },
   "close": "关闭",
-  "aboutDescription": "具有古巴基因的 Cashu 钱包，面向全世界。La Chispa 的兄弟项目。",
+  "aboutDescription": "具有古巴基因的 Cashu 钱包，面向全世界。LaChispa 的兄弟项目。",
   "couldNotOpenLink": "无法打开链接",
 
   "deleteWalletQuestion": "删除钱包？",

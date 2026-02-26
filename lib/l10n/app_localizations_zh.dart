@@ -665,7 +665,7 @@ class L10nZh extends L10n {
   String get close => '关闭';
 
   @override
-  String get aboutDescription => '具有古巴基因的 Cashu 钱包，面向全世界。La Chispa 的兄弟项目。';
+  String get aboutDescription => '具有古巴基因的 Cashu 钱包，面向全世界。LaChispa 的兄弟项目。';
 
   @override
   String get couldNotOpenLink => '无法打开链接';

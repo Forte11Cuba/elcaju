@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:elcaju/l10n/app_localizations.dart';
@@ -24,6 +25,25 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  String _appVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (!mounted) return;
+      setState(() => _appVersion = info.version);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _appVersion = '—');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
@@ -124,7 +144,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildInfoTile(
                       icon: LucideIcons.tag,
                       title: l10n.version,
-                      subtitle: '0.0.1',
+                      subtitle: _appVersion,
                     ),
                     _buildSettingTile(
                       icon: LucideIcons.info,
@@ -620,7 +640,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              'v0.0.1',
+              'v$_appVersion',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
@@ -638,43 +658,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            Text(
-              L10n.of(context)!.aboutDescription,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 14,
-                color: AppColors.textSecondary.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    LucideIcons.bitcoin,
-                    color: AppColors.secondaryAction,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Cuba Bitcoin',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.secondaryAction,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildAboutDescription(context),
           ],
         ),
         actions: [
@@ -691,6 +675,72 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildAboutDescription(BuildContext context) {
+    final description = L10n.of(context)!.aboutDescription;
+    const keyword = 'LaChispa';
+    final index = description.indexOf(keyword);
+    if (index == -1) {
+      return Text(
+        description,
+        style: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          color: AppColors.textSecondary.withValues(alpha: 0.7),
+        ),
+        textAlign: TextAlign.center,
+      );
+    }
+    final before = description.substring(0, index);
+    final after = description.substring(index + keyword.length);
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        style: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          color: AppColors.textSecondary.withValues(alpha: 0.7),
+        ),
+        children: [
+          TextSpan(text: before),
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: GestureDetector(
+              onTap: () => _openLaChispa(context),
+              child: Text(
+                keyword,
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14,
+                  color: AppColors.secondaryAction,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.secondaryAction,
+                ),
+              ),
+            ),
+          ),
+          TextSpan(text: after),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openLaChispa(BuildContext context) async {
+    final url = Uri.parse('https://app.lachispa.me');
+    try {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(L10n.of(context)!.couldNotOpenLink),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   /// 4. Abrir GitHub
