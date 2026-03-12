@@ -780,6 +780,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Future<void> _pasteFromClipboard() async {
     final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    if (!mounted) return;
     if (clipboardData?.text != null) {
       var text = clipboardData!.text!.trim();
 
