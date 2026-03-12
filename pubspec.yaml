@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 0.1.0+2
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.11.0
 
 dependencies:
   flutter:
@@ -55,6 +55,10 @@ dependencies:
 
   # UUID generator for pending tokens
   uuid: ^4.3.3
+
+  # NFC for token sharing
+  nfc_manager: ^4.1.1
+  ndef_record: ^1.4.2
 
   # BIP32 for NIP-06 key derivation (P2PK)
   bip32: ^2.0.0

@@ -1,5 +1,5 @@
+// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -60,7 +60,8 @@ class L10nDe extends L10n {
   String get generatingSeed => 'Sichere Generierung deiner Seed-Phrase';
 
   @override
-  String get createWalletDescription => 'Eine 12-Wort Seed-Phrase wird generiert.\nBewahre sie an einem sicheren Ort auf.';
+  String get createWalletDescription =>
+      'Eine 12-Wort Seed-Phrase wird generiert.\nBewahre sie an einem sicheren Ort auf.';
 
   @override
   String get generateWallet => 'Wallet generieren';
@@ -69,10 +70,12 @@ class L10nDe extends L10n {
   String get walletCreated => 'Wallet erstellt!';
 
   @override
-  String get walletCreatedDescription => 'Deine Wallet ist bereit. Wir empfehlen, jetzt ein Backup deiner Seed-Phrase zu erstellen.';
+  String get walletCreatedDescription =>
+      'Deine Wallet ist bereit. Wir empfehlen, jetzt ein Backup deiner Seed-Phrase zu erstellen.';
 
   @override
-  String get backupWarning => 'Ohne Backup verlierst du den Zugang zu deinen Mitteln, wenn du das Gerät verlierst.';
+  String get backupWarning =>
+      'Ohne Backup verlierst du den Zugang zu deinen Mitteln, wenn du das Gerät verlierst.';
 
   @override
   String get backupNow => 'Jetzt sichern';
@@ -87,13 +90,15 @@ class L10nDe extends L10n {
   String get seedPhraseTitle => 'Deine Seed-Phrase';
 
   @override
-  String get seedPhraseDescription => 'Speichere diese 12 Wörter in der richtigen Reihenfolge. Sie sind der einzige Weg, deine Wallet wiederherzustellen.';
+  String get seedPhraseDescription =>
+      'Speichere diese 12 Wörter in der richtigen Reihenfolge. Sie sind der einzige Weg, deine Wallet wiederherzustellen.';
 
   @override
   String get revealSeedPhrase => 'Seed-Phrase anzeigen';
 
   @override
-  String get tapToReveal => 'Tippe auf den Button, um\ndeine Seed-Phrase anzuzeigen';
+  String get tapToReveal =>
+      'Tippe auf den Button, um\ndeine Seed-Phrase anzuzeigen';
 
   @override
   String get copyToClipboard => 'In Zwischenablage kopieren';
@@ -105,7 +110,8 @@ class L10nDe extends L10n {
   String get neverShareSeed => 'Teile deine Seed-Phrase niemals mit anderen.';
 
   @override
-  String get confirmBackup => 'Ich habe meine Seed-Phrase an einem sicheren Ort gespeichert';
+  String get confirmBackup =>
+      'Ich habe meine Seed-Phrase an einem sicheren Ort gespeichert';
 
   @override
   String get continue_ => 'Weiter';
@@ -117,7 +123,8 @@ class L10nDe extends L10n {
   String get enterSeedPhrase => 'Gib deine Seed-Phrase ein';
 
   @override
-  String get enterSeedDescription => 'Gib die 12 oder 24 Wörter durch Leerzeichen getrennt ein.';
+  String get enterSeedDescription =>
+      'Gib die 12 oder 24 Wörter durch Leerzeichen getrennt ein.';
 
   @override
   String get seedPlaceholder => 'wort1 wort2 wort3 ...';
@@ -131,7 +138,8 @@ class L10nDe extends L10n {
   String get needWords => '(du brauchst 12 oder 24)';
 
   @override
-  String get restoreScanningMint => 'Mint wird nach vorhandenen Token durchsucht...';
+  String get restoreScanningMint =>
+      'Mint wird nach vorhandenen Token durchsucht...';
 
   @override
   String restoreError(String error) {
@@ -310,7 +318,8 @@ class L10nDe extends L10n {
   }
 
   @override
-  String get keepTokenWarning => 'Bewahre diesen Token auf, bis der Empfänger ihn einlöst. Wenn du ihn verlierst, verlierst du die Mittel.';
+  String get keepTokenWarning =>
+      'Bewahre diesen Token auf, bis der Empfänger ihn einlöst. Wenn du ihn verlierst, verlierst du die Mittel.';
 
   @override
   String get tokenCopiedToClipboard => 'Token in Zwischenablage kopiert';
@@ -322,7 +331,37 @@ class L10nDe extends L10n {
   String get emojiCopiedToClipboard => 'Token als Emoji kopiert 🥜';
 
   @override
-  String get peanutDecodeError => 'Emoji-Token konnte nicht dekodiert werden. Möglicherweise beschädigt.';
+  String get peanutDecodeError =>
+      'Emoji-Token konnte nicht dekodiert werden. Möglicherweise beschädigt.';
+
+  @override
+  String get nfcWrite => 'Auf NFC-Tag schreiben';
+
+  @override
+  String get nfcRead => 'NFC-Tag lesen';
+
+  @override
+  String get nfcHoldNear => 'Gerät an NFC-Tag halten...';
+
+  @override
+  String get nfcWriteSuccess => 'Token auf NFC-Tag geschrieben';
+
+  @override
+  String nfcWriteError(String error) {
+    return 'NFC-Schreibfehler: $error';
+  }
+
+  @override
+  String nfcReadError(String error) {
+    return 'NFC-Lesefehler: $error';
+  }
+
+  @override
+  String get nfcDisabled =>
+      'NFC ist deaktiviert. Aktiviere es in den Einstellungen.';
+
+  @override
+  String get nfcUnsupported => 'Dieses Gerät unterstützt kein NFC';
 
   @override
   String get amountToDeposit => 'Einzuzahlender Betrag:';
@@ -459,7 +498,8 @@ class L10nDe extends L10n {
   String get noPendingTransactions => 'Keine ausstehenden Transaktionen';
 
   @override
-  String get allTransactionsCompleted => 'Alle deine Transaktionen sind abgeschlossen';
+  String get allTransactionsCompleted =>
+      'Alle deine Transaktionen sind abgeschlossen';
 
   @override
   String get noEcashTransactions => 'Keine Ecash Transaktionen';
@@ -471,7 +511,8 @@ class L10nDe extends L10n {
   String get noLightningTransactions => 'Keine Lightning Transaktionen';
 
   @override
-  String get depositOrWithdrawLightning => 'Zahle ein oder hebe ab via Lightning';
+  String get depositOrWithdrawLightning =>
+      'Zahle ein oder hebe ab via Lightning';
 
   @override
   String get pendingStatus => 'Ausstehend';
@@ -674,7 +715,8 @@ class L10nDe extends L10n {
   String get close => 'Schließen';
 
   @override
-  String get aboutDescription => 'Eine Cashu Wallet mit kubanischer DNA für die ganze Welt. Bruder von LaChispa.';
+  String get aboutDescription =>
+      'Eine Cashu Wallet mit kubanischer DNA für die ganze Welt. Bruder von LaChispa.';
 
   @override
   String get couldNotOpenLink => 'Link konnte nicht geöffnet werden';
@@ -686,7 +728,8 @@ class L10nDe extends L10n {
   String get actionIrreversible => 'Diese Aktion ist unwiderruflich';
 
   @override
-  String get deleteWalletWarning => 'Alle Daten werden gelöscht, einschließlich deiner Seed-Phrase und Tokens. Stelle sicher, dass du ein Backup hast.';
+  String get deleteWalletWarning =>
+      'Alle Daten werden gelöscht, einschließlich deiner Seed-Phrase und Tokens. Stelle sicher, dass du ein Backup hast.';
 
   @override
   String get typeDeleteToConfirm => 'Gib \"LÖSCHEN\" zur Bestätigung ein:';
@@ -703,19 +746,22 @@ class L10nDe extends L10n {
   String get recoverTokensTitle => 'Tokens wiederherstellen';
 
   @override
-  String get recoverTokensDescription => 'Mints scannen, um Tokens wiederherzustellen, die mit deiner Seed-Phrase verknüpft sind (NUT-13)';
+  String get recoverTokensDescription =>
+      'Mints scannen, um Tokens wiederherzustellen, die mit deiner Seed-Phrase verknüpft sind (NUT-13)';
 
   @override
   String get useCurrentSeedPhrase => 'Meine aktuelle Seed-Phrase verwenden';
 
   @override
-  String get scanWithSavedWords => 'Mints mit den gespeicherten 12 Wörtern scannen';
+  String get scanWithSavedWords =>
+      'Mints mit den gespeicherten 12 Wörtern scannen';
 
   @override
   String get useOtherSeedPhrase => 'Andere Seed-Phrase verwenden';
 
   @override
-  String get recoverFromOtherWords => 'Tokens von anderen 12 Wörtern wiederherstellen';
+  String get recoverFromOtherWords =>
+      'Tokens von anderen 12 Wörtern wiederherstellen';
 
   @override
   String get mintsToScan => 'Zu scannende Mints:';
@@ -729,7 +775,8 @@ class L10nDe extends L10n {
   String get specificMint => 'Ein bestimmter Mint';
 
   @override
-  String get enterMnemonicWords => 'Gib die 12 Wörter durch Leerzeichen getrennt ein...';
+  String get enterMnemonicWords =>
+      'Gib die 12 Wörter durch Leerzeichen getrennt ein...';
 
   @override
   String get scanMints => 'Mints scannen';
@@ -749,7 +796,8 @@ class L10nDe extends L10n {
   }
 
   @override
-  String get scanCompleteNoTokens => 'Scan abgeschlossen. Keine neuen Tokens gefunden.';
+  String get scanCompleteNoTokens =>
+      'Scan abgeschlossen. Keine neuen Tokens gefunden.';
 
   @override
   String mintsWithError(int count) {
@@ -772,7 +820,8 @@ class L10nDe extends L10n {
   }
 
   @override
-  String get noTokensForMnemonic => 'Keine Tokens mit diesem Mnemonic verknüpft gefunden.';
+  String get noTokensForMnemonic =>
+      'Keine Tokens mit diesem Mnemonic verknüpft gefunden.';
 
   @override
   String get noConnectedMints => 'Keine verbundenen Mints';
@@ -852,7 +901,8 @@ class L10nDe extends L10n {
   String get deleteMintConfirmTitle => 'Mint löschen';
 
   @override
-  String get deleteMintConfirmMessage => 'Wenn du Guthaben auf diesem Mint hast, geht es verloren. Bist du sicher?';
+  String get deleteMintConfirmMessage =>
+      'Wenn du Guthaben auf diesem Mint hast, geht es verloren. Bist du sicher?';
 
   @override
   String get delete => 'Löschen';
@@ -905,19 +955,24 @@ class L10nDe extends L10n {
   String get tokenSavedForLater => 'Token zum späteren Einlösen gespeichert';
 
   @override
-  String get noConnectionTokenSaved => 'Keine Verbindung. Token zum späteren Einlösen gespeichert.';
+  String get noConnectionTokenSaved =>
+      'Keine Verbindung. Token zum späteren Einlösen gespeichert.';
 
   @override
-  String get unknownMintOffline => 'Dieser Token stammt von einem unbekannten Mint. Verbinde dich mit dem Internet, um ihn hinzuzufügen und den Token einzulösen.';
+  String get unknownMintOffline =>
+      'Dieser Token stammt von einem unbekannten Mint. Verbinde dich mit dem Internet, um ihn hinzuzufügen und den Token einzulösen.';
 
   @override
-  String get noConnectionTryLater => 'Keine Verbindung zum Mint. Versuche es später erneut.';
+  String get noConnectionTryLater =>
+      'Keine Verbindung zum Mint. Versuche es später erneut.';
 
   @override
-  String get saveTokenError => 'Fehler beim Speichern des Tokens. Bitte erneut versuchen.';
+  String get saveTokenError =>
+      'Fehler beim Speichern des Tokens. Bitte erneut versuchen.';
 
   @override
-  String get pendingTokenLimitReached => 'Limit für ausstehende Tokens erreicht (max 50)';
+  String get pendingTokenLimitReached =>
+      'Limit für ausstehende Tokens erreicht (max 50)';
 
   @override
   String get filterToReceive => 'Zu empfangen';
@@ -994,10 +1049,12 @@ class L10nDe extends L10n {
   String get unrecognizedQrCode => 'Nicht erkannter QR-Code';
 
   @override
-  String get scanCashuTokenHint => 'Scanne einen Cashu Token (cashuA... oder cashuB...)';
+  String get scanCashuTokenHint =>
+      'Scanne einen Cashu Token (cashuA... oder cashuB...)';
 
   @override
-  String get scanLightningInvoiceHint => 'Scanne eine Lightning Rechnung (lnbc...)';
+  String get scanLightningInvoiceHint =>
+      'Scanne eine Lightning Rechnung (lnbc...)';
 
   @override
   String get addMintQuestion => 'Diesen Mint hinzufügen?';
@@ -1006,7 +1063,8 @@ class L10nDe extends L10n {
   String get cameraPermissionDenied => 'Kamera-Berechtigung verweigert';
 
   @override
-  String get paymentRequestNotSupported => 'Zahlungsanfragen werden noch nicht unterstützt';
+  String get paymentRequestNotSupported =>
+      'Zahlungsanfragen werden noch nicht unterstützt';
 
   @override
   String get p2pkTitle => 'P2PK-Schlüssel';
@@ -1015,10 +1073,12 @@ class L10nDe extends L10n {
   String get p2pkSettingsDescription => 'Gesperrtes ecash empfangen';
 
   @override
-  String get p2pkExperimental => 'P2PK ist experimentell. Mit Vorsicht verwenden.';
+  String get p2pkExperimental =>
+      'P2PK ist experimentell. Mit Vorsicht verwenden.';
 
   @override
-  String get p2pkPendingSendWarning => 'Du hast einen ausstehenden P2PK-Versand. Gehe zum Verlauf und aktualisiere, nachdem der Empfänger den Token eingelöst hat.';
+  String get p2pkPendingSendWarning =>
+      'Du hast einen ausstehenden P2PK-Versand. Gehe zum Verlauf und aktualisiere, nachdem der Empfänger den Token eingelöst hat.';
 
   @override
   String get p2pkExperimentalShort => 'Experimentell';
@@ -1075,7 +1135,8 @@ class L10nDe extends L10n {
   String get p2pkLockedToOther => 'Für anderen Schlüssel gesperrt';
 
   @override
-  String get p2pkCannotUnlock => 'Du hast nicht den Schlüssel, um diesen Token zu entsperren';
+  String get p2pkCannotUnlock =>
+      'Du hast nicht den Schlüssel, um diesen Token zu entsperren';
 
   @override
   String get p2pkEnterPrivateKey => 'Privaten Schlüssel eingeben (nsec)';
@@ -1084,13 +1145,15 @@ class L10nDe extends L10n {
   String get p2pkDeleteTitle => 'Schlüssel löschen';
 
   @override
-  String get p2pkDeleteConfirm => 'Diesen Schlüssel löschen? Du kannst keine Token mehr empfangen, die daran gesperrt sind.';
+  String get p2pkDeleteConfirm =>
+      'Diesen Schlüssel löschen? Du kannst keine Token mehr empfangen, die daran gesperrt sind.';
 
   @override
   String get p2pkRequiresConnection => 'P2PK erfordert Verbindung zum Mint';
 
   @override
-  String get p2pkErrorMaxKeysReached => 'Maximale Anzahl importierter Schlüssel erreicht (10)';
+  String get p2pkErrorMaxKeysReached =>
+      'Maximale Anzahl importierter Schlüssel erreicht (10)';
 
   @override
   String get p2pkErrorInvalidNsec => 'Ungültiger nsec';
@@ -1102,5 +1165,6 @@ class L10nDe extends L10n {
   String get p2pkErrorKeyNotFound => 'Schlüssel nicht gefunden';
 
   @override
-  String get p2pkErrorCannotDeletePrimary => 'Primärschlüssel kann nicht gelöscht werden';
+  String get p2pkErrorCannotDeletePrimary =>
+      'Primärschlüssel kann nicht gelöscht werden';
 }

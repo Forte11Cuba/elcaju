@@ -141,6 +141,17 @@
   "emojiCopiedToClipboard": "トークンを絵文字としてコピーしました 🥜",
   "peanutDecodeError": "絵文字トークンをデコードできませんでした。破損している可能性があります。",
 
+  "nfcWrite": "NFCタグに書き込む",
+  "nfcRead": "NFCタグを読み取る",
+  "nfcHoldNear": "デバイスをNFCタグに近づけてください...",
+  "nfcWriteSuccess": "トークンをNFCタグに書き込みました",
+  "nfcWriteError": "NFC書き込みエラー: {error}",
+  "@nfcWriteError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcReadError": "NFC読み取りエラー: {error}",
+  "@nfcReadError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcDisabled": "NFCが無効です。設定で有効にしてください。",
+  "nfcUnsupported": "このデバイスはNFCに対応していません",
+
   "amountToDeposit": "入金額：",
   "descriptionOptional": "説明（任意）：",
   "depositPlaceholder": "この入金は何のためですか？",

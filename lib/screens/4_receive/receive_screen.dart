@@ -9,6 +9,7 @@ import '../../core/utils/formatters.dart';
 import '../../core/utils/incoming_data_parser.dart' hide TokenInfo;
 import '../../core/utils/nostr_utils.dart';
 import '../../core/utils/peanut_codec.dart';
+import '../../core/services/nfc_service.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -47,9 +48,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   bool _showManualKey = false; // Toggle para mostrar/ocultar nsec
   String? _manualKeyError;
 
+  // NFC
+  NfcState _nfcState = NfcState.unsupported;
+  bool _nfcReading = false;
+
   @override
   void initState() {
     super.initState();
+    _checkNfc();
     // Pre-cargar token inicial si existe
     if (widget.initialToken != null && widget.initialToken!.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -61,9 +67,17 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   @override
   void dispose() {
+    if (_nfcReading) NfcService.stopRead();
     _tokenController.dispose();
     _manualKeyController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkNfc() async {
+    final state = await NfcService.checkState();
+    if (mounted) {
+      setState(() => _nfcState = state);
+    }
   }
 
   @override
@@ -246,6 +260,9 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         // Botón pegar (expandido)
         Expanded(child: _buildPasteButton()),
         const SizedBox(width: 12),
+        // Botón NFC (siempre visible)
+        _buildNfcButton(),
+        const SizedBox(width: 12),
         // Botón escanear QR
         _buildScanButton(),
       ],
@@ -289,6 +306,118 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildNfcButton() {
+    final isNfcEnabled = _nfcState == NfcState.enabled;
+    final isNfcUnsupported = _nfcState == NfcState.unsupported;
+
+    return Tooltip(
+      message: isNfcUnsupported
+          ? L10n.of(context)!.nfcUnsupported
+          : isNfcEnabled
+              ? L10n.of(context)!.nfcRead
+              : L10n.of(context)!.nfcDisabled,
+      child: GestureDetector(
+        onTap: _toggleNfcRead,
+        child: Opacity(
+          opacity: isNfcUnsupported ? 0.3 : 1.0,
+          child: Container(
+            padding: const EdgeInsets.all(AppDimensions.paddingSmall + 4),
+            decoration: BoxDecoration(
+              color: _nfcReading
+                  ? AppColors.primaryAction.withValues(alpha: 0.3)
+                  : Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _nfcReading
+                    ? AppColors.primaryAction
+                    : Colors.white.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Icon(
+              LucideIcons.nfc,
+              color: _nfcReading
+                  ? AppColors.primaryAction
+                  : isNfcEnabled
+                      ? AppColors.textSecondary
+                      : AppColors.textSecondary.withValues(alpha: 0.5),
+              size: 24,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _toggleNfcRead() async {
+    // Re-check state in case user toggled NFC in settings
+    final currentState = await NfcService.checkState();
+    if (mounted) setState(() => _nfcState = currentState);
+
+    if (currentState == NfcState.unsupported) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcUnsupported),
+          backgroundColor: AppColors.textSecondary,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
+    if (currentState == NfcState.disabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcDisabled),
+          backgroundColor: AppColors.warning,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
+    if (_nfcReading) {
+      NfcService.stopRead();
+      setState(() => _nfcReading = false);
+      return;
+    }
+
+    setState(() => _nfcReading = true);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(L10n.of(context)!.nfcHoldNear),
+        backgroundColor: AppColors.primaryAction,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+
+    NfcService.startRead(
+      onTokenRead: (token) {
+        if (!mounted) return;
+        setState(() => _nfcReading = false);
+        _tokenController.text = token;
+        _onTokenChanged(token);
+      },
+      onError: (error) {
+        if (!mounted) return;
+        setState(() => _nfcReading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(L10n.of(context)!.nfcReadError(error)),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8)),
+          ),
+        );
+      },
     );
   }
 

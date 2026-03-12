@@ -116,6 +116,25 @@
   "emojiCopiedToClipboard": "Token copied as emoji 🥜",
   "peanutDecodeError": "Could not decode emoji token. It may be corrupted.",
 
+  "nfcWrite": "Write to NFC tag",
+  "nfcRead": "Read NFC tag",
+  "nfcHoldNear": "Hold device near NFC tag...",
+  "nfcWriteSuccess": "Token written to NFC tag",
+  "nfcWriteError": "NFC write error: {error}",
+  "@nfcWriteError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "nfcReadError": "NFC read error: {error}",
+  "@nfcReadError": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "nfcDisabled": "NFC is disabled. Enable it in Settings.",
+  "nfcUnsupported": "This device does not support NFC",
+
   "amountToDeposit": "Amount to deposit:",
   "descriptionOptional": "Description (optional):",
   "depositPlaceholder": "What is this deposit for?",

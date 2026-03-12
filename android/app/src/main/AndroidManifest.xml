@@ -7,6 +7,9 @@
     <!-- Cámara opcional: la app funciona sin ella (pegando desde portapapeles) -->
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <!-- NFC para compartir tokens Cashu -->
+    <uses-permission android:name="android.permission.NFC"/>
+    <uses-feature android:name="android.hardware.nfc" android:required="false"/>
 
     <application
         android:label="ElCaju"

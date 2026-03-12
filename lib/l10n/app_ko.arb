@@ -141,6 +141,17 @@
   "emojiCopiedToClipboard": "토큰이 이모지로 복사되었습니다 🥜",
   "peanutDecodeError": "이모지 토큰을 디코딩할 수 없습니다. 손상되었을 수 있습니다.",
 
+  "nfcWrite": "NFC 태그에 쓰기",
+  "nfcRead": "NFC 태그 읽기",
+  "nfcHoldNear": "기기를 NFC 태그에 가까이 대세요...",
+  "nfcWriteSuccess": "토큰이 NFC 태그에 기록되었습니다",
+  "nfcWriteError": "NFC 쓰기 오류: {error}",
+  "@nfcWriteError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcReadError": "NFC 읽기 오류: {error}",
+  "@nfcReadError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcDisabled": "NFC가 비활성화되어 있습니다. 설정에서 활성화하세요.",
+  "nfcUnsupported": "이 기기는 NFC를 지원하지 않습니다",
+
   "amountToDeposit": "입금할 금액:",
   "descriptionOptional": "설명 (선택사항):",
   "depositPlaceholder": "이 입금은 무엇을 위한 것인가요?",

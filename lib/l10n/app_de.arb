@@ -141,6 +141,17 @@
   "emojiCopiedToClipboard": "Token als Emoji kopiert 🥜",
   "peanutDecodeError": "Emoji-Token konnte nicht dekodiert werden. Möglicherweise beschädigt.",
 
+  "nfcWrite": "Auf NFC-Tag schreiben",
+  "nfcRead": "NFC-Tag lesen",
+  "nfcHoldNear": "Gerät an NFC-Tag halten...",
+  "nfcWriteSuccess": "Token auf NFC-Tag geschrieben",
+  "nfcWriteError": "NFC-Schreibfehler: {error}",
+  "@nfcWriteError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcReadError": "NFC-Lesefehler: {error}",
+  "@nfcReadError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcDisabled": "NFC ist deaktiviert. Aktiviere es in den Einstellungen.",
+  "nfcUnsupported": "Dieses Gerät unterstützt kein NFC",
+
   "amountToDeposit": "Einzuzahlender Betrag:",
   "descriptionOptional": "Beschreibung (optional):",
   "depositPlaceholder": "Wofür ist diese Einzahlung?",

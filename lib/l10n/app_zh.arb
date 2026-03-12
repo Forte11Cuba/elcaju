@@ -141,6 +141,17 @@
   "emojiCopiedToClipboard": "代币已复制为表情符号 🥜",
   "peanutDecodeError": "无法解码表情符号代币。可能已损坏。",
 
+  "nfcWrite": "写入NFC标签",
+  "nfcRead": "读取NFC标签",
+  "nfcHoldNear": "将设备靠近NFC标签...",
+  "nfcWriteSuccess": "代币已写入NFC标签",
+  "nfcWriteError": "NFC写入错误：{error}",
+  "@nfcWriteError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcReadError": "NFC读取错误：{error}",
+  "@nfcReadError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcDisabled": "NFC已禁用，请在设置中启用。",
+  "nfcUnsupported": "此设备不支持NFC",
+
   "amountToDeposit": "存入金额：",
   "descriptionOptional": "描述（可选）：",
   "depositPlaceholder": "这笔存款是用于什么？",
