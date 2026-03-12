@@ -8,6 +8,7 @@ import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/incoming_data_parser.dart' hide TokenInfo;
 import '../../core/utils/nostr_utils.dart';
+import '../../core/utils/peanut_codec.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -779,15 +780,57 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
 
   Future<void> _pasteFromClipboard() async {
     final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    if (!mounted) return;
     if (clipboardData?.text != null) {
-      _tokenController.text = clipboardData!.text!.trim();
-      _onTokenChanged(clipboardData.text!.trim());
+      var text = clipboardData!.text!.trim();
+
+      // Auto-decode peanut emoji format
+      if (PeanutCodec.isPeanut(text)) {
+        final decoded = PeanutCodec.decode(text);
+        if (decoded != null) {
+          text = decoded;
+        } else {
+          // Malformed peanut: clear field and show specific error
+          _tokenController.clear();
+          setState(() {
+            _isValidToken = false;
+            _tokenInfo = null;
+            _errorMessage = L10n.of(context)!.peanutDecodeError;
+          });
+          return;
+        }
+      }
+
+      _tokenController.text = text;
+      _onTokenChanged(text);
     }
   }
 
   void _onTokenChanged(String value) {
     final walletProvider = context.read<WalletProvider>();
     final p2pkProvider = context.read<P2PKProvider>();
+
+    // Auto-decode peanut emoji format
+    var tokenValue = value.trim();
+    if (PeanutCodec.isPeanut(tokenValue)) {
+      final decoded = PeanutCodec.decode(tokenValue);
+      if (decoded != null) {
+        tokenValue = decoded;
+        // Update the text field with the decoded token
+        _tokenController.text = tokenValue;
+        _tokenController.selection = TextSelection.collapsed(
+          offset: tokenValue.length,
+        );
+      } else {
+        // Malformed peanut: show specific error
+        setState(() {
+          _isValidToken = false;
+          _tokenInfo = null;
+          _errorMessage = L10n.of(context)!.peanutDecodeError;
+        });
+        return;
+      }
+    }
 
     setState(() {
       _errorMessage = null;
@@ -799,24 +842,24 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       _lockedToPubkeyHex = null;
       _matchingKeyLabel = null;
 
-      if (value.isEmpty) {
+      if (tokenValue.isEmpty) {
         _isValidToken = false;
         _tokenInfo = null;
         return;
       }
 
       // Parsear token real con cdk-flutter
-      final tokenInfo = walletProvider.parseToken(value.trim());
+      final tokenInfo = walletProvider.parseToken(tokenValue);
 
       if (tokenInfo != null) {
         _isValidToken = true;
         _tokenInfo = tokenInfo;
 
         // Detectar P2PK
-        _isP2PKLocked = p2pkProvider.isTokenLocked(value.trim());
+        _isP2PKLocked = p2pkProvider.isTokenLocked(tokenValue);
         if (_isP2PKLocked) {
-          _lockedToPubkeyHex = p2pkProvider.extractLockedPubkey(value.trim());
-          _isLockedToUs = p2pkProvider.isTokenLockedToUs(value.trim());
+          _lockedToPubkeyHex = p2pkProvider.extractLockedPubkey(tokenValue);
+          _isLockedToUs = p2pkProvider.isTokenLockedToUs(tokenValue);
 
           // Si es nuestra, buscar el label de la clave
           if (_isLockedToUs && _lockedToPubkeyHex != null) {

@@ -316,6 +316,15 @@ class L10nZh extends L10n {
   String get tokenCopiedToClipboard => '代币已复制到剪贴板';
 
   @override
+  String get copyAsEmoji => '复制为表情符号';
+
+  @override
+  String get emojiCopiedToClipboard => '代币已复制为表情符号 🥜';
+
+  @override
+  String get peanutDecodeError => '无法解码表情符号代币。可能已损坏。';
+
+  @override
   String get amountToDeposit => '存入金额：';
 
   @override

@@ -9,6 +9,7 @@ import 'package:elcaju/l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/peanut_codec.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -414,7 +415,27 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
             ),
           ),
         ),
-        const SizedBox(width: AppDimensions.paddingMedium),
+        const SizedBox(width: AppDimensions.paddingSmall),
+        // Copiar como emoji (peanut encoding)
+        Tooltip(
+          message: L10n.of(context)!.copyAsEmoji,
+          child: GestureDetector(
+            onTap: () => _copyPeanut(context),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Icon(LucideIcons.bean, color: AppColors.primaryAction, size: 22),
+            ),
+          ),
+        ),
+        const SizedBox(width: AppDimensions.paddingSmall),
         // Compartir
         Expanded(
           child: GestureDetector(
@@ -485,6 +506,19 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(L10n.of(context)!.tokenCopiedToClipboard),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  void _copyPeanut(BuildContext context) {
+    final peanut = PeanutCodec.encode(widget.token);
+    Clipboard.setData(ClipboardData(text: peanut));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(L10n.of(context)!.emojiCopiedToClipboard),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

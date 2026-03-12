@@ -316,6 +316,15 @@ class L10nSw extends L10n {
   String get tokenCopiedToClipboard => 'Tokeni imenakiliwa kwenye ubao';
 
   @override
+  String get copyAsEmoji => 'Nakili kama emoji';
+
+  @override
+  String get emojiCopiedToClipboard => 'Tokeni imenakiliwa kama emoji 🥜';
+
+  @override
+  String get peanutDecodeError => 'Imeshindwa kusimbua tokeni ya emoji. Inaweza kuwa imeharibika.';
+
+  @override
   String get amountToDeposit => 'Kiasi cha kuweka:';
 
   @override

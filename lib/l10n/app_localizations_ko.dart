@@ -316,6 +316,15 @@ class L10nKo extends L10n {
   String get tokenCopiedToClipboard => '토큰이 클립보드에 복사되었습니다';
 
   @override
+  String get copyAsEmoji => '이모지로 복사';
+
+  @override
+  String get emojiCopiedToClipboard => '토큰이 이모지로 복사되었습니다 🥜';
+
+  @override
+  String get peanutDecodeError => '이모지 토큰을 디코딩할 수 없습니다. 손상되었을 수 있습니다.';
+
+  @override
   String get amountToDeposit => '입금할 금액:';
 
   @override

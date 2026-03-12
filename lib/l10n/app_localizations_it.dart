@@ -316,6 +316,15 @@ class L10nIt extends L10n {
   String get tokenCopiedToClipboard => 'Token copiato negli appunti';
 
   @override
+  String get copyAsEmoji => 'Copia come emoji';
+
+  @override
+  String get emojiCopiedToClipboard => 'Token copiato come emoji 🥜';
+
+  @override
+  String get peanutDecodeError => 'Impossibile decodificare il token emoji. Potrebbe essere corrotto.';
+
+  @override
   String get amountToDeposit => 'Importo da depositare:';
 
   @override

@@ -137,6 +137,9 @@
   },
   "keepTokenWarning": "Conserva questo token finché il destinatario non lo riscatta. Se lo perdi, perderai i fondi.",
   "tokenCopiedToClipboard": "Token copiato negli appunti",
+  "copyAsEmoji": "Copia come emoji",
+  "emojiCopiedToClipboard": "Token copiato come emoji 🥜",
+  "peanutDecodeError": "Impossibile decodificare il token emoji. Potrebbe essere corrotto.",
 
   "amountToDeposit": "Importo da depositare:",
   "descriptionOptional": "Descrizione (opzionale):",

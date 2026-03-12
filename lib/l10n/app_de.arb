@@ -137,6 +137,9 @@
   },
   "keepTokenWarning": "Bewahre diesen Token auf, bis der Empfänger ihn einlöst. Wenn du ihn verlierst, verlierst du die Mittel.",
   "tokenCopiedToClipboard": "Token in Zwischenablage kopiert",
+  "copyAsEmoji": "Als Emoji kopieren",
+  "emojiCopiedToClipboard": "Token als Emoji kopiert 🥜",
+  "peanutDecodeError": "Emoji-Token konnte nicht dekodiert werden. Möglicherweise beschädigt.",
 
   "amountToDeposit": "Einzuzahlender Betrag:",
   "descriptionOptional": "Beschreibung (optional):",
