@@ -800,6 +800,20 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
     final walletProvider = context.read<WalletProvider>();
     final p2pkProvider = context.read<P2PKProvider>();
 
+    // Auto-decode peanut emoji format
+    var tokenValue = value.trim();
+    if (PeanutCodec.isPeanut(tokenValue)) {
+      final decoded = PeanutCodec.decode(tokenValue);
+      if (decoded != null) {
+        tokenValue = decoded;
+        // Update the text field with the decoded token
+        _tokenController.text = tokenValue;
+        _tokenController.selection = TextSelection.collapsed(
+          offset: tokenValue.length,
+        );
+      }
+    }
+
     setState(() {
       _errorMessage = null;
       _manualKeyError = null;
@@ -810,24 +824,24 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       _lockedToPubkeyHex = null;
       _matchingKeyLabel = null;
 
-      if (value.isEmpty) {
+      if (tokenValue.isEmpty) {
         _isValidToken = false;
         _tokenInfo = null;
         return;
       }
 
       // Parsear token real con cdk-flutter
-      final tokenInfo = walletProvider.parseToken(value.trim());
+      final tokenInfo = walletProvider.parseToken(tokenValue);
 
       if (tokenInfo != null) {
         _isValidToken = true;
         _tokenInfo = tokenInfo;
 
         // Detectar P2PK
-        _isP2PKLocked = p2pkProvider.isTokenLocked(value.trim());
+        _isP2PKLocked = p2pkProvider.isTokenLocked(tokenValue);
         if (_isP2PKLocked) {
-          _lockedToPubkeyHex = p2pkProvider.extractLockedPubkey(value.trim());
-          _isLockedToUs = p2pkProvider.isTokenLockedToUs(value.trim());
+          _lockedToPubkeyHex = p2pkProvider.extractLockedPubkey(tokenValue);
+          _isLockedToUs = p2pkProvider.isTokenLockedToUs(tokenValue);
 
           // Si es nuestra, buscar el label de la clave
           if (_isLockedToUs && _lockedToPubkeyHex != null) {

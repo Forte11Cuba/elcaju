@@ -31,10 +31,11 @@ class PeanutCodec {
   /// Decodes a peanut-encoded string back to the original Cashu token.
   /// Returns null if the input is not valid peanut format.
   static String? decode(String peanut) {
-    if (!isPeanut(peanut)) return null;
+    final trimmed = peanut.trimLeft();
+    if (!trimmed.startsWith(_peanutEmoji)) return null;
 
     final buffer = StringBuffer();
-    final runes = peanut.runes.toList();
+    final runes = trimmed.runes.toList();
 
     // Skip the first rune (🥜 emoji)
     for (int i = 1; i < runes.length; i++) {
