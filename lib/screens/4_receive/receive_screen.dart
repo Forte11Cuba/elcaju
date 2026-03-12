@@ -8,6 +8,7 @@ import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/incoming_data_parser.dart' hide TokenInfo;
 import '../../core/utils/nostr_utils.dart';
+import '../../core/utils/peanut_codec.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -780,8 +781,18 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   Future<void> _pasteFromClipboard() async {
     final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
     if (clipboardData?.text != null) {
-      _tokenController.text = clipboardData!.text!.trim();
-      _onTokenChanged(clipboardData.text!.trim());
+      var text = clipboardData!.text!.trim();
+
+      // Auto-decode peanut emoji format
+      if (PeanutCodec.isPeanut(text)) {
+        final decoded = PeanutCodec.decode(text);
+        if (decoded != null) {
+          text = decoded;
+        }
+      }
+
+      _tokenController.text = text;
+      _onTokenChanged(text);
     }
   }
 

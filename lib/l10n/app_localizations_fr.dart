@@ -316,6 +316,12 @@ class L10nFr extends L10n {
   String get tokenCopiedToClipboard => 'Token copié dans le presse-papiers';
 
   @override
+  String get copyAsEmoji => 'Copier en emoji';
+
+  @override
+  String get emojiCopiedToClipboard => 'Token copié en emoji 🥜';
+
+  @override
   String get amountToDeposit => 'Montant à déposer :';
 
   @override

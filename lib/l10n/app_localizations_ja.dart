@@ -316,6 +316,12 @@ class L10nJa extends L10n {
   String get tokenCopiedToClipboard => 'トークンをクリップボードにコピーしました';
 
   @override
+  String get copyAsEmoji => '絵文字としてコピー';
+
+  @override
+  String get emojiCopiedToClipboard => 'トークンを絵文字としてコピーしました 🥜';
+
+  @override
   String get amountToDeposit => '入金額：';
 
   @override

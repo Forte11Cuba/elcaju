@@ -316,6 +316,12 @@ class L10nRu extends L10n {
   String get tokenCopiedToClipboard => 'Токен скопирован в буфер обмена';
 
   @override
+  String get copyAsEmoji => 'Скопировать как эмодзи';
+
+  @override
+  String get emojiCopiedToClipboard => 'Токен скопирован как эмодзи 🥜';
+
+  @override
   String get amountToDeposit => 'Сумма для пополнения:';
 
   @override

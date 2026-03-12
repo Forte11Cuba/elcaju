@@ -316,6 +316,12 @@ class L10nPt extends L10n {
   String get tokenCopiedToClipboard => 'Token copiado para área de transferência';
 
   @override
+  String get copyAsEmoji => 'Copiar como emoji';
+
+  @override
+  String get emojiCopiedToClipboard => 'Token copiado como emoji 🥜';
+
+  @override
   String get amountToDeposit => 'Valor a depositar:';
 
   @override

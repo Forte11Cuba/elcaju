@@ -137,6 +137,8 @@
   },
   "keepTokenWarning": "Hifadhi tokeni hii hadi mpokeaji aidai. Ukiipoteza, utapoteza fedha.",
   "tokenCopiedToClipboard": "Tokeni imenakiliwa kwenye ubao",
+  "copyAsEmoji": "Nakili kama emoji",
+  "emojiCopiedToClipboard": "Tokeni imenakiliwa kama emoji 🥜",
 
   "amountToDeposit": "Kiasi cha kuweka:",
   "descriptionOptional": "Maelezo (si lazima):",

@@ -1,5 +1,7 @@
 // Parser para detectar el tipo de dato entrante (QR, clipboard, etc.)
-// Soporta: tokens Cashu (A/B), invoices Lightning, URLs de mint, payment requests
+// Soporta: tokens Cashu (A/B), invoices Lightning, URLs de mint, payment requests, peanut emoji
+
+import 'peanut_codec.dart';
 
 /// Modo de escaneo
 enum ScanMode {
@@ -57,6 +59,15 @@ class IncomingDataParser {
   /// Detecta el tipo de dato y extrae información relevante
   static ParsedData parse(String data) {
     final trimmed = data.trim();
+
+    // Peanut-encoded token (🥜 + variation selectors)
+    if (PeanutCodec.isPeanut(trimmed)) {
+      final decoded = PeanutCodec.decode(trimmed);
+      if (decoded != null) {
+        return parse(decoded);
+      }
+    }
+
     final lower = trimmed.toLowerCase();
 
     // Token Cashu (cashuA... o cashuB...)

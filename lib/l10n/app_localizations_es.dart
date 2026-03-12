@@ -316,6 +316,12 @@ class L10nEs extends L10n {
   String get tokenCopiedToClipboard => 'Token copiado al portapapeles';
 
   @override
+  String get copyAsEmoji => 'Copiar como emoji';
+
+  @override
+  String get emojiCopiedToClipboard => 'Token copiado como emoji 🥜';
+
+  @override
   String get amountToDeposit => 'Monto a depositar:';
 
   @override

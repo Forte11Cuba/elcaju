@@ -112,6 +112,8 @@
   "tokenCashuAnimatedQr": "Cashu Token (animated QR - {fragments} UR fragments)",
   "keepTokenWarning": "Keep this token until the recipient claims it. If you lose it, you will lose the funds.",
   "tokenCopiedToClipboard": "Token copied to clipboard",
+  "copyAsEmoji": "Copy as emoji",
+  "emojiCopiedToClipboard": "Token copied as emoji 🥜",
 
   "amountToDeposit": "Amount to deposit:",
   "descriptionOptional": "Description (optional):",

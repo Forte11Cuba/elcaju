@@ -137,6 +137,8 @@
   },
   "keepTokenWarning": "请保留此代币直到收款方领取。如果丢失，资金将无法找回。",
   "tokenCopiedToClipboard": "代币已复制到剪贴板",
+  "copyAsEmoji": "复制为表情符号",
+  "emojiCopiedToClipboard": "代币已复制为表情符号 🥜",
 
   "amountToDeposit": "存入金额：",
   "descriptionOptional": "描述（可选）：",

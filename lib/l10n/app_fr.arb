@@ -137,6 +137,8 @@
   },
   "keepTokenWarning": "Conservez ce token jusqu'à ce que le destinataire le réclame. Si vous le perdez, vous perdrez les fonds.",
   "tokenCopiedToClipboard": "Token copié dans le presse-papiers",
+  "copyAsEmoji": "Copier en emoji",
+  "emojiCopiedToClipboard": "Token copié en emoji 🥜",
 
   "amountToDeposit": "Montant à déposer :",
   "descriptionOptional": "Description (optionnelle) :",
