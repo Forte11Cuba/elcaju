@@ -139,6 +139,7 @@
   "tokenCopiedToClipboard": "代币已复制到剪贴板",
   "copyAsEmoji": "复制为表情符号",
   "emojiCopiedToClipboard": "代币已复制为表情符号 🥜",
+  "peanutDecodeError": "无法解码表情符号代币。可能已损坏。",
 
   "amountToDeposit": "存入金额：",
   "descriptionOptional": "描述（可选）：",

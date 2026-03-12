@@ -719,6 +719,12 @@ abstract class L10n {
   /// **'Token copiado como emoji 🥜'**
   String get emojiCopiedToClipboard;
 
+  /// No description provided for @peanutDecodeError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo decodificar el token emoji. Puede estar corrupto.'**
+  String get peanutDecodeError;
+
   /// No description provided for @amountToDeposit.
   ///
   /// In es, this message translates to:

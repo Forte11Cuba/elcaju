@@ -139,6 +139,7 @@
   "tokenCopiedToClipboard": "Tokeni imenakiliwa kwenye ubao",
   "copyAsEmoji": "Nakili kama emoji",
   "emojiCopiedToClipboard": "Tokeni imenakiliwa kama emoji 🥜",
+  "peanutDecodeError": "Imeshindwa kusimbua tokeni ya emoji. Inaweza kuwa imeharibika.",
 
   "amountToDeposit": "Kiasi cha kuweka:",
   "descriptionOptional": "Maelezo (si lazima):",

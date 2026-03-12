@@ -139,6 +139,7 @@
   "tokenCopiedToClipboard": "Token copié dans le presse-papiers",
   "copyAsEmoji": "Copier en emoji",
   "emojiCopiedToClipboard": "Token copié en emoji 🥜",
+  "peanutDecodeError": "Impossible de décoder le token emoji. Il est peut-être corrompu.",
 
   "amountToDeposit": "Montant à déposer :",
   "descriptionOptional": "Description (optionnelle) :",

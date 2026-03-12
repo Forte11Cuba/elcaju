@@ -789,6 +789,15 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         final decoded = PeanutCodec.decode(text);
         if (decoded != null) {
           text = decoded;
+        } else {
+          // Malformed peanut: clear field and show specific error
+          _tokenController.clear();
+          setState(() {
+            _isValidToken = false;
+            _tokenInfo = null;
+            _errorMessage = L10n.of(context)!.peanutDecodeError;
+          });
+          return;
         }
       }
 
@@ -812,6 +821,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         _tokenController.selection = TextSelection.collapsed(
           offset: tokenValue.length,
         );
+      } else {
+        // Malformed peanut: show specific error
+        setState(() {
+          _isValidToken = false;
+          _tokenInfo = null;
+          _errorMessage = L10n.of(context)!.peanutDecodeError;
+        });
+        return;
       }
     }
 

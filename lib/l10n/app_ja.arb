@@ -139,6 +139,7 @@
   "tokenCopiedToClipboard": "トークンをクリップボードにコピーしました",
   "copyAsEmoji": "絵文字としてコピー",
   "emojiCopiedToClipboard": "トークンを絵文字としてコピーしました 🥜",
+  "peanutDecodeError": "絵文字トークンをデコードできませんでした。破損している可能性があります。",
 
   "amountToDeposit": "入金額：",
   "descriptionOptional": "説明（任意）：",

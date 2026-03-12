@@ -139,6 +139,7 @@
   "tokenCopiedToClipboard": "Token copiado al portapapeles",
   "copyAsEmoji": "Copiar como emoji",
   "emojiCopiedToClipboard": "Token copiado como emoji 🥜",
+  "peanutDecodeError": "No se pudo decodificar el token emoji. Puede estar corrupto.",
 
   "amountToDeposit": "Monto a depositar:",
   "descriptionOptional": "Descripción (opcional):",

@@ -322,6 +322,9 @@ class L10nJa extends L10n {
   String get emojiCopiedToClipboard => 'トークンを絵文字としてコピーしました 🥜';
 
   @override
+  String get peanutDecodeError => '絵文字トークンをデコードできませんでした。破損している可能性があります。';
+
+  @override
   String get amountToDeposit => '入金額：';
 
   @override

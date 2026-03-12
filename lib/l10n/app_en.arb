@@ -114,6 +114,7 @@
   "tokenCopiedToClipboard": "Token copied to clipboard",
   "copyAsEmoji": "Copy as emoji",
   "emojiCopiedToClipboard": "Token copied as emoji 🥜",
+  "peanutDecodeError": "Could not decode emoji token. It may be corrupted.",
 
   "amountToDeposit": "Amount to deposit:",
   "descriptionOptional": "Description (optional):",
