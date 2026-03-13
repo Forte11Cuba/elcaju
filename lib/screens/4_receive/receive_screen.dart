@@ -353,6 +353,14 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
   }
 
   void _toggleNfcRead() async {
+    // Cancel active session first (before state checks, in case NFC was
+    // disabled while a session was running)
+    if (_nfcReading) {
+      NfcService.stopRead();
+      setState(() => _nfcReading = false);
+      return;
+    }
+
     // Re-check state in case user toggled NFC in settings
     final currentState = await NfcService.checkState();
     if (mounted) setState(() => _nfcState = currentState);
@@ -381,12 +389,6 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       return;
     }
 
-    if (_nfcReading) {
-      NfcService.stopRead();
-      setState(() => _nfcReading = false);
-      return;
-    }
-
     setState(() => _nfcReading = true);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -398,27 +400,41 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       ),
     );
 
-    NfcService.startRead(
-      onTokenRead: (token) {
-        if (!mounted) return;
-        setState(() => _nfcReading = false);
-        _tokenController.text = token;
-        _onTokenChanged(token);
-      },
-      onError: (error) {
-        if (!mounted) return;
-        setState(() => _nfcReading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(L10n.of(context)!.nfcReadError(error)),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8)),
-          ),
-        );
-      },
-    );
+    try {
+      await NfcService.startRead(
+        onTokenRead: (token) {
+          if (!mounted) return;
+          setState(() => _nfcReading = false);
+          _tokenController.text = token;
+          _onTokenChanged(token);
+        },
+        onError: (error) {
+          if (!mounted) return;
+          setState(() => _nfcReading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(L10n.of(context)!.nfcReadError(error)),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _nfcReading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcReadError(e.toString())),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
   }
 
   Widget _buildScanButton() {

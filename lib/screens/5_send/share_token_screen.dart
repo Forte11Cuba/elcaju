@@ -60,8 +60,7 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
   @override
   void dispose() {
     _animationTimer?.cancel();
-    if (_nfcWriting) NfcService.stopWrite();
-
+    if (_nfcWriting) NfcService.stopEmulating();
     super.dispose();
   }
 
@@ -612,6 +611,13 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
   }
 
   void _writeNfc(BuildContext context) async {
+    // Toggle off: stop emulating
+    if (_nfcWriting) {
+      await NfcService.stopEmulating();
+      setState(() => _nfcWriting = false);
+      return;
+    }
+
     // Re-check state in case user toggled NFC in settings
     final currentState = await NfcService.checkState();
     if (mounted) setState(() => _nfcState = currentState);
@@ -640,53 +646,30 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
       return;
     }
 
-    if (_nfcWriting) {
-      // Cancel active session
-      NfcService.stopWrite();
+    try {
+      await NfcService.startEmulating(widget.token);
+      setState(() => _nfcWriting = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcHoldNear),
+          backgroundColor: AppColors.primaryAction,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
       setState(() => _nfcWriting = false);
-      return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcWriteError(e.toString())),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8)),
+        ),
+      );
     }
-
-    setState(() => _nfcWriting = true);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(L10n.of(context)!.nfcHoldNear),
-        backgroundColor: AppColors.primaryAction,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-
-    NfcService.startWrite(
-      token: widget.token,
-      onSuccess: () {
-        if (!mounted) return;
-        setState(() => _nfcWriting = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(L10n.of(context)!.nfcWriteSuccess),
-            backgroundColor: AppColors.success,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8)),
-          ),
-        );
-      },
-      onError: (error) {
-        if (!mounted) return;
-        setState(() => _nfcWriting = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(L10n.of(context)!.nfcWriteError(error)),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8)),
-          ),
-        );
-      },
-    );
   }
 
   void _goToHome(BuildContext context) {
