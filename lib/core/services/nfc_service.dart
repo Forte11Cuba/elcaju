@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:nfc_manager/nfc_manager.dart';
@@ -81,6 +82,7 @@ class NfcService {
 
   /// Check NFC state on the device.
   static Future<NfcState> checkState() async {
+    if (!Platform.isAndroid) return NfcState.unsupported;
     try {
       final availability = await NfcManager.instance.checkAvailability();
       return switch (availability) {
@@ -458,10 +460,10 @@ class NfcService {
   static String? _extractTokenFromUri(String uri) {
     try {
       final parsed = Uri.parse(uri);
-      final fragment = parsed.fragment;
-      if (fragment.startsWith('token=')) {
-        final token = fragment.substring(6);
-        if (_isCashuToken(token)) return token;
+      final fragmentParams = Uri.splitQueryString(parsed.fragment);
+      final fragmentToken = fragmentParams['token'];
+      if (fragmentToken != null && _isCashuToken(fragmentToken)) {
+        return fragmentToken;
       }
       final tokenParam = parsed.queryParameters['token'];
       if (tokenParam != null && _isCashuToken(tokenParam)) {
