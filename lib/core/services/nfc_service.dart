@@ -286,8 +286,11 @@ class NfcService {
       }
 
       // Response = data + SW1 SW2 (last 2 bytes are status)
-      ndefBytes.add(chunk.sublist(0, chunk.length - 2));
       final bytesRead = chunk.length - 2;
+      if (bytesRead == 0) {
+        return (null, 'READ chunk at offset=$offset returned no data');
+      }
+      ndefBytes.add(chunk.sublist(0, bytesRead));
       offset += bytesRead;
       remaining -= bytesRead;
     }
