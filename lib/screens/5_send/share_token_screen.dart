@@ -10,6 +10,7 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/utils/peanut_codec.dart';
+import '../../core/services/nfc_service.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -45,16 +46,29 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
   int _currentInterval = _intervalMedium;
   String _speedLabel = 'M';
 
+  // NFC
+  NfcState _nfcState = NfcState.unsupported;
+  bool _nfcWriting = false;
+
   @override
   void initState() {
     super.initState();
     _encodeTokenToUR();
+    _checkNfc();
   }
 
   @override
   void dispose() {
     _animationTimer?.cancel();
+    if (_nfcWriting) NfcService.stopEmulating();
     super.dispose();
+  }
+
+  Future<void> _checkNfc() async {
+    final state = await NfcService.checkState();
+    if (mounted) {
+      setState(() => _nfcState = state);
+    }
   }
 
   void _encodeTokenToUR() {
@@ -156,8 +170,13 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
 
                       const SizedBox(height: AppDimensions.paddingMedium),
 
-                      // Botones copiar y compartir
+                      // Botones principales: copiar y compartir
                       _buildActionButtons(context),
+
+                      const SizedBox(height: AppDimensions.paddingSmall),
+
+                      // Botones secundarios: bean (peanut) y NFC
+                      _buildSecondaryActions(context),
 
                       const SizedBox(height: AppDimensions.paddingLarge),
 
@@ -415,27 +434,7 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
             ),
           ),
         ),
-        const SizedBox(width: AppDimensions.paddingSmall),
-        // Copiar como emoji (peanut encoding)
-        Tooltip(
-          message: L10n.of(context)!.copyAsEmoji,
-          child: GestureDetector(
-            onTap: () => _copyPeanut(context),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  width: 1,
-                ),
-              ),
-              child: Icon(LucideIcons.bean, color: AppColors.primaryAction, size: 22),
-            ),
-          ),
-        ),
-        const SizedBox(width: AppDimensions.paddingSmall),
+        const SizedBox(width: AppDimensions.paddingMedium),
         // Compartir
         Expanded(
           child: GestureDetector(
@@ -463,6 +462,75 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSecondaryActions(BuildContext context) {
+    final isNfcEnabled = _nfcState == NfcState.enabled;
+    final isNfcUnsupported = _nfcState == NfcState.unsupported;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Copiar como emoji (peanut encoding)
+        Tooltip(
+          message: L10n.of(context)!.copyAsEmoji,
+          child: GestureDetector(
+            onTap: () => _copyPeanut(context),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+              child: Icon(LucideIcons.bean, color: AppColors.primaryAction, size: 20),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // NFC - siempre visible con 3 estados
+        Tooltip(
+          message: isNfcUnsupported
+              ? L10n.of(context)!.nfcUnsupported
+              : isNfcEnabled
+                  ? L10n.of(context)!.nfcWrite
+                  : L10n.of(context)!.nfcDisabled,
+          child: GestureDetector(
+            onTap: () => _writeNfc(context),
+            child: Opacity(
+              opacity: isNfcUnsupported ? 0.3 : 1.0,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _nfcWriting
+                      ? AppColors.primaryAction.withValues(alpha: 0.3)
+                      : Colors.white.withValues(alpha: 0.07),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _nfcWriting
+                        ? AppColors.primaryAction
+                        : Colors.white.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  LucideIcons.nfc,
+                  color: _nfcWriting
+                      ? AppColors.primaryAction
+                      : isNfcEnabled
+                          ? AppColors.textSecondary
+                          : AppColors.textSecondary.withValues(alpha: 0.5),
+                  size: 20,
+                ),
               ),
             ),
           ),
@@ -540,6 +608,68 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
         subject: 'Token Cashu - $formattedAmount $unitLabel',
       ),
     );
+  }
+
+  void _writeNfc(BuildContext context) async {
+    // Toggle off: stop emulating
+    if (_nfcWriting) {
+      await NfcService.stopEmulating();
+      setState(() => _nfcWriting = false);
+      return;
+    }
+
+    // Re-check state in case user toggled NFC in settings
+    final currentState = await NfcService.checkState();
+    if (mounted) setState(() => _nfcState = currentState);
+
+    if (currentState == NfcState.unsupported) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcUnsupported),
+          backgroundColor: AppColors.textSecondary,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
+    if (currentState == NfcState.disabled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcDisabled),
+          backgroundColor: AppColors.warning,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await NfcService.startEmulating(widget.token);
+      setState(() => _nfcWriting = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcHoldNear),
+          backgroundColor: AppColors.primaryAction,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _nfcWriting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(L10n.of(context)!.nfcWriteError(e.toString())),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+    }
   }
 
   void _goToHome(BuildContext context) {

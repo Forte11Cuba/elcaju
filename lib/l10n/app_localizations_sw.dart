@@ -1,5 +1,5 @@
+// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -60,7 +60,8 @@ class L10nSw extends L10n {
   String get generatingSeed => 'Kutengeneza maneno yako ya mbegu kwa usalama';
 
   @override
-  String get createWalletDescription => 'Maneno 12 ya mbegu yatatengenezwa.\nYahifadhi mahali salama.';
+  String get createWalletDescription =>
+      'Maneno 12 ya mbegu yatatengenezwa.\nYahifadhi mahali salama.';
 
   @override
   String get generateWallet => 'Tengeneza pochi';
@@ -69,10 +70,12 @@ class L10nSw extends L10n {
   String get walletCreated => 'Pochi imeundwa!';
 
   @override
-  String get walletCreatedDescription => 'Pochi yako iko tayari. Tunakushauri uhifadhi nakala ya maneno yako ya mbegu sasa.';
+  String get walletCreatedDescription =>
+      'Pochi yako iko tayari. Tunakushauri uhifadhi nakala ya maneno yako ya mbegu sasa.';
 
   @override
-  String get backupWarning => 'Bila nakala, utapoteza uwezo wa kufikia fedha zako ukipoteza kifaa.';
+  String get backupWarning =>
+      'Bila nakala, utapoteza uwezo wa kufikia fedha zako ukipoteza kifaa.';
 
   @override
   String get backupNow => 'Hifadhi nakala sasa';
@@ -87,7 +90,8 @@ class L10nSw extends L10n {
   String get seedPhraseTitle => 'Maneno yako ya mbegu';
 
   @override
-  String get seedPhraseDescription => 'Hifadhi maneno haya 12 kwa mpangilio. Ndiyo njia pekee ya kurejesha pochi yako.';
+  String get seedPhraseDescription =>
+      'Hifadhi maneno haya 12 kwa mpangilio. Ndiyo njia pekee ya kurejesha pochi yako.';
 
   @override
   String get revealSeedPhrase => 'Onyesha maneno ya mbegu';
@@ -117,7 +121,8 @@ class L10nSw extends L10n {
   String get enterSeedPhrase => 'Ingiza maneno yako ya mbegu';
 
   @override
-  String get enterSeedDescription => 'Andika maneno 12 au 24 yakitengwa na nafasi.';
+  String get enterSeedDescription =>
+      'Andika maneno 12 au 24 yakitengwa na nafasi.';
 
   @override
   String get seedPlaceholder => 'neno1 neno2 neno3 ...';
@@ -273,7 +278,8 @@ class L10nSw extends L10n {
   String get noActiveMint => 'Hakuna mint inayofanya kazi';
 
   @override
-  String get offlineModeMessage => 'Hakuna muunganisho. Kutumia hali ya nje ya mtandao...';
+  String get offlineModeMessage =>
+      'Hakuna muunganisho. Kutumia hali ya nje ya mtandao...';
 
   @override
   String get confirmSend => 'Thibitisha kutuma';
@@ -310,7 +316,8 @@ class L10nSw extends L10n {
   }
 
   @override
-  String get keepTokenWarning => 'Hifadhi tokeni hii hadi mpokeaji aidai. Ukiipoteza, utapoteza fedha.';
+  String get keepTokenWarning =>
+      'Hifadhi tokeni hii hadi mpokeaji aidai. Ukiipoteza, utapoteza fedha.';
 
   @override
   String get tokenCopiedToClipboard => 'Tokeni imenakiliwa kwenye ubao';
@@ -322,7 +329,36 @@ class L10nSw extends L10n {
   String get emojiCopiedToClipboard => 'Tokeni imenakiliwa kama emoji 🥜';
 
   @override
-  String get peanutDecodeError => 'Imeshindwa kusimbua tokeni ya emoji. Inaweza kuwa imeharibika.';
+  String get peanutDecodeError =>
+      'Imeshindwa kusimbua tokeni ya emoji. Inaweza kuwa imeharibika.';
+
+  @override
+  String get nfcWrite => 'Andika kwenye NFC tag';
+
+  @override
+  String get nfcRead => 'Soma NFC tag';
+
+  @override
+  String get nfcHoldNear => 'Karibia kifaa kwenye NFC tag...';
+
+  @override
+  String get nfcWriteSuccess => 'Tokeni imeandikwa kwenye NFC tag';
+
+  @override
+  String nfcWriteError(String error) {
+    return 'Hitilafu ya NFC kuandika: $error';
+  }
+
+  @override
+  String nfcReadError(String error) {
+    return 'Hitilafu ya NFC kusoma: $error';
+  }
+
+  @override
+  String get nfcDisabled => 'NFC imezimwa. Iwashe katika Mipangilio.';
+
+  @override
+  String get nfcUnsupported => 'Kifaa hiki hakitumii NFC';
 
   @override
   String get amountToDeposit => 'Kiasi cha kuweka:';
@@ -674,7 +710,8 @@ class L10nSw extends L10n {
   String get close => 'Funga';
 
   @override
-  String get aboutDescription => 'Pochi ya Cashu yenye DNA ya Cuba kwa ulimwengu wote. Ndugu wa LaChispa.';
+  String get aboutDescription =>
+      'Pochi ya Cashu yenye DNA ya Cuba kwa ulimwengu wote. Ndugu wa LaChispa.';
 
   @override
   String get couldNotOpenLink => 'Haikuweza kufungua kiungo';
@@ -686,7 +723,8 @@ class L10nSw extends L10n {
   String get actionIrreversible => 'Kitendo hiki hakiwezi kutenduliwa';
 
   @override
-  String get deleteWalletWarning => 'Data zote zitafutwa ikiwa ni pamoja na maneno yako ya mbegu na tokeni. Hakikisha una nakala.';
+  String get deleteWalletWarning =>
+      'Data zote zitafutwa ikiwa ni pamoja na maneno yako ya mbegu na tokeni. Hakikisha una nakala.';
 
   @override
   String get typeDeleteToConfirm => 'Andika \"FUTA\" kuthibitisha:';
@@ -703,13 +741,15 @@ class L10nSw extends L10n {
   String get recoverTokensTitle => 'Rejesha tokeni';
 
   @override
-  String get recoverTokensDescription => 'Changanua mint kurejesha tokeni zinazohusiana na maneno yako ya mbegu (NUT-13)';
+  String get recoverTokensDescription =>
+      'Changanua mint kurejesha tokeni zinazohusiana na maneno yako ya mbegu (NUT-13)';
 
   @override
   String get useCurrentSeedPhrase => 'Tumia maneno yangu ya mbegu ya sasa';
 
   @override
-  String get scanWithSavedWords => 'Changanua mint na maneno 12 yaliyohifadhiwa';
+  String get scanWithSavedWords =>
+      'Changanua mint na maneno 12 yaliyohifadhiwa';
 
   @override
   String get useOtherSeedPhrase => 'Tumia maneno mengine ya mbegu';
@@ -741,7 +781,8 @@ class L10nSw extends L10n {
   String get mnemonicMustHaveWords => 'Mnemonic lazima iwe na maneno 12 au 24';
 
   @override
-  String get noConnectedMintsToScan => 'Hakuna mint zilizounganishwa za kuchanganua';
+  String get noConnectedMintsToScan =>
+      'Hakuna mint zilizounganishwa za kuchanganua';
 
   @override
   String recoveredTokens(String tokens, int mints) {
@@ -749,7 +790,8 @@ class L10nSw extends L10n {
   }
 
   @override
-  String get scanCompleteNoTokens => 'Uchanganuzi umekamilika. Hakuna tokeni mpya zilizopatikana.';
+  String get scanCompleteNoTokens =>
+      'Uchanganuzi umekamilika. Hakuna tokeni mpya zilizopatikana.';
 
   @override
   String mintsWithError(int count) {
@@ -772,7 +814,8 @@ class L10nSw extends L10n {
   }
 
   @override
-  String get noTokensForMnemonic => 'Hakuna tokeni zilizopatikana zinazohusiana na mnemonic hiyo.';
+  String get noTokensForMnemonic =>
+      'Hakuna tokeni zilizopatikana zinazohusiana na mnemonic hiyo.';
 
   @override
   String get noConnectedMints => 'Hakuna mint zilizounganishwa';
@@ -852,7 +895,8 @@ class L10nSw extends L10n {
   String get deleteMintConfirmTitle => 'Futa mint';
 
   @override
-  String get deleteMintConfirmMessage => 'Ukiwa na salio katika mint hii, itapotea. Una uhakika?';
+  String get deleteMintConfirmMessage =>
+      'Ukiwa na salio katika mint hii, itapotea. Una uhakika?';
 
   @override
   String get delete => 'Futa';
@@ -905,19 +949,23 @@ class L10nSw extends L10n {
   String get tokenSavedForLater => 'Tokeni imehifadhiwa kudai baadaye';
 
   @override
-  String get noConnectionTokenSaved => 'Hakuna muunganisho. Tokeni imehifadhiwa kudai baadaye.';
+  String get noConnectionTokenSaved =>
+      'Hakuna muunganisho. Tokeni imehifadhiwa kudai baadaye.';
 
   @override
-  String get unknownMintOffline => 'Tokeni hii ni kutoka mint isiyojulikana. Unganisha na mtandao kuongeza na kudai tokeni.';
+  String get unknownMintOffline =>
+      'Tokeni hii ni kutoka mint isiyojulikana. Unganisha na mtandao kuongeza na kudai tokeni.';
 
   @override
-  String get noConnectionTryLater => 'Hakuna muunganisho na mint. Jaribu baadaye.';
+  String get noConnectionTryLater =>
+      'Hakuna muunganisho na mint. Jaribu baadaye.';
 
   @override
   String get saveTokenError => 'Hitilafu ya kuhifadhi tokeni. Jaribu tena.';
 
   @override
-  String get pendingTokenLimitReached => 'Kikomo cha tokeni zinazosubiri kimefikiwa (upeo 50)';
+  String get pendingTokenLimitReached =>
+      'Kikomo cha tokeni zinazosubiri kimefikiwa (upeo 50)';
 
   @override
   String get filterToReceive => 'Za kupokea';
@@ -985,7 +1033,8 @@ class L10nSw extends L10n {
   String get pointCameraAtQr => 'Elekeza kamera kwenye msimbo wa QR';
 
   @override
-  String get pointCameraAtCashuQr => 'Elekeza kamera kwenye QR ya tokeni ya Cashu';
+  String get pointCameraAtCashuQr =>
+      'Elekeza kamera kwenye QR ya tokeni ya Cashu';
 
   @override
   String get pointCameraAtInvoiceQr => 'Elekeza kamera kwenye QR ya ankara';
@@ -994,10 +1043,12 @@ class L10nSw extends L10n {
   String get unrecognizedQrCode => 'Msimbo wa QR haujatambuliwa';
 
   @override
-  String get scanCashuTokenHint => 'Changanua tokeni ya Cashu (cashuA... au cashuB...)';
+  String get scanCashuTokenHint =>
+      'Changanua tokeni ya Cashu (cashuA... au cashuB...)';
 
   @override
-  String get scanLightningInvoiceHint => 'Changanua ankara ya Lightning (lnbc...)';
+  String get scanLightningInvoiceHint =>
+      'Changanua ankara ya Lightning (lnbc...)';
 
   @override
   String get addMintQuestion => 'Ongeza mint hii?';
@@ -1018,7 +1069,8 @@ class L10nSw extends L10n {
   String get p2pkExperimental => 'P2PK ni ya majaribio. Tumia kwa uangalifu.';
 
   @override
-  String get p2pkPendingSendWarning => 'Una usafirishaji wa P2PK unaosubiri. Nenda kwenye historia na usasishe baada ya mpokeaji kudai tokeni.';
+  String get p2pkPendingSendWarning =>
+      'Una usafirishaji wa P2PK unaosubiri. Nenda kwenye historia na usasishe baada ya mpokeaji kudai tokeni.';
 
   @override
   String get p2pkExperimentalShort => 'Majaribio';
@@ -1084,13 +1136,15 @@ class L10nSw extends L10n {
   String get p2pkDeleteTitle => 'Futa ufunguo';
 
   @override
-  String get p2pkDeleteConfirm => 'Futa ufunguo huu? Hutaweza kupokea tokeni zilizofungwa kwake.';
+  String get p2pkDeleteConfirm =>
+      'Futa ufunguo huu? Hutaweza kupokea tokeni zilizofungwa kwake.';
 
   @override
   String get p2pkRequiresConnection => 'P2PK inahitaji muunganisho kwa mint';
 
   @override
-  String get p2pkErrorMaxKeysReached => 'Idadi ya juu ya funguo zilizoingizwa imefikiwa (10)';
+  String get p2pkErrorMaxKeysReached =>
+      'Idadi ya juu ya funguo zilizoingizwa imefikiwa (10)';
 
   @override
   String get p2pkErrorInvalidNsec => 'nsec batili';

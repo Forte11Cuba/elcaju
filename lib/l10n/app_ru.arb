@@ -141,6 +141,17 @@
   "emojiCopiedToClipboard": "Токен скопирован как эмодзи 🥜",
   "peanutDecodeError": "Не удалось декодировать эмодзи-токен. Возможно, он повреждён.",
 
+  "nfcWrite": "Записать на NFC-метку",
+  "nfcRead": "Читать NFC-метку",
+  "nfcHoldNear": "Поднесите устройство к NFC-метке...",
+  "nfcWriteSuccess": "Токен записан на NFC-метку",
+  "nfcWriteError": "Ошибка записи NFC: {error}",
+  "@nfcWriteError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcReadError": "Ошибка чтения NFC: {error}",
+  "@nfcReadError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcDisabled": "NFC отключён. Включите в Настройках.",
+  "nfcUnsupported": "Это устройство не поддерживает NFC",
+
   "amountToDeposit": "Сумма для пополнения:",
   "descriptionOptional": "Описание (необязательно):",
   "depositPlaceholder": "Для чего это пополнение?",

@@ -141,6 +141,17 @@
   "emojiCopiedToClipboard": "Tokeni imenakiliwa kama emoji 🥜",
   "peanutDecodeError": "Imeshindwa kusimbua tokeni ya emoji. Inaweza kuwa imeharibika.",
 
+  "nfcWrite": "Andika kwenye NFC tag",
+  "nfcRead": "Soma NFC tag",
+  "nfcHoldNear": "Karibia kifaa kwenye NFC tag...",
+  "nfcWriteSuccess": "Tokeni imeandikwa kwenye NFC tag",
+  "nfcWriteError": "Hitilafu ya NFC kuandika: {error}",
+  "@nfcWriteError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcReadError": "Hitilafu ya NFC kusoma: {error}",
+  "@nfcReadError": { "placeholders": { "error": { "type": "String" } } },
+  "nfcDisabled": "NFC imezimwa. Iwashe katika Mipangilio.",
+  "nfcUnsupported": "Kifaa hiki hakitumii NFC",
+
   "amountToDeposit": "Kiasi cha kuweka:",
   "descriptionOptional": "Maelezo (si lazima):",
   "depositPlaceholder": "Amana hii ni ya nini?",

@@ -1,5 +1,5 @@
+// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -60,7 +60,8 @@ class L10nEn extends L10n {
   String get generatingSeed => 'Generating your seed phrase securely';
 
   @override
-  String get createWalletDescription => 'A 12-word seed phrase will be generated.\nStore it in a safe place.';
+  String get createWalletDescription =>
+      'A 12-word seed phrase will be generated.\nStore it in a safe place.';
 
   @override
   String get generateWallet => 'Generate wallet';
@@ -69,10 +70,12 @@ class L10nEn extends L10n {
   String get walletCreated => 'Wallet created!';
 
   @override
-  String get walletCreatedDescription => 'Your wallet is ready. We recommend backing up your seed phrase now.';
+  String get walletCreatedDescription =>
+      'Your wallet is ready. We recommend backing up your seed phrase now.';
 
   @override
-  String get backupWarning => 'Without backup, you will lose access to your funds if you lose the device.';
+  String get backupWarning =>
+      'Without backup, you will lose access to your funds if you lose the device.';
 
   @override
   String get backupNow => 'Backup now';
@@ -87,7 +90,8 @@ class L10nEn extends L10n {
   String get seedPhraseTitle => 'Your seed phrase';
 
   @override
-  String get seedPhraseDescription => 'Save these 12 words in order. They are the only way to recover your wallet.';
+  String get seedPhraseDescription =>
+      'Save these 12 words in order. They are the only way to recover your wallet.';
 
   @override
   String get revealSeedPhrase => 'Reveal seed phrase';
@@ -117,7 +121,8 @@ class L10nEn extends L10n {
   String get enterSeedPhrase => 'Enter your seed phrase';
 
   @override
-  String get enterSeedDescription => 'Type the 12 or 24 words separated by spaces.';
+  String get enterSeedDescription =>
+      'Type the 12 or 24 words separated by spaces.';
 
   @override
   String get seedPlaceholder => 'word1 word2 word3 ...';
@@ -310,7 +315,8 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get keepTokenWarning => 'Keep this token until the recipient claims it. If you lose it, you will lose the funds.';
+  String get keepTokenWarning =>
+      'Keep this token until the recipient claims it. If you lose it, you will lose the funds.';
 
   @override
   String get tokenCopiedToClipboard => 'Token copied to clipboard';
@@ -322,7 +328,36 @@ class L10nEn extends L10n {
   String get emojiCopiedToClipboard => 'Token copied as emoji 🥜';
 
   @override
-  String get peanutDecodeError => 'Could not decode emoji token. It may be corrupted.';
+  String get peanutDecodeError =>
+      'Could not decode emoji token. It may be corrupted.';
+
+  @override
+  String get nfcWrite => 'Write to NFC tag';
+
+  @override
+  String get nfcRead => 'Read NFC tag';
+
+  @override
+  String get nfcHoldNear => 'Hold device near NFC tag...';
+
+  @override
+  String get nfcWriteSuccess => 'Token written to NFC tag';
+
+  @override
+  String nfcWriteError(String error) {
+    return 'NFC write error: $error';
+  }
+
+  @override
+  String nfcReadError(String error) {
+    return 'NFC read error: $error';
+  }
+
+  @override
+  String get nfcDisabled => 'NFC is disabled. Enable it in Settings.';
+
+  @override
+  String get nfcUnsupported => 'This device does not support NFC';
 
   @override
   String get amountToDeposit => 'Amount to deposit:';
@@ -674,7 +709,8 @@ class L10nEn extends L10n {
   String get close => 'Close';
 
   @override
-  String get aboutDescription => 'A Cashu wallet with Cuban DNA for the entire world. Brother of LaChispa.';
+  String get aboutDescription =>
+      'A Cashu wallet with Cuban DNA for the entire world. Brother of LaChispa.';
 
   @override
   String get couldNotOpenLink => 'Could not open link';
@@ -686,7 +722,8 @@ class L10nEn extends L10n {
   String get actionIrreversible => 'This action is irreversible';
 
   @override
-  String get deleteWalletWarning => 'All data will be deleted including your seed phrase and tokens. Make sure you have a backup.';
+  String get deleteWalletWarning =>
+      'All data will be deleted including your seed phrase and tokens. Make sure you have a backup.';
 
   @override
   String get typeDeleteToConfirm => 'Type \"DELETE\" to confirm:';
@@ -703,7 +740,8 @@ class L10nEn extends L10n {
   String get recoverTokensTitle => 'Recover tokens';
 
   @override
-  String get recoverTokensDescription => 'Scan mints to recover tokens associated with your seed phrase (NUT-13)';
+  String get recoverTokensDescription =>
+      'Scan mints to recover tokens associated with your seed phrase (NUT-13)';
 
   @override
   String get useCurrentSeedPhrase => 'Use my current seed phrase';
@@ -772,7 +810,8 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get noTokensForMnemonic => 'No tokens found associated with that mnemonic.';
+  String get noTokensForMnemonic =>
+      'No tokens found associated with that mnemonic.';
 
   @override
   String get noConnectedMints => 'No connected mints';
@@ -852,7 +891,8 @@ class L10nEn extends L10n {
   String get deleteMintConfirmTitle => 'Delete mint';
 
   @override
-  String get deleteMintConfirmMessage => 'If you have balance in this mint, it will be lost. Are you sure?';
+  String get deleteMintConfirmMessage =>
+      'If you have balance in this mint, it will be lost. Are you sure?';
 
   @override
   String get delete => 'Delete';
@@ -905,10 +945,12 @@ class L10nEn extends L10n {
   String get tokenSavedForLater => 'Token saved to claim later';
 
   @override
-  String get noConnectionTokenSaved => 'No connection. Token saved to claim later.';
+  String get noConnectionTokenSaved =>
+      'No connection. Token saved to claim later.';
 
   @override
-  String get unknownMintOffline => 'This token is from an unknown mint. Connect to the internet to add it and claim the token.';
+  String get unknownMintOffline =>
+      'This token is from an unknown mint. Connect to the internet to add it and claim the token.';
 
   @override
   String get noConnectionTryLater => 'No connection to mint. Try again later.';
@@ -917,7 +959,8 @@ class L10nEn extends L10n {
   String get saveTokenError => 'Error saving token. Please try again.';
 
   @override
-  String get pendingTokenLimitReached => 'Pending tokens limit reached (max 50)';
+  String get pendingTokenLimitReached =>
+      'Pending tokens limit reached (max 50)';
 
   @override
   String get filterToReceive => 'To receive';
@@ -994,7 +1037,8 @@ class L10nEn extends L10n {
   String get unrecognizedQrCode => 'Unrecognized QR code';
 
   @override
-  String get scanCashuTokenHint => 'Scan a Cashu token (cashuA... or cashuB...)';
+  String get scanCashuTokenHint =>
+      'Scan a Cashu token (cashuA... or cashuB...)';
 
   @override
   String get scanLightningInvoiceHint => 'Scan a Lightning invoice (lnbc...)';
@@ -1006,7 +1050,8 @@ class L10nEn extends L10n {
   String get cameraPermissionDenied => 'Camera permission denied';
 
   @override
-  String get paymentRequestNotSupported => 'Payment requests are not yet supported';
+  String get paymentRequestNotSupported =>
+      'Payment requests are not yet supported';
 
   @override
   String get p2pkTitle => 'P2PK Keys';
@@ -1018,7 +1063,8 @@ class L10nEn extends L10n {
   String get p2pkExperimental => 'P2PK is experimental. Use with caution.';
 
   @override
-  String get p2pkPendingSendWarning => 'You have a pending P2PK send. Go to history and refresh after the recipient claims the token.';
+  String get p2pkPendingSendWarning =>
+      'You have a pending P2PK send. Go to history and refresh after the recipient claims the token.';
 
   @override
   String get p2pkExperimentalShort => 'Experimental';
@@ -1084,7 +1130,8 @@ class L10nEn extends L10n {
   String get p2pkDeleteTitle => 'Delete key';
 
   @override
-  String get p2pkDeleteConfirm => 'Delete this key? You won\'t be able to receive tokens locked to it.';
+  String get p2pkDeleteConfirm =>
+      'Delete this key? You won\'t be able to receive tokens locked to it.';
 
   @override
   String get p2pkRequiresConnection => 'P2PK requires connection to the mint';

@@ -1,5 +1,5 @@
+// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -69,7 +69,8 @@ class L10nJa extends L10n {
   String get walletCreated => 'ウォレット作成完了！';
 
   @override
-  String get walletCreatedDescription => 'ウォレットの準備ができました。今すぐシードフレーズをバックアップすることをお勧めします。';
+  String get walletCreatedDescription =>
+      'ウォレットの準備ができました。今すぐシードフレーズをバックアップすることをお勧めします。';
 
   @override
   String get backupWarning => 'バックアップがないと、デバイスを紛失した場合に資金にアクセスできなくなります。';
@@ -323,6 +324,34 @@ class L10nJa extends L10n {
 
   @override
   String get peanutDecodeError => '絵文字トークンをデコードできませんでした。破損している可能性があります。';
+
+  @override
+  String get nfcWrite => 'NFCタグに書き込む';
+
+  @override
+  String get nfcRead => 'NFCタグを読み取る';
+
+  @override
+  String get nfcHoldNear => 'デバイスをNFCタグに近づけてください...';
+
+  @override
+  String get nfcWriteSuccess => 'トークンをNFCタグに書き込みました';
+
+  @override
+  String nfcWriteError(String error) {
+    return 'NFC書き込みエラー: $error';
+  }
+
+  @override
+  String nfcReadError(String error) {
+    return 'NFC読み取りエラー: $error';
+  }
+
+  @override
+  String get nfcDisabled => 'NFCが無効です。設定で有効にしてください。';
+
+  @override
+  String get nfcUnsupported => 'このデバイスはNFCに対応していません';
 
   @override
   String get amountToDeposit => '入金額：';
@@ -686,7 +715,8 @@ class L10nJa extends L10n {
   String get actionIrreversible => 'この操作は取り消せません';
 
   @override
-  String get deleteWalletWarning => 'シードフレーズとトークンを含むすべてのデータが削除されます。バックアップがあることを確認してください。';
+  String get deleteWalletWarning =>
+      'シードフレーズとトークンを含むすべてのデータが削除されます。バックアップがあることを確認してください。';
 
   @override
   String get typeDeleteToConfirm => '確認のため「DELETE」と入力：';
@@ -703,7 +733,8 @@ class L10nJa extends L10n {
   String get recoverTokensTitle => 'トークンを復元';
 
   @override
-  String get recoverTokensDescription => 'シードフレーズに関連付けられたトークンを復元するためにMintをスキャン（NUT-13）';
+  String get recoverTokensDescription =>
+      'シードフレーズに関連付けられたトークンを復元するためにMintをスキャン（NUT-13）';
 
   @override
   String get useCurrentSeedPhrase => '現在のシードフレーズを使用';
@@ -908,7 +939,8 @@ class L10nJa extends L10n {
   String get noConnectionTokenSaved => '接続なし。トークンを保存しました。後で請求できます。';
 
   @override
-  String get unknownMintOffline => 'このトークンは不明なMintからのものです。インターネットに接続してMintを追加し、トークンを請求してください。';
+  String get unknownMintOffline =>
+      'このトークンは不明なMintからのものです。インターネットに接続してMintを追加し、トークンを請求してください。';
 
   @override
   String get noConnectionTryLater => 'Mintに接続できません。後でもう一度お試しください。';
@@ -1018,7 +1050,8 @@ class L10nJa extends L10n {
   String get p2pkExperimental => 'P2PKは実験的機能です。注意してご使用ください。';
 
   @override
-  String get p2pkPendingSendWarning => '保留中のP2PK送信があります。受取人がトークンを受け取った後、履歴で更新してください。';
+  String get p2pkPendingSendWarning =>
+      '保留中のP2PK送信があります。受取人がトークンを受け取った後、履歴で更新してください。';
 
   @override
   String get p2pkExperimentalShort => '実験的';

@@ -1,5 +1,5 @@
+// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -323,6 +323,34 @@ class L10nZh extends L10n {
 
   @override
   String get peanutDecodeError => '无法解码表情符号代币。可能已损坏。';
+
+  @override
+  String get nfcWrite => '写入NFC标签';
+
+  @override
+  String get nfcRead => '读取NFC标签';
+
+  @override
+  String get nfcHoldNear => '将设备靠近NFC标签...';
+
+  @override
+  String get nfcWriteSuccess => '代币已写入NFC标签';
+
+  @override
+  String nfcWriteError(String error) {
+    return 'NFC写入错误：$error';
+  }
+
+  @override
+  String nfcReadError(String error) {
+    return 'NFC读取错误：$error';
+  }
+
+  @override
+  String get nfcDisabled => 'NFC已禁用，请在设置中启用。';
+
+  @override
+  String get nfcUnsupported => '此设备不支持NFC';
 
   @override
   String get amountToDeposit => '存入金额：';

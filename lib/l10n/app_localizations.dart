@@ -71,7 +71,8 @@ import 'app_localizations_zh.dart';
 /// be consistent with the languages listed in the L10n.supportedLocales
 /// property.
 abstract class L10n {
-  L10n(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  L10n(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -91,12 +92,13 @@ abstract class L10n {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
@@ -110,7 +112,7 @@ abstract class L10n {
     Locale('pt'),
     Locale('ru'),
     Locale('sw'),
-    Locale('zh')
+    Locale('zh'),
   ];
 
   /// No description provided for @appName.
@@ -724,6 +726,54 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'No se pudo decodificar el token emoji. Puede estar corrupto.'**
   String get peanutDecodeError;
+
+  /// No description provided for @nfcWrite.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribir en tag NFC'**
+  String get nfcWrite;
+
+  /// No description provided for @nfcRead.
+  ///
+  /// In es, this message translates to:
+  /// **'Leer tag NFC'**
+  String get nfcRead;
+
+  /// No description provided for @nfcHoldNear.
+  ///
+  /// In es, this message translates to:
+  /// **'Acerca el dispositivo al tag NFC...'**
+  String get nfcHoldNear;
+
+  /// No description provided for @nfcWriteSuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Token escrito en tag NFC'**
+  String get nfcWriteSuccess;
+
+  /// No description provided for @nfcWriteError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error NFC al escribir: {error}'**
+  String nfcWriteError(String error);
+
+  /// No description provided for @nfcReadError.
+  ///
+  /// In es, this message translates to:
+  /// **'Error NFC al leer: {error}'**
+  String nfcReadError(String error);
+
+  /// No description provided for @nfcDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'NFC está desactivado. Actívalo en Ajustes.'**
+  String get nfcDisabled;
+
+  /// No description provided for @nfcUnsupported.
+  ///
+  /// In es, this message translates to:
+  /// **'Este dispositivo no soporta NFC'**
+  String get nfcUnsupported;
 
   /// No description provided for @amountToDeposit.
   ///
@@ -2175,34 +2225,55 @@ class _L10nDelegate extends LocalizationsDelegate<L10n> {
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['de', 'en', 'es', 'fr', 'it', 'ja', 'ko', 'pt', 'ru', 'sw', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'de',
+    'en',
+    'es',
+    'fr',
+    'it',
+    'ja',
+    'ko',
+    'pt',
+    'ru',
+    'sw',
+    'zh',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_L10nDelegate old) => false;
 }
 
 L10n lookupL10n(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'de': return L10nDe();
-    case 'en': return L10nEn();
-    case 'es': return L10nEs();
-    case 'fr': return L10nFr();
-    case 'it': return L10nIt();
-    case 'ja': return L10nJa();
-    case 'ko': return L10nKo();
-    case 'pt': return L10nPt();
-    case 'ru': return L10nRu();
-    case 'sw': return L10nSw();
-    case 'zh': return L10nZh();
+    case 'de':
+      return L10nDe();
+    case 'en':
+      return L10nEn();
+    case 'es':
+      return L10nEs();
+    case 'fr':
+      return L10nFr();
+    case 'it':
+      return L10nIt();
+    case 'ja':
+      return L10nJa();
+    case 'ko':
+      return L10nKo();
+    case 'pt':
+      return L10nPt();
+    case 'ru':
+      return L10nRu();
+    case 'sw':
+      return L10nSw();
+    case 'zh':
+      return L10nZh();
   }
 
   throw FlutterError(
     'L10n.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

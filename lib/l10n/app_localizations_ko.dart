@@ -1,5 +1,5 @@
+// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -60,7 +60,8 @@ class L10nKo extends L10n {
   String get generatingSeed => '시드 문구를 안전하게 생성 중';
 
   @override
-  String get createWalletDescription => '12개의 단어로 된 시드 문구가 생성됩니다.\n안전한 곳에 보관하세요.';
+  String get createWalletDescription =>
+      '12개의 단어로 된 시드 문구가 생성됩니다.\n안전한 곳에 보관하세요.';
 
   @override
   String get generateWallet => '지갑 생성';
@@ -69,7 +70,8 @@ class L10nKo extends L10n {
   String get walletCreated => '지갑이 생성되었습니다!';
 
   @override
-  String get walletCreatedDescription => '지갑이 준비되었습니다. 지금 시드 문구를 백업하는 것을 권장합니다.';
+  String get walletCreatedDescription =>
+      '지갑이 준비되었습니다. 지금 시드 문구를 백업하는 것을 권장합니다.';
 
   @override
   String get backupWarning => '백업 없이는 기기를 분실하면 자금에 접근할 수 없습니다.';
@@ -87,7 +89,8 @@ class L10nKo extends L10n {
   String get seedPhraseTitle => '시드 문구';
 
   @override
-  String get seedPhraseDescription => '이 12개의 단어를 순서대로 저장하세요. 지갑을 복구하는 유일한 방법입니다.';
+  String get seedPhraseDescription =>
+      '이 12개의 단어를 순서대로 저장하세요. 지갑을 복구하는 유일한 방법입니다.';
 
   @override
   String get revealSeedPhrase => '시드 문구 보기';
@@ -323,6 +326,34 @@ class L10nKo extends L10n {
 
   @override
   String get peanutDecodeError => '이모지 토큰을 디코딩할 수 없습니다. 손상되었을 수 있습니다.';
+
+  @override
+  String get nfcWrite => 'NFC 태그에 쓰기';
+
+  @override
+  String get nfcRead => 'NFC 태그 읽기';
+
+  @override
+  String get nfcHoldNear => '기기를 NFC 태그에 가까이 대세요...';
+
+  @override
+  String get nfcWriteSuccess => '토큰이 NFC 태그에 기록되었습니다';
+
+  @override
+  String nfcWriteError(String error) {
+    return 'NFC 쓰기 오류: $error';
+  }
+
+  @override
+  String nfcReadError(String error) {
+    return 'NFC 읽기 오류: $error';
+  }
+
+  @override
+  String get nfcDisabled => 'NFC가 비활성화되어 있습니다. 설정에서 활성화하세요.';
+
+  @override
+  String get nfcUnsupported => '이 기기는 NFC를 지원하지 않습니다';
 
   @override
   String get amountToDeposit => '입금할 금액:';
@@ -686,7 +717,8 @@ class L10nKo extends L10n {
   String get actionIrreversible => '이 작업은 되돌릴 수 없습니다';
 
   @override
-  String get deleteWalletWarning => '시드 문구와 토큰을 포함한 모든 데이터가 삭제됩니다. 백업이 있는지 확인하세요.';
+  String get deleteWalletWarning =>
+      '시드 문구와 토큰을 포함한 모든 데이터가 삭제됩니다. 백업이 있는지 확인하세요.';
 
   @override
   String get typeDeleteToConfirm => '확인하려면 \"삭제\"를 입력하세요:';
@@ -703,7 +735,8 @@ class L10nKo extends L10n {
   String get recoverTokensTitle => '토큰 복구';
 
   @override
-  String get recoverTokensDescription => '시드 문구와 연결된 토큰을 복구하기 위해 mint 스캔 (NUT-13)';
+  String get recoverTokensDescription =>
+      '시드 문구와 연결된 토큰을 복구하기 위해 mint 스캔 (NUT-13)';
 
   @override
   String get useCurrentSeedPhrase => '현재 시드 문구 사용';
@@ -908,7 +941,8 @@ class L10nKo extends L10n {
   String get noConnectionTokenSaved => '연결 없음. 나중에 청구하기 위해 토큰이 저장되었습니다.';
 
   @override
-  String get unknownMintOffline => '이 토큰은 알 수 없는 mint의 것입니다. 인터넷에 연결하여 추가하고 토큰을 청구하세요.';
+  String get unknownMintOffline =>
+      '이 토큰은 알 수 없는 mint의 것입니다. 인터넷에 연결하여 추가하고 토큰을 청구하세요.';
 
   @override
   String get noConnectionTryLater => 'Mint에 연결할 수 없음. 나중에 다시 시도하세요.';
@@ -1018,7 +1052,8 @@ class L10nKo extends L10n {
   String get p2pkExperimental => 'P2PK는 실험적 기능입니다. 주의하여 사용하세요.';
 
   @override
-  String get p2pkPendingSendWarning => '대기 중인 P2PK 전송이 있습니다. 수신자가 토큰을 수령한 후 기록에서 새로고침하세요.';
+  String get p2pkPendingSendWarning =>
+      '대기 중인 P2PK 전송이 있습니다. 수신자가 토큰을 수령한 후 기록에서 새로고침하세요.';
 
   @override
   String get p2pkExperimentalShort => '실험적';
