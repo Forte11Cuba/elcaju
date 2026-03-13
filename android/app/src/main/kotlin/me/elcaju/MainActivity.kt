@@ -3,6 +3,7 @@ package me.elcaju
 import android.content.ComponentName
 import android.nfc.NfcAdapter
 import android.nfc.cardemulation.CardEmulation
+import android.util.Log
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -30,7 +31,9 @@ class MainActivity : FlutterActivity() {
                                 ComponentName(this, NfcHceService::class.java)
                             )
                         }
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        Log.w("MainActivity", "setPreferredService failed (non-critical)", e)
+                    }
 
                     result.success(true)
                 }
@@ -44,7 +47,9 @@ class MainActivity : FlutterActivity() {
                             val cardEmulation = CardEmulation.getInstance(adapter)
                             cardEmulation.unsetPreferredService(this)
                         }
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {
+                        Log.w("MainActivity", "unsetPreferredService failed (non-critical)", e)
+                    }
 
                     result.success(true)
                 }

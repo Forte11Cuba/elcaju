@@ -99,55 +99,59 @@ class NfcService {
     required void Function() onSuccess,
     required void Function(String error) onError,
   }) async {
-    NfcManager.instance.startSession(
-      pollingOptions: {NfcPollingOption.iso14443},
-      onDiscovered: (NfcTag tag) async {
-        final ndef = NdefAndroid.from(tag);
-        if (ndef == null || !ndef.isWritable) {
-          onError('Tag is not writable');
-          NfcManager.instance.stopSession();
-          return;
-        }
+    try {
+      await NfcManager.instance.startSession(
+        pollingOptions: {NfcPollingOption.iso14443},
+        onDiscovered: (NfcTag tag) async {
+          final ndef = NdefAndroid.from(tag);
+          if (ndef == null || !ndef.isWritable) {
+            onError('Tag is not writable');
+            await NfcManager.instance.stopSession();
+            return;
+          }
 
-        // Build NDEF Text Record: [status byte][language code][text]
-        final textBytes = Uint8List.fromList(token.codeUnits);
-        final languageCode = Uint8List.fromList('en'.codeUnits);
-        final payload = Uint8List(1 + languageCode.length + textBytes.length);
-        payload[0] = languageCode.length; // status byte (UTF-8, no length)
-        payload.setRange(1, 1 + languageCode.length, languageCode);
-        payload.setRange(1 + languageCode.length, payload.length, textBytes);
+          // Build NDEF Text Record: [status byte][language code][text]
+          final textBytes = Uint8List.fromList(token.codeUnits);
+          final languageCode = Uint8List.fromList('en'.codeUnits);
+          final payload = Uint8List(1 + languageCode.length + textBytes.length);
+          payload[0] = languageCode.length; // status byte (UTF-8, no length)
+          payload.setRange(1, 1 + languageCode.length, languageCode);
+          payload.setRange(1 + languageCode.length, payload.length, textBytes);
 
-        // Check size
-        if (payload.length + 7 > ndef.maxSize) {
-          onError('Token too large for this NFC tag '
-              '(${payload.length + 7}B > ${ndef.maxSize}B)');
-          NfcManager.instance.stopSession();
-          return;
-        }
+          // Check size
+          if (payload.length + 7 > ndef.maxSize) {
+            onError('Token too large for this NFC tag '
+                '(${payload.length + 7}B > ${ndef.maxSize}B)');
+            await NfcManager.instance.stopSession();
+            return;
+          }
 
-        try {
-          final message = NdefMessage(records: [
-            NdefRecord(
-              typeNameFormat: TypeNameFormat.wellKnown,
-              type: Uint8List.fromList([0x54]), // 'T' = Text Record
-              identifier: Uint8List(0),
-              payload: payload,
-            ),
-          ]);
-          await ndef.writeNdefMessage(message);
-          onSuccess();
-          NfcManager.instance.stopSession();
-        } catch (e) {
-          onError(e.toString());
-          NfcManager.instance.stopSession();
-        }
-      },
-    );
+          try {
+            final message = NdefMessage(records: [
+              NdefRecord(
+                typeNameFormat: TypeNameFormat.wellKnown,
+                type: Uint8List.fromList([0x54]), // 'T' = Text Record
+                identifier: Uint8List(0),
+                payload: payload,
+              ),
+            ]);
+            await ndef.writeNdefMessage(message);
+            onSuccess();
+            await NfcManager.instance.stopSession();
+          } catch (e) {
+            onError(e.toString());
+            await NfcManager.instance.stopSession();
+          }
+        },
+      );
+    } catch (e) {
+      onError(e.toString());
+    }
   }
 
   /// Stop any active NFC session.
-  static void stopWrite() {
-    NfcManager.instance.stopSession();
+  static Future<void> stopWrite() async {
+    await NfcManager.instance.stopSession();
   }
 
   /// Start reading NFC tags for Cashu tokens.
@@ -157,53 +161,57 @@ class NfcService {
     required void Function(String token) onTokenRead,
     required void Function(String error) onError,
   }) async {
-    NfcManager.instance.startSession(
-      pollingOptions: {NfcPollingOption.iso14443},
-      onDiscovered: (NfcTag tag) async {
-        try {
-          final diagnostics = <String>[];
+    try {
+      await NfcManager.instance.startSession(
+        pollingOptions: {NfcPollingOption.iso14443},
+        onDiscovered: (NfcTag tag) async {
+          try {
+            final diagnostics = <String>[];
 
-          // 1. Try IsoDep first (HCE phone-to-phone)
-          final isoDep = IsoDepAndroid.from(tag);
-          if (isoDep != null) {
-            final (token, isoInfo) = await _readViaIsoDep(isoDep);
-            if (token != null) {
-              onTokenRead(token);
-              NfcManager.instance.stopSession();
-              return;
-            }
-            diagnostics.add('IsoDep: $isoInfo');
-          } else {
-            diagnostics.add('IsoDep: not available');
-          }
-
-          // 2. Fallback: NDEF (physical tags)
-          final ndef = NdefAndroid.from(tag);
-          if (ndef != null) {
-            final message = ndef.cachedNdefMessage ?? await ndef.getNdefMessage();
-            if (message != null) {
-              final token = _extractToken(message);
+            // 1. Try IsoDep first (HCE phone-to-phone)
+            final isoDep = IsoDepAndroid.from(tag);
+            if (isoDep != null) {
+              final (token, isoInfo) = await _readViaIsoDep(isoDep);
               if (token != null) {
                 onTokenRead(token);
-                NfcManager.instance.stopSession();
+                await NfcManager.instance.stopSession();
                 return;
               }
-              diagnostics.add('NDEF: ${message.records.length} records, no Cashu token');
+              diagnostics.add('IsoDep: $isoInfo');
             } else {
-              diagnostics.add('NDEF: no message');
+              diagnostics.add('IsoDep: not available');
             }
-          } else {
-            diagnostics.add('NDEF: not available');
-          }
 
-          onError('No Cashu token found [${diagnostics.join('; ')}]');
-          NfcManager.instance.stopSession();
-        } catch (e) {
-          onError(e.toString());
-          NfcManager.instance.stopSession();
-        }
-      },
-    );
+            // 2. Fallback: NDEF (physical tags)
+            final ndef = NdefAndroid.from(tag);
+            if (ndef != null) {
+              final message = ndef.cachedNdefMessage ?? await ndef.getNdefMessage();
+              if (message != null) {
+                final token = _extractToken(message);
+                if (token != null) {
+                  onTokenRead(token);
+                  await NfcManager.instance.stopSession();
+                  return;
+                }
+                diagnostics.add('NDEF: ${message.records.length} records, no Cashu token');
+              } else {
+                diagnostics.add('NDEF: no message');
+              }
+            } else {
+              diagnostics.add('NDEF: not available');
+            }
+
+            onError('No Cashu token found [${diagnostics.join('; ')}]');
+            await NfcManager.instance.stopSession();
+          } catch (e) {
+            onError(e.toString());
+            await NfcManager.instance.stopSession();
+          }
+        },
+      );
+    } catch (e) {
+      onError(e.toString());
+    }
   }
 
   /// Read NDEF from HCE via IsoDep APDU commands (like Numo).
@@ -387,8 +395,8 @@ class NfcService {
   }
 
   /// Stop any active NFC read session.
-  static void stopRead() {
-    NfcManager.instance.stopSession();
+  static Future<void> stopRead() async {
+    await NfcManager.instance.stopSession();
   }
 
   /// Extract a Cashu token from an NDEF message.
@@ -449,7 +457,8 @@ class NfcService {
       final parsed = Uri.parse(uri);
       final fragment = parsed.fragment;
       if (fragment.startsWith('token=')) {
-        return fragment.substring(6);
+        final token = fragment.substring(6);
+        if (_isCashuToken(token)) return token;
       }
       final tokenParam = parsed.queryParameters['token'];
       if (tokenParam != null && _isCashuToken(tokenParam)) {
