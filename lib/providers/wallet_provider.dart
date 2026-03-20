@@ -1393,12 +1393,44 @@ class WalletProvider extends ChangeNotifier {
   /// Llamar en background al iniciar la app.
   /// También vincula transacciones incoming sin metadata con invoices pendientes.
   Future<void> checkPendingTransactions() async {
-    for (final wallet in _wallets.values) {
-      try {
-        await wallet.checkPendingTransactions();
-      } catch (e) {
-        // Silencioso - puede fallar offline
-        debugPrint('Check pending failed: $e');
+    // Iterar todos los mints y todas sus unidades, no solo los wallets
+    // ya instanciados. initialize() solo precarga units.first por mint,
+    // así que quotes/sagas/melts en otras unidades se perderían.
+    for (final entry in _mintUnits.entries) {
+      for (final unit in entry.value) {
+        try {
+          final wallet = await getWallet(entry.key, unit);
+
+          try {
+            // Reclamar quotes pagados pero no emitidos (Lightning → proofs)
+            await wallet.checkAllMintQuotes();
+          } catch (e) {
+            debugPrint('Check mint quotes failed: $e');
+          }
+
+          try {
+            // Recuperar sagas incompletas (swaps/mints/melts interrumpidos)
+            await wallet.recoverIncompleteSagas();
+          } catch (e) {
+            debugPrint('Recover incomplete sagas failed: $e');
+          }
+
+          try {
+            // Finalizar retiros Lightning que quedaron a medias
+            await wallet.finalizePendingMelts();
+          } catch (e) {
+            debugPrint('Finalize pending melts failed: $e');
+          }
+
+          try {
+            await wallet.checkPendingTransactions();
+          } catch (e) {
+            // Silencioso - puede fallar offline
+            debugPrint('Check pending failed: $e');
+          }
+        } catch (e) {
+          debugPrint('Error getting wallet ${entry.key}:$unit: $e');
+        }
       }
     }
 
