@@ -108,20 +108,28 @@ impl TokenDecoder {
 
     #[frb(sync)]
     pub fn is_complete(&self) -> bool {
-        let decoder = self.decoder.read().expect("Lock poisoned");
-        decoder.is_complete()
+        self.decoder
+            .read()
+            .map(|decoder| decoder.is_complete())
+            .unwrap_or(false)
     }
 
     #[frb(sync)]
     pub fn receive(&self, input: String) -> Result<(), Error> {
-        let mut decoder = self.decoder.write().expect("Lock poisoned");
+        let mut decoder = self
+            .decoder
+            .write()
+            .map_err(|_| Error::Ur("Token decoder lock poisoned".to_string()))?;
         decoder.receive(&input)?;
         Ok(())
     }
 
     #[frb(sync)]
     pub fn value(&self) -> Result<Option<Token>, Error> {
-        let decoder = self.decoder.read().expect("Lock poisoned");
+        let decoder = self
+            .decoder
+            .read()
+            .map_err(|_| Error::Ur("Token decoder lock poisoned".to_string()))?;
         let ur = decoder.message()?;
         match ur {
             Some(ur) => {
