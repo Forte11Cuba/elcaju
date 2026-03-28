@@ -11,7 +11,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:bip32/bip32.dart' as bip32;
-import 'package:cdk_flutter/cdk_flutter.dart' as cdk;
+import '../src/rust/api/keys.dart' as cdk;
 import 'package:uuid/uuid.dart';
 
 import '../models/p2pk_key.dart';

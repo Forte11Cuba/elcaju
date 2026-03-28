@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:elcaju/l10n/app_localizations.dart';
-import 'package:cdk_flutter/cdk_flutter.dart';
+import '../../src/rust/api/token.dart';
 import '../../core/constants/colors.dart';
 import '../../core/utils/incoming_data_parser.dart';
 
