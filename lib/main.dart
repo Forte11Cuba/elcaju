@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:cdk_flutter/cdk_flutter.dart' hide WalletProvider;
+import 'src/rust/frb_generated.dart';
 import 'package:elcaju/l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/wallet_provider.dart';
@@ -15,8 +15,8 @@ import 'screens/1_splash/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializar CDK Flutter (Cashu SDK)
-  await CdkFlutter.init();
+  // Inicializar bridge Rust interno (Cashu SDK)
+  await RustLib.init();
 
   // Configurar orientación y estilo de barra de estado
   SystemChrome.setPreferredOrientations([

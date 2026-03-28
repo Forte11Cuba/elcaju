@@ -64,7 +64,7 @@ class _RestoreWalletScreenState extends State<RestoreWalletScreen> {
       final p2pkProvider = context.read<P2PKProvider>();
 
       // Inicializar wallet primero (valida el mnemonic internamente).
-      // Si es inválido, cdk_flutter lanzará una excepción antes de persistir.
+      // Si es inválido, el bridge Rust lanzará una excepción antes de persistir.
       await walletProvider.initialize(mnemonic);
 
       // Solo guardar mnemonic si initialize() pasó sin error

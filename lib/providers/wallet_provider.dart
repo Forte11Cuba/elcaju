@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:cbor/cbor.dart';
-import 'package:cdk_flutter/cdk_flutter.dart';
-import 'package:http/http.dart' as http;
+import '../src/rust/api/wallet.dart';
+import '../src/rust/api/token.dart';
+import '../src/rust/api/mint_info.dart';
+import '../src/rust/api/keys.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -177,15 +179,11 @@ class WalletProvider extends ChangeNotifier {
   // ============================================================
 
   /// Verifica si podemos alcanzar un mint específico.
-  /// Hace ping HTTP GET a {mintUrl}/v1/info con timeout de 3 segundos.
+  /// Usa función Rust que hace GET a {mintUrl}/v1/info.
   /// Retorna true si responde 200, false en cualquier otro caso.
   Future<bool> canReachMint(String mintUrl) async {
     try {
-      final uri = Uri.parse('$mintUrl/v1/info');
-      final response = await http.get(uri).timeout(
-        const Duration(seconds: 3),
-      );
-      return response.statusCode == 200;
+      return await pingMint(mintUrl: mintUrl);
     } catch (e) {
       debugPrint('Ping to mint failed: $e');
       return false;
@@ -409,7 +407,7 @@ class WalletProvider extends ChangeNotifier {
   /// Usa mintInfo.nuts.nut04 (MintMethodSettings) para obtener las unidades.
   Future<List<String>> _detectAndAddMint(String mintUrl) async {
     try {
-      // Obtener info del mint (función global de cdk_flutter)
+      // Obtener info del mint (función del bridge Rust)
       final mintInfo = await getMintInfo(mintUrl: mintUrl);
 
       // Extraer unidades de nut04 (mint methods)
@@ -446,31 +444,14 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Obtiene los keysets de un mint y los agrega al caché _keysetUnits.
-  /// Llama a GET {mintUrl}/v1/keysets para obtener el mapping keyset_id → unit.
+  /// Usa función Rust que llama a GET {mintUrl}/v1/keysets.
   Future<void> _fetchKeysets(String mintUrl) async {
     try {
-      final response = await http.get(
-        Uri.parse('$mintUrl/v1/keysets'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final keysets = data['keysets'] as List<dynamic>?;
-
-        if (keysets != null) {
-          for (final ks in keysets) {
-            final id = ks['id'] as String?;
-            final unit = ks['unit'] as String?;
-            if (id != null && unit != null) {
-              _keysetUnits[id] = unit;
-            }
-          }
-          debugPrint('Keysets cargados para $mintUrl: ${keysets.length}');
-        }
-      } else {
-        debugPrint('Error HTTP ${response.statusCode} al obtener keysets de $mintUrl');
+      final keysets = await fetchKeysets(mintUrl: mintUrl);
+      for (final ks in keysets) {
+        _keysetUnits[ks.id] = ks.unit;
       }
+      debugPrint('Keysets cargados para $mintUrl: ${keysets.length}');
     } catch (e) {
       debugPrint('Error obteniendo keysets de $mintUrl: $e');
       // No lanzamos excepción, el caché simplemente no tendrá estos keysets

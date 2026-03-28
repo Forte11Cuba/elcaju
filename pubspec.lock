@@ -161,15 +161,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.3.5"
-  cdk_flutter:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "7fb8580530d963c9ff09f23e55a1e56bccd8676b"
-      url: "https://github.com/cashubtc/cdk_flutter.git"
-    source: git
-    version: "0.1.0"
   characters:
     dependency: transitive
     description:
@@ -814,6 +805,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
+  rust_builder:
+    dependency: "direct main"
+    description:
+      path: rust_builder
+      relative: true
+    source: path
+    version: "0.1.0"
   share_plus:
     dependency: "direct main"
     description:

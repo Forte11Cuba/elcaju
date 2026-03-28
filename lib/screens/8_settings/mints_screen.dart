@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:cdk_flutter/cdk_flutter.dart' show MintInfo;
+import '../../src/rust/api/mint_info.dart' show MintInfo;
 import 'package:elcaju/l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
@@ -623,7 +623,7 @@ class _AddMintDialogState extends State<_AddMintDialog> {
     });
 
     try {
-      // Intentar agregar el mint (cdk_flutter validará la conexión)
+      // Intentar agregar el mint (el bridge Rust validará la conexión)
       await widget.walletProvider.addMint(url);
 
       if (mounted) {

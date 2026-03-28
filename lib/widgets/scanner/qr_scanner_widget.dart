@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:elcaju/l10n/app_localizations.dart';
-import 'package:cdk_flutter/cdk_flutter.dart';
+import '../../src/rust/api/token.dart';
 import '../../core/constants/colors.dart';
 import '../../core/utils/incoming_data_parser.dart';
 
@@ -36,7 +36,7 @@ class QrScannerWidget extends StatefulWidget {
 class _QrScannerWidgetState extends State<QrScannerWidget> {
   late MobileScannerController _controller;
 
-  // Estado para QR animados (UR multipartes) usando TokenDecoder de cdk-flutter
+  // Estado para QR animados (UR multipartes) — TokenDecoder (Rust bridge)
   TokenDecoder? _urDecoder;
   bool _isCapturingUr = false;
   final Set<String> _urFragmentsSeen = {};  // Trackear fragmentos únicos
