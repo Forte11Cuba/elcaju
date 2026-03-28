@@ -951,11 +951,13 @@ dependencies = [
  "cdk-common",
  "cdk-sqlite",
  "flutter_rust_bridge",
+ "getrandom 0.3.4",
  "log",
  "oslog",
  "reqwest",
  "serde_json",
  "tokio",
+ "uuid",
 ]
 
 [[package]]

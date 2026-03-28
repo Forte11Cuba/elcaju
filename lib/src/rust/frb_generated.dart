@@ -3,6 +3,11 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/error.dart';
+import 'api/keys.dart';
+import 'api/mint_info.dart';
+import 'api/token.dart';
+import 'api/wallet.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -63,7 +68,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -291292710;
+  int get rustContentHash => -625377011;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -73,7 +78,222 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
       );
 }
 
-abstract class RustLibApi extends BaseApi {}
+abstract class RustLibApi extends BaseApi {
+  BigInt crateApiWalletPreparedSendAutoAccessorGetAmount({
+    required PreparedSend that,
+  });
+
+  BigInt crateApiWalletPreparedSendAutoAccessorGetFee({
+    required PreparedSend that,
+  });
+
+  BigInt crateApiWalletPreparedSendAutoAccessorGetSendFee({
+    required PreparedSend that,
+  });
+
+  BigInt crateApiWalletPreparedSendAutoAccessorGetSwapFee({
+    required PreparedSend that,
+  });
+
+  void crateApiWalletPreparedSendAutoAccessorSetAmount({
+    required PreparedSend that,
+    required BigInt amount,
+  });
+
+  void crateApiWalletPreparedSendAutoAccessorSetFee({
+    required PreparedSend that,
+    required BigInt fee,
+  });
+
+  void crateApiWalletPreparedSendAutoAccessorSetSendFee({
+    required PreparedSend that,
+    required BigInt sendFee,
+  });
+
+  void crateApiWalletPreparedSendAutoAccessorSetSwapFee({
+    required PreparedSend that,
+    required BigInt swapFee,
+  });
+
+  bool crateApiTokenTokenDecoderIsComplete({required TokenDecoder that});
+
+  TokenDecoder crateApiTokenTokenDecoderNew();
+
+  void crateApiTokenTokenDecoderReceive({
+    required TokenDecoder that,
+    required String input,
+  });
+
+  Token? crateApiTokenTokenDecoderValue({required TokenDecoder that});
+
+  String crateApiWalletWalletDatabaseAutoAccessorGetPath({
+    required WalletDatabase that,
+  });
+
+  void crateApiWalletWalletDatabaseAutoAccessorSetPath({
+    required WalletDatabase that,
+    required String path,
+  });
+
+  Future<WalletDatabase> crateApiWalletWalletDatabaseNewInstance({
+    required String path,
+  });
+
+  Future<void> crateApiWalletWalletDatabaseRemoveMint({
+    required WalletDatabase that,
+    required String mintUrl,
+  });
+
+  String crateApiWalletWalletAutoAccessorGetMintUrl({required Wallet that});
+
+  String crateApiWalletWalletAutoAccessorGetUnit({required Wallet that});
+
+  void crateApiWalletWalletAutoAccessorSetMintUrl({
+    required Wallet that,
+    required String mintUrl,
+  });
+
+  void crateApiWalletWalletAutoAccessorSetUnit({
+    required Wallet that,
+    required String unit,
+  });
+
+  Future<BigInt> crateApiWalletWalletBalance({required Wallet that});
+
+  Future<void> crateApiWalletWalletCancelSend({
+    required Wallet that,
+    required PreparedSend send,
+  });
+
+  Future<void> crateApiWalletWalletCheckAllMintQuotes({required Wallet that});
+
+  Future<void> crateApiWalletWalletCheckPendingTransactions({
+    required Wallet that,
+  });
+
+  Future<void> crateApiWalletWalletFinalizePendingMelts({required Wallet that});
+
+  Future<MintInfo?> crateApiWalletWalletGetMint({required Wallet that});
+
+  Future<bool> crateApiWalletWalletIsTokenSpent({
+    required Wallet that,
+    required Token token,
+  });
+
+  Future<List<Transaction>> crateApiWalletWalletListTransactions({
+    required Wallet that,
+    TransactionDirection? direction,
+  });
+
+  Future<BigInt> crateApiWalletWalletMelt({
+    required Wallet that,
+    required MeltQuote quote,
+  });
+
+  Future<MeltQuote> crateApiWalletWalletMeltQuote({
+    required Wallet that,
+    required String request,
+  });
+
+  Stream<MintQuote> crateApiWalletWalletMint({
+    required Wallet that,
+    required BigInt amount,
+    String? description,
+  });
+
+  Wallet crateApiWalletWalletNew({
+    required String mintUrl,
+    required String unit,
+    required String mnemonic,
+    BigInt? targetProofCount,
+    required WalletDatabase db,
+  });
+
+  Future<PreparedSend> crateApiWalletWalletPrepareSend({
+    required Wallet that,
+    required BigInt amount,
+    SendOptions? opts,
+  });
+
+  Future<BigInt> crateApiWalletWalletReceive({
+    required Wallet that,
+    required Token token,
+    ReceiveOptions? opts,
+  });
+
+  Future<void> crateApiWalletWalletRecoverIncompleteSagas({
+    required Wallet that,
+  });
+
+  Future<void> crateApiWalletWalletRestore({required Wallet that});
+
+  Future<Token> crateApiWalletWalletSend({
+    required Wallet that,
+    required PreparedSend send,
+    String? memo,
+    bool? includeMemo,
+  });
+
+  Stream<BigInt> crateApiWalletWalletStreamBalance({required Wallet that});
+
+  List<String> crateApiTokenEncodeQrToken({
+    required Token token,
+    BigInt? maxFragmentLength,
+  });
+
+  Future<List<KeysetInfo>> crateApiMintInfoFetchKeysets({
+    required String mintUrl,
+  });
+
+  String crateApiKeysGenerateMnemonic();
+
+  Future<MintInfo> crateApiMintInfoGetMintInfo({required String mintUrl});
+
+  String crateApiKeysGetPubKey({required String secret});
+
+  Uint8List crateApiKeysMnemonicToSeed({required String mnemonic});
+
+  Future<bool> crateApiMintInfoPingMint({required String mintUrl});
+
+  Future<ReceiveOptions> crateApiWalletReceiveOptionsDefault();
+
+  Future<SendOptions> crateApiWalletSendOptionsDefault();
+
+  Token crateApiTokenTokenFromRawBytes({required List<int> raw});
+
+  Token crateApiTokenTokenParse({required String encoded});
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_PreparedSend;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_PreparedSend;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PreparedSendPtr;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_TokenDecoder;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_TokenDecoder;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_TokenDecoderPtr;
+
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Wallet;
+
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Wallet;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_WalletPtr;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_WalletDatabase;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_WalletDatabase;
+
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_WalletDatabasePtr;
+}
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   RustLibApiImpl({
@@ -83,10 +303,2529 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required super.portManager,
   });
 
+  @override
+  BigInt crateApiWalletPreparedSendAutoAccessorGetAmount({
+    required PreparedSend that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletPreparedSendAutoAccessorGetAmountConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletPreparedSendAutoAccessorGetAmountConstMeta =>
+      const TaskConstMeta(
+        debugName: "PreparedSend_auto_accessor_get_amount",
+        argNames: ["that"],
+      );
+
+  @override
+  BigInt crateApiWalletPreparedSendAutoAccessorGetFee({
+    required PreparedSend that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletPreparedSendAutoAccessorGetFeeConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletPreparedSendAutoAccessorGetFeeConstMeta =>
+      const TaskConstMeta(
+        debugName: "PreparedSend_auto_accessor_get_fee",
+        argNames: ["that"],
+      );
+
+  @override
+  BigInt crateApiWalletPreparedSendAutoAccessorGetSendFee({
+    required PreparedSend that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletPreparedSendAutoAccessorGetSendFeeConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiWalletPreparedSendAutoAccessorGetSendFeeConstMeta =>
+      const TaskConstMeta(
+        debugName: "PreparedSend_auto_accessor_get_send_fee",
+        argNames: ["that"],
+      );
+
+  @override
+  BigInt crateApiWalletPreparedSendAutoAccessorGetSwapFee({
+    required PreparedSend that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletPreparedSendAutoAccessorGetSwapFeeConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiWalletPreparedSendAutoAccessorGetSwapFeeConstMeta =>
+      const TaskConstMeta(
+        debugName: "PreparedSend_auto_accessor_get_swap_fee",
+        argNames: ["that"],
+      );
+
+  @override
+  void crateApiWalletPreparedSendAutoAccessorSetAmount({
+    required PreparedSend that,
+    required BigInt amount,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(amount, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletPreparedSendAutoAccessorSetAmountConstMeta,
+        argValues: [that, amount],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletPreparedSendAutoAccessorSetAmountConstMeta =>
+      const TaskConstMeta(
+        debugName: "PreparedSend_auto_accessor_set_amount",
+        argNames: ["that", "amount"],
+      );
+
+  @override
+  void crateApiWalletPreparedSendAutoAccessorSetFee({
+    required PreparedSend that,
+    required BigInt fee,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(fee, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletPreparedSendAutoAccessorSetFeeConstMeta,
+        argValues: [that, fee],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletPreparedSendAutoAccessorSetFeeConstMeta =>
+      const TaskConstMeta(
+        debugName: "PreparedSend_auto_accessor_set_fee",
+        argNames: ["that", "fee"],
+      );
+
+  @override
+  void crateApiWalletPreparedSendAutoAccessorSetSendFee({
+    required PreparedSend that,
+    required BigInt sendFee,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(sendFee, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletPreparedSendAutoAccessorSetSendFeeConstMeta,
+        argValues: [that, sendFee],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiWalletPreparedSendAutoAccessorSetSendFeeConstMeta =>
+      const TaskConstMeta(
+        debugName: "PreparedSend_auto_accessor_set_send_fee",
+        argNames: ["that", "sendFee"],
+      );
+
+  @override
+  void crateApiWalletPreparedSendAutoAccessorSetSwapFee({
+    required PreparedSend that,
+    required BigInt swapFee,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(swapFee, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletPreparedSendAutoAccessorSetSwapFeeConstMeta,
+        argValues: [that, swapFee],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta
+  get kCrateApiWalletPreparedSendAutoAccessorSetSwapFeeConstMeta =>
+      const TaskConstMeta(
+        debugName: "PreparedSend_auto_accessor_set_swap_fee",
+        argNames: ["that", "swapFee"],
+      );
+
+  @override
+  bool crateApiTokenTokenDecoderIsComplete({required TokenDecoder that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTokenTokenDecoderIsCompleteConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTokenTokenDecoderIsCompleteConstMeta =>
+      const TaskConstMeta(
+        debugName: "TokenDecoder_is_complete",
+        argNames: ["that"],
+      );
+
+  @override
+  TokenDecoder crateApiTokenTokenDecoderNew() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiTokenTokenDecoderNewConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTokenTokenDecoderNewConstMeta =>
+      const TaskConstMeta(debugName: "TokenDecoder_new", argNames: []);
+
+  @override
+  void crateApiTokenTokenDecoderReceive({
+    required TokenDecoder that,
+    required String input,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+            that,
+            serializer,
+          );
+          sse_encode_String(input, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiTokenTokenDecoderReceiveConstMeta,
+        argValues: [that, input],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTokenTokenDecoderReceiveConstMeta =>
+      const TaskConstMeta(
+        debugName: "TokenDecoder_receive",
+        argNames: ["that", "input"],
+      );
+
+  @override
+  Token? crateApiTokenTokenDecoderValue({required TokenDecoder that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_token,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiTokenTokenDecoderValueConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTokenTokenDecoderValueConstMeta =>
+      const TaskConstMeta(debugName: "TokenDecoder_value", argNames: ["that"]);
+
+  @override
+  String crateApiWalletWalletDatabaseAutoAccessorGetPath({
+    required WalletDatabase that,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletWalletDatabaseAutoAccessorGetPathConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletDatabaseAutoAccessorGetPathConstMeta =>
+      const TaskConstMeta(
+        debugName: "WalletDatabase_auto_accessor_get_path",
+        argNames: ["that"],
+      );
+
+  @override
+  void crateApiWalletWalletDatabaseAutoAccessorSetPath({
+    required WalletDatabase that,
+    required String path,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+            that,
+            serializer,
+          );
+          sse_encode_String(path, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletWalletDatabaseAutoAccessorSetPathConstMeta,
+        argValues: [that, path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletDatabaseAutoAccessorSetPathConstMeta =>
+      const TaskConstMeta(
+        debugName: "WalletDatabase_auto_accessor_set_path",
+        argNames: ["that", "path"],
+      );
+
+  @override
+  Future<WalletDatabase> crateApiWalletWalletDatabaseNewInstance({
+    required String path,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletDatabaseNewInstanceConstMeta,
+        argValues: [path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletDatabaseNewInstanceConstMeta =>
+      const TaskConstMeta(
+        debugName: "WalletDatabase_new_instance",
+        argNames: ["path"],
+      );
+
+  @override
+  Future<void> crateApiWalletWalletDatabaseRemoveMint({
+    required WalletDatabase that,
+    required String mintUrl,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+            that,
+            serializer,
+          );
+          sse_encode_String(mintUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 16,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletDatabaseRemoveMintConstMeta,
+        argValues: [that, mintUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletDatabaseRemoveMintConstMeta =>
+      const TaskConstMeta(
+        debugName: "WalletDatabase_remove_mint",
+        argNames: ["that", "mintUrl"],
+      );
+
+  @override
+  String crateApiWalletWalletAutoAccessorGetMintUrl({required Wallet that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 17)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletWalletAutoAccessorGetMintUrlConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletAutoAccessorGetMintUrlConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_auto_accessor_get_mint_url",
+        argNames: ["that"],
+      );
+
+  @override
+  String crateApiWalletWalletAutoAccessorGetUnit({required Wallet that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletWalletAutoAccessorGetUnitConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletAutoAccessorGetUnitConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_auto_accessor_get_unit",
+        argNames: ["that"],
+      );
+
+  @override
+  void crateApiWalletWalletAutoAccessorSetMintUrl({
+    required Wallet that,
+    required String mintUrl,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_String(mintUrl, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletWalletAutoAccessorSetMintUrlConstMeta,
+        argValues: [that, mintUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletAutoAccessorSetMintUrlConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_auto_accessor_set_mint_url",
+        argNames: ["that", "mintUrl"],
+      );
+
+  @override
+  void crateApiWalletWalletAutoAccessorSetUnit({
+    required Wallet that,
+    required String unit,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_String(unit, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 20)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletWalletAutoAccessorSetUnitConstMeta,
+        argValues: [that, unit],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletAutoAccessorSetUnitConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_auto_accessor_set_unit",
+        argNames: ["that", "unit"],
+      );
+
+  @override
+  Future<BigInt> crateApiWalletWalletBalance({required Wallet that}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 21,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletBalanceConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletBalanceConstMeta =>
+      const TaskConstMeta(debugName: "Wallet_balance", argNames: ["that"]);
+
+  @override
+  Future<void> crateApiWalletWalletCancelSend({
+    required Wallet that,
+    required PreparedSend send,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            send,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 22,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletCancelSendConstMeta,
+        argValues: [that, send],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletCancelSendConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_cancel_send",
+        argNames: ["that", "send"],
+      );
+
+  @override
+  Future<void> crateApiWalletWalletCheckAllMintQuotes({required Wallet that}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 23,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletCheckAllMintQuotesConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletCheckAllMintQuotesConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_check_all_mint_quotes",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<void> crateApiWalletWalletCheckPendingTransactions({
+    required Wallet that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 24,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletCheckPendingTransactionsConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletCheckPendingTransactionsConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_check_pending_transactions",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<void> crateApiWalletWalletFinalizePendingMelts({
+    required Wallet that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 25,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletFinalizePendingMeltsConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletFinalizePendingMeltsConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_finalize_pending_melts",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<MintInfo?> crateApiWalletWalletGetMint({required Wallet that}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 26,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_opt_box_autoadd_mint_info,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletGetMintConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletGetMintConstMeta =>
+      const TaskConstMeta(debugName: "Wallet_get_mint", argNames: ["that"]);
+
+  @override
+  Future<bool> crateApiWalletWalletIsTokenSpent({
+    required Wallet that,
+    required Token token,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_box_autoadd_token(token, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 27,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletIsTokenSpentConstMeta,
+        argValues: [that, token],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletIsTokenSpentConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_is_token_spent",
+        argNames: ["that", "token"],
+      );
+
+  @override
+  Future<List<Transaction>> crateApiWalletWalletListTransactions({
+    required Wallet that,
+    TransactionDirection? direction,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_opt_box_autoadd_transaction_direction(
+            direction,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 28,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_transaction,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletListTransactionsConstMeta,
+        argValues: [that, direction],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletListTransactionsConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_list_transactions",
+        argNames: ["that", "direction"],
+      );
+
+  @override
+  Future<BigInt> crateApiWalletWalletMelt({
+    required Wallet that,
+    required MeltQuote quote,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_box_autoadd_melt_quote(quote, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 29,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletMeltConstMeta,
+        argValues: [that, quote],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletMeltConstMeta => const TaskConstMeta(
+    debugName: "Wallet_melt",
+    argNames: ["that", "quote"],
+  );
+
+  @override
+  Future<MeltQuote> crateApiWalletWalletMeltQuote({
+    required Wallet that,
+    required String request,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_String(request, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 30,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_melt_quote,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletMeltQuoteConstMeta,
+        argValues: [that, request],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletMeltQuoteConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_melt_quote",
+        argNames: ["that", "request"],
+      );
+
+  @override
+  Stream<MintQuote> crateApiWalletWalletMint({
+    required Wallet that,
+    required BigInt amount,
+    String? description,
+  }) {
+    final sink = RustStreamSink<MintQuote>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+              that,
+              serializer,
+            );
+            sse_encode_u_64(amount, serializer);
+            sse_encode_opt_String(description, serializer);
+            sse_encode_StreamSink_mint_quote_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 31,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_error,
+          ),
+          constMeta: kCrateApiWalletWalletMintConstMeta,
+          argValues: [that, amount, description, sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletMintConstMeta => const TaskConstMeta(
+    debugName: "Wallet_mint",
+    argNames: ["that", "amount", "description", "sink"],
+  );
+
+  @override
+  Wallet crateApiWalletWalletNew({
+    required String mintUrl,
+    required String unit,
+    required String mnemonic,
+    BigInt? targetProofCount,
+    required WalletDatabase db,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(mintUrl, serializer);
+          sse_encode_String(unit, serializer);
+          sse_encode_String(mnemonic, serializer);
+          sse_encode_opt_box_autoadd_usize(targetProofCount, serializer);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+            db,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletNewConstMeta,
+        argValues: [mintUrl, unit, mnemonic, targetProofCount, db],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletNewConstMeta => const TaskConstMeta(
+    debugName: "Wallet_new",
+    argNames: ["mintUrl", "unit", "mnemonic", "targetProofCount", "db"],
+  );
+
+  @override
+  Future<PreparedSend> crateApiWalletWalletPrepareSend({
+    required Wallet that,
+    required BigInt amount,
+    SendOptions? opts,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_u_64(amount, serializer);
+          sse_encode_opt_box_autoadd_send_options(opts, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 33,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletPrepareSendConstMeta,
+        argValues: [that, amount, opts],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletPrepareSendConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_prepare_send",
+        argNames: ["that", "amount", "opts"],
+      );
+
+  @override
+  Future<BigInt> crateApiWalletWalletReceive({
+    required Wallet that,
+    required Token token,
+    ReceiveOptions? opts,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_box_autoadd_token(token, serializer);
+          sse_encode_opt_box_autoadd_receive_options(opts, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 34,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletReceiveConstMeta,
+        argValues: [that, token, opts],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletReceiveConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_receive",
+        argNames: ["that", "token", "opts"],
+      );
+
+  @override
+  Future<void> crateApiWalletWalletRecoverIncompleteSagas({
+    required Wallet that,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 35,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletRecoverIncompleteSagasConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletRecoverIncompleteSagasConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_recover_incomplete_sagas",
+        argNames: ["that"],
+      );
+
+  @override
+  Future<void> crateApiWalletWalletRestore({required Wallet that}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 36,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletRestoreConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletRestoreConstMeta =>
+      const TaskConstMeta(debugName: "Wallet_restore", argNames: ["that"]);
+
+  @override
+  Future<Token> crateApiWalletWalletSend({
+    required Wallet that,
+    required PreparedSend send,
+    String? memo,
+    bool? includeMemo,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+            that,
+            serializer,
+          );
+          sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+            send,
+            serializer,
+          );
+          sse_encode_opt_String(memo, serializer);
+          sse_encode_opt_box_autoadd_bool(includeMemo, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 37,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_token,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiWalletWalletSendConstMeta,
+        argValues: [that, send, memo, includeMemo],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletSendConstMeta => const TaskConstMeta(
+    debugName: "Wallet_send",
+    argNames: ["that", "send", "memo", "includeMemo"],
+  );
+
+  @override
+  Stream<BigInt> crateApiWalletWalletStreamBalance({required Wallet that}) {
+    final sink = RustStreamSink<BigInt>();
+    unawaited(
+      handler.executeNormal(
+        NormalTask(
+          callFfi: (port_) {
+            final serializer = SseSerializer(generalizedFrbRustBinding);
+            sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+              that,
+              serializer,
+            );
+            sse_encode_StreamSink_u_64_Sse(sink, serializer);
+            pdeCallFfi(
+              generalizedFrbRustBinding,
+              serializer,
+              funcId: 38,
+              port: port_,
+            );
+          },
+          codec: SseCodec(
+            decodeSuccessData: sse_decode_unit,
+            decodeErrorData: sse_decode_error,
+          ),
+          constMeta: kCrateApiWalletWalletStreamBalanceConstMeta,
+          argValues: [that, sink],
+          apiImpl: this,
+        ),
+      ),
+    );
+    return sink.stream;
+  }
+
+  TaskConstMeta get kCrateApiWalletWalletStreamBalanceConstMeta =>
+      const TaskConstMeta(
+        debugName: "Wallet_stream_balance",
+        argNames: ["that", "sink"],
+      );
+
+  @override
+  List<String> crateApiTokenEncodeQrToken({
+    required Token token,
+    BigInt? maxFragmentLength,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_box_autoadd_token(token, serializer);
+          sse_encode_opt_box_autoadd_usize(maxFragmentLength, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_String,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiTokenEncodeQrTokenConstMeta,
+        argValues: [token, maxFragmentLength],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTokenEncodeQrTokenConstMeta => const TaskConstMeta(
+    debugName: "encode_qr_token",
+    argNames: ["token", "maxFragmentLength"],
+  );
+
+  @override
+  Future<List<KeysetInfo>> crateApiMintInfoFetchKeysets({
+    required String mintUrl,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(mintUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 40,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_keyset_info,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiMintInfoFetchKeysetsConstMeta,
+        argValues: [mintUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiMintInfoFetchKeysetsConstMeta =>
+      const TaskConstMeta(debugName: "fetch_keysets", argNames: ["mintUrl"]);
+
+  @override
+  String crateApiKeysGenerateMnemonic() {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 41)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiKeysGenerateMnemonicConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiKeysGenerateMnemonicConstMeta =>
+      const TaskConstMeta(debugName: "generate_mnemonic", argNames: []);
+
+  @override
+  Future<MintInfo> crateApiMintInfoGetMintInfo({required String mintUrl}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(mintUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 42,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_mint_info,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiMintInfoGetMintInfoConstMeta,
+        argValues: [mintUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiMintInfoGetMintInfoConstMeta =>
+      const TaskConstMeta(debugName: "get_mint_info", argNames: ["mintUrl"]);
+
+  @override
+  String crateApiKeysGetPubKey({required String secret}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(secret, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 43)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_String,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiKeysGetPubKeyConstMeta,
+        argValues: [secret],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiKeysGetPubKeyConstMeta =>
+      const TaskConstMeta(debugName: "get_pub_key", argNames: ["secret"]);
+
+  @override
+  Uint8List crateApiKeysMnemonicToSeed({required String mnemonic}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(mnemonic, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 44)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_prim_u_8_strict,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiKeysMnemonicToSeedConstMeta,
+        argValues: [mnemonic],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiKeysMnemonicToSeedConstMeta => const TaskConstMeta(
+    debugName: "mnemonic_to_seed",
+    argNames: ["mnemonic"],
+  );
+
+  @override
+  Future<bool> crateApiMintInfoPingMint({required String mintUrl}) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(mintUrl, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 45,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_bool,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiMintInfoPingMintConstMeta,
+        argValues: [mintUrl],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiMintInfoPingMintConstMeta =>
+      const TaskConstMeta(debugName: "ping_mint", argNames: ["mintUrl"]);
+
+  @override
+  Future<ReceiveOptions> crateApiWalletReceiveOptionsDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 46,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_receive_options,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletReceiveOptionsDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletReceiveOptionsDefaultConstMeta =>
+      const TaskConstMeta(debugName: "receive_options_default", argNames: []);
+
+  @override
+  Future<SendOptions> crateApiWalletSendOptionsDefault() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 47,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_send_options,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiWalletSendOptionsDefaultConstMeta,
+        argValues: [],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiWalletSendOptionsDefaultConstMeta =>
+      const TaskConstMeta(debugName: "send_options_default", argNames: []);
+
+  @override
+  Token crateApiTokenTokenFromRawBytes({required List<int> raw}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(raw, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_token,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiTokenTokenFromRawBytesConstMeta,
+        argValues: [raw],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTokenTokenFromRawBytesConstMeta =>
+      const TaskConstMeta(debugName: "token_from_raw_bytes", argNames: ["raw"]);
+
+  @override
+  Token crateApiTokenTokenParse({required String encoded}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(encoded, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_token,
+          decodeErrorData: sse_decode_error,
+        ),
+        constMeta: kCrateApiTokenTokenParseConstMeta,
+        argValues: [encoded],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiTokenTokenParseConstMeta =>
+      const TaskConstMeta(debugName: "token_parse", argNames: ["encoded"]);
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_PreparedSend => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_PreparedSend => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_TokenDecoder => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_TokenDecoder => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_Wallet => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_Wallet => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet;
+
+  RustArcIncrementStrongCountFnType
+  get rust_arc_increment_strong_count_WalletDatabase => wire
+      .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase;
+
+  RustArcDecrementStrongCountFnType
+  get rust_arc_decrement_strong_count_WalletDatabase => wire
+      .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase;
+
   @protected
-  int sse_decode_i_32(SseDeserializer deserializer) {
+  AnyhowException dco_decode_AnyhowException(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return AnyhowException(raw as String);
+  }
+
+  @protected
+  PreparedSend
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PreparedSendImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  TokenDecoder
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return TokenDecoderImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Wallet
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WalletImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  WalletDatabase
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WalletDatabaseImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  PreparedSend
+  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PreparedSendImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Wallet
+  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WalletImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  WalletDatabase
+  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WalletDatabaseImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  PreparedSend
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PreparedSendImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  TokenDecoder
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return TokenDecoderImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Wallet
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WalletImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  WalletDatabase
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WalletDatabaseImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Map<String, String> dco_decode_Map_String_String_None(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(
+      dco_decode_list_record_string_string(
+        raw,
+      ).map((e) => MapEntry(e.$1, e.$2)),
+    );
+  }
+
+  @protected
+  PreparedSend
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return PreparedSendImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  TokenDecoder
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return TokenDecoderImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  Wallet
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WalletImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  WalletDatabase
+  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return WalletDatabaseImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  RustStreamSink<MintQuote> dco_decode_StreamSink_mint_quote_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  RustStreamSink<BigInt> dco_decode_StreamSink_u_64_Sse(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    throw UnimplementedError();
+  }
+
+  @protected
+  String dco_decode_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as String;
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  bool dco_decode_box_autoadd_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  MeltQuote dco_decode_box_autoadd_melt_quote(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_melt_quote(raw);
+  }
+
+  @protected
+  MintInfo dco_decode_box_autoadd_mint_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_mint_info(raw);
+  }
+
+  @protected
+  MintVersion dco_decode_box_autoadd_mint_version(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_mint_version(raw);
+  }
+
+  @protected
+  ReceiveOptions dco_decode_box_autoadd_receive_options(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_receive_options(raw);
+  }
+
+  @protected
+  SendOptions dco_decode_box_autoadd_send_options(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_send_options(raw);
+  }
+
+  @protected
+  Token dco_decode_box_autoadd_token(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_token(raw);
+  }
+
+  @protected
+  TransactionDirection dco_decode_box_autoadd_transaction_direction(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_transaction_direction(raw);
+  }
+
+  @protected
+  BigInt dco_decode_box_autoadd_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_u_64(raw);
+  }
+
+  @protected
+  BigInt dco_decode_box_autoadd_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_usize(raw);
+  }
+
+  @protected
+  ContactInfo dco_decode_contact_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ContactInfo(
+      method: dco_decode_String(arr[0]),
+      info: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  Error dco_decode_error(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return Error_Cdk(dco_decode_String(raw[1]));
+      case 1:
+        return Error_Database(dco_decode_String(raw[1]));
+      case 2:
+        return Error_InvalidInput();
+      case 3:
+        return Error_Network(dco_decode_String(raw[1]));
+      case 4:
+        return Error_Ur(dco_decode_String(raw[1]));
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
+  int dco_decode_i_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  KeysetInfo dco_decode_keyset_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return KeysetInfo(
+      id: dco_decode_String(arr[0]),
+      unit: dco_decode_String(arr[1]),
+      active: dco_decode_bool(arr[2]),
+    );
+  }
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_String).toList();
+  }
+
+  @protected
+  List<ContactInfo> dco_decode_list_contact_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_contact_info).toList();
+  }
+
+  @protected
+  List<KeysetInfo> dco_decode_list_keyset_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_keyset_info).toList();
+  }
+
+  @protected
+  List<MeltMethodSettings> dco_decode_list_melt_method_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_melt_method_settings).toList();
+  }
+
+  @protected
+  List<MintMethodSettings> dco_decode_list_mint_method_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_mint_method_settings).toList();
+  }
+
+  @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as List<int>;
+  }
+
+  @protected
+  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as Uint8List;
+  }
+
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_string_string).toList();
+  }
+
+  @protected
+  List<Transaction> dco_decode_list_transaction(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_transaction).toList();
+  }
+
+  @protected
+  MeltMethodSettings dco_decode_melt_method_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return MeltMethodSettings(
+      method: dco_decode_String(arr[0]),
+      unit: dco_decode_String(arr[1]),
+      minAmount: dco_decode_opt_box_autoadd_u_64(arr[2]),
+      maxAmount: dco_decode_opt_box_autoadd_u_64(arr[3]),
+    );
+  }
+
+  @protected
+  MeltQuote dco_decode_melt_quote(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return MeltQuote(
+      id: dco_decode_String(arr[0]),
+      request: dco_decode_String(arr[1]),
+      amount: dco_decode_u_64(arr[2]),
+      feeReserve: dco_decode_u_64(arr[3]),
+      expiry: dco_decode_u_64(arr[4]),
+    );
+  }
+
+  @protected
+  MintInfo dco_decode_mint_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 12)
+      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+    return MintInfo(
+      name: dco_decode_opt_String(arr[0]),
+      pubkey: dco_decode_opt_String(arr[1]),
+      version: dco_decode_opt_box_autoadd_mint_version(arr[2]),
+      description: dco_decode_opt_String(arr[3]),
+      descriptionLong: dco_decode_opt_String(arr[4]),
+      contact: dco_decode_opt_list_contact_info(arr[5]),
+      nuts: dco_decode_nuts(arr[6]),
+      iconUrl: dco_decode_opt_String(arr[7]),
+      urls: dco_decode_opt_list_String(arr[8]),
+      motd: dco_decode_opt_String(arr[9]),
+      time: dco_decode_opt_box_autoadd_u_64(arr[10]),
+      tosUrl: dco_decode_opt_String(arr[11]),
+    );
+  }
+
+  @protected
+  MintMethodSettings dco_decode_mint_method_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return MintMethodSettings(
+      method: dco_decode_String(arr[0]),
+      unit: dco_decode_String(arr[1]),
+      minAmount: dco_decode_opt_box_autoadd_u_64(arr[2]),
+      maxAmount: dco_decode_opt_box_autoadd_u_64(arr[3]),
+    );
+  }
+
+  @protected
+  MintQuote dco_decode_mint_quote(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return MintQuote(
+      id: dco_decode_String(arr[0]),
+      request: dco_decode_String(arr[1]),
+      amount: dco_decode_opt_box_autoadd_u_64(arr[2]),
+      expiry: dco_decode_opt_box_autoadd_u_64(arr[3]),
+      state: dco_decode_mint_quote_state(arr[4]),
+      token: dco_decode_opt_box_autoadd_token(arr[5]),
+      error: dco_decode_opt_String(arr[6]),
+    );
+  }
+
+  @protected
+  MintQuoteState dco_decode_mint_quote_state(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return MintQuoteState.values[raw as int];
+  }
+
+  @protected
+  MintVersion dco_decode_mint_version(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return MintVersion(
+      name: dco_decode_String(arr[0]),
+      version: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  Nut04Settings dco_decode_nut_04_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return Nut04Settings(
+      methods: dco_decode_list_mint_method_settings(arr[0]),
+      disabled: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
+  Nut05Settings dco_decode_nut_05_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return Nut05Settings(
+      methods: dco_decode_list_melt_method_settings(arr[0]),
+      disabled: dco_decode_bool(arr[1]),
+    );
+  }
+
+  @protected
+  Nuts dco_decode_nuts(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    return Nuts(
+      nut04: dco_decode_nut_04_settings(arr[0]),
+      nut05: dco_decode_nut_05_settings(arr[1]),
+      nut07: dco_decode_supported_settings(arr[2]),
+      nut08: dco_decode_supported_settings(arr[3]),
+      nut09: dco_decode_supported_settings(arr[4]),
+      nut10: dco_decode_supported_settings(arr[5]),
+      nut11: dco_decode_supported_settings(arr[6]),
+      nut12: dco_decode_supported_settings(arr[7]),
+      nut14: dco_decode_supported_settings(arr[8]),
+      nut20: dco_decode_supported_settings(arr[9]),
+    );
+  }
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  bool? dco_decode_opt_box_autoadd_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_bool(raw);
+  }
+
+  @protected
+  MintInfo? dco_decode_opt_box_autoadd_mint_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_mint_info(raw);
+  }
+
+  @protected
+  MintVersion? dco_decode_opt_box_autoadd_mint_version(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_mint_version(raw);
+  }
+
+  @protected
+  ReceiveOptions? dco_decode_opt_box_autoadd_receive_options(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_receive_options(raw);
+  }
+
+  @protected
+  SendOptions? dco_decode_opt_box_autoadd_send_options(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_send_options(raw);
+  }
+
+  @protected
+  Token? dco_decode_opt_box_autoadd_token(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_token(raw);
+  }
+
+  @protected
+  TransactionDirection? dco_decode_opt_box_autoadd_transaction_direction(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_transaction_direction(raw);
+  }
+
+  @protected
+  BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_u_64(raw);
+  }
+
+  @protected
+  BigInt? dco_decode_opt_box_autoadd_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_usize(raw);
+  }
+
+  @protected
+  List<String>? dco_decode_opt_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_String(raw);
+  }
+
+  @protected
+  List<ContactInfo>? dco_decode_opt_list_contact_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_contact_info(raw);
+  }
+
+  @protected
+  Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_prim_u_8_strict(raw);
+  }
+
+  @protected
+  ReceiveOptions dco_decode_receive_options(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ReceiveOptions(
+      signingKeys: dco_decode_opt_list_String(arr[0]),
+      preimages: dco_decode_opt_list_String(arr[1]),
+    );
+  }
+
+  @protected
+  (String, String) dco_decode_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_String(arr[0]), dco_decode_String(arr[1]));
+  }
+
+  @protected
+  SendOptions dco_decode_send_options(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return SendOptions(
+      pubkey: dco_decode_opt_String(arr[0]),
+      includeFee: dco_decode_opt_box_autoadd_bool(arr[1]),
+    );
+  }
+
+  @protected
+  SupportedSettings dco_decode_supported_settings(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return SupportedSettings(supported: dco_decode_bool(arr[0]));
+  }
+
+  @protected
+  Token dco_decode_token(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return Token(
+      encoded: dco_decode_String(arr[0]),
+      raw: dco_decode_opt_list_prim_u_8_strict(arr[1]),
+      amount: dco_decode_u_64(arr[2]),
+      mintUrl: dco_decode_String(arr[3]),
+    );
+  }
+
+  @protected
+  Transaction dco_decode_transaction(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return Transaction(
+      id: dco_decode_String(arr[0]),
+      mintUrl: dco_decode_String(arr[1]),
+      direction: dco_decode_transaction_direction(arr[2]),
+      amount: dco_decode_u_64(arr[3]),
+      fee: dco_decode_u_64(arr[4]),
+      unit: dco_decode_String(arr[5]),
+      ys: dco_decode_list_String(arr[6]),
+      timestamp: dco_decode_u_64(arr[7]),
+      memo: dco_decode_opt_String(arr[8]),
+      metadata: dco_decode_Map_String_String_None(arr[9]),
+      status: dco_decode_transaction_status(arr[10]),
+    );
+  }
+
+  @protected
+  TransactionDirection dco_decode_transaction_direction(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return TransactionDirection.values[raw as int];
+  }
+
+  @protected
+  TransactionStatus dco_decode_transaction_status(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return TransactionStatus.values[raw as int];
+  }
+
+  @protected
+  BigInt dco_decode_u_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
+  int dco_decode_u_8(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
+  void dco_decode_unit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return;
+  }
+
+  @protected
+  BigInt dco_decode_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
+  AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getInt32();
+    var inner = sse_decode_String(deserializer);
+    return AnyhowException(inner);
+  }
+
+  @protected
+  PreparedSend
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return PreparedSendImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  TokenDecoder
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return TokenDecoderImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  Wallet
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return WalletImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  WalletDatabase
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return WalletDatabaseImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  PreparedSend
+  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return PreparedSendImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  Wallet
+  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return WalletImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  WalletDatabase
+  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return WalletDatabaseImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  PreparedSend
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return PreparedSendImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  TokenDecoder
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return TokenDecoderImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  Wallet
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return WalletImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  WalletDatabase
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return WalletDatabaseImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  Map<String, String> sse_decode_Map_String_String_None(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_string_string(deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
+  PreparedSend
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return PreparedSendImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  TokenDecoder
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return TokenDecoderImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  Wallet
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return WalletImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  WalletDatabase
+  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return WalletDatabaseImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  RustStreamSink<MintQuote> sse_decode_StreamSink_mint_quote_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  RustStreamSink<BigInt> sse_decode_StreamSink_u_64_Sse(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    throw UnimplementedError('Unreachable ()');
+  }
+
+  @protected
+  String sse_decode_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return utf8.decoder.convert(inner);
   }
 
   @protected
@@ -96,9 +2835,916 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_i_32(int self, SseSerializer serializer) {
+  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putInt32(self);
+    return (sse_decode_bool(deserializer));
+  }
+
+  @protected
+  MeltQuote sse_decode_box_autoadd_melt_quote(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_melt_quote(deserializer));
+  }
+
+  @protected
+  MintInfo sse_decode_box_autoadd_mint_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_mint_info(deserializer));
+  }
+
+  @protected
+  MintVersion sse_decode_box_autoadd_mint_version(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_mint_version(deserializer));
+  }
+
+  @protected
+  ReceiveOptions sse_decode_box_autoadd_receive_options(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_receive_options(deserializer));
+  }
+
+  @protected
+  SendOptions sse_decode_box_autoadd_send_options(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_send_options(deserializer));
+  }
+
+  @protected
+  Token sse_decode_box_autoadd_token(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_token(deserializer));
+  }
+
+  @protected
+  TransactionDirection sse_decode_box_autoadd_transaction_direction(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_transaction_direction(deserializer));
+  }
+
+  @protected
+  BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_u_64(deserializer));
+  }
+
+  @protected
+  BigInt sse_decode_box_autoadd_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_usize(deserializer));
+  }
+
+  @protected
+  ContactInfo sse_decode_contact_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_method = sse_decode_String(deserializer);
+    var var_info = sse_decode_String(deserializer);
+    return ContactInfo(method: var_method, info: var_info);
+  }
+
+  @protected
+  Error sse_decode_error(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_String(deserializer);
+        return Error_Cdk(var_field0);
+      case 1:
+        var var_field0 = sse_decode_String(deserializer);
+        return Error_Database(var_field0);
+      case 2:
+        return Error_InvalidInput();
+      case 3:
+        var var_field0 = sse_decode_String(deserializer);
+        return Error_Network(var_field0);
+      case 4:
+        var var_field0 = sse_decode_String(deserializer);
+        return Error_Ur(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
+  int sse_decode_i_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  KeysetInfo sse_decode_keyset_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_unit = sse_decode_String(deserializer);
+    var var_active = sse_decode_bool(deserializer);
+    return KeysetInfo(id: var_id, unit: var_unit, active: var_active);
+  }
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <String>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_String(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ContactInfo> sse_decode_list_contact_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ContactInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_contact_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<KeysetInfo> sse_decode_list_keyset_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <KeysetInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_keyset_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<MeltMethodSettings> sse_decode_list_melt_method_settings(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <MeltMethodSettings>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_melt_method_settings(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<MintMethodSettings> sse_decode_list_mint_method_settings(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <MintMethodSettings>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_mint_method_settings(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_string_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<Transaction> sse_decode_list_transaction(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Transaction>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_transaction(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  MeltMethodSettings sse_decode_melt_method_settings(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_method = sse_decode_String(deserializer);
+    var var_unit = sse_decode_String(deserializer);
+    var var_minAmount = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_maxAmount = sse_decode_opt_box_autoadd_u_64(deserializer);
+    return MeltMethodSettings(
+      method: var_method,
+      unit: var_unit,
+      minAmount: var_minAmount,
+      maxAmount: var_maxAmount,
+    );
+  }
+
+  @protected
+  MeltQuote sse_decode_melt_quote(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_request = sse_decode_String(deserializer);
+    var var_amount = sse_decode_u_64(deserializer);
+    var var_feeReserve = sse_decode_u_64(deserializer);
+    var var_expiry = sse_decode_u_64(deserializer);
+    return MeltQuote(
+      id: var_id,
+      request: var_request,
+      amount: var_amount,
+      feeReserve: var_feeReserve,
+      expiry: var_expiry,
+    );
+  }
+
+  @protected
+  MintInfo sse_decode_mint_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_opt_String(deserializer);
+    var var_pubkey = sse_decode_opt_String(deserializer);
+    var var_version = sse_decode_opt_box_autoadd_mint_version(deserializer);
+    var var_description = sse_decode_opt_String(deserializer);
+    var var_descriptionLong = sse_decode_opt_String(deserializer);
+    var var_contact = sse_decode_opt_list_contact_info(deserializer);
+    var var_nuts = sse_decode_nuts(deserializer);
+    var var_iconUrl = sse_decode_opt_String(deserializer);
+    var var_urls = sse_decode_opt_list_String(deserializer);
+    var var_motd = sse_decode_opt_String(deserializer);
+    var var_time = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_tosUrl = sse_decode_opt_String(deserializer);
+    return MintInfo(
+      name: var_name,
+      pubkey: var_pubkey,
+      version: var_version,
+      description: var_description,
+      descriptionLong: var_descriptionLong,
+      contact: var_contact,
+      nuts: var_nuts,
+      iconUrl: var_iconUrl,
+      urls: var_urls,
+      motd: var_motd,
+      time: var_time,
+      tosUrl: var_tosUrl,
+    );
+  }
+
+  @protected
+  MintMethodSettings sse_decode_mint_method_settings(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_method = sse_decode_String(deserializer);
+    var var_unit = sse_decode_String(deserializer);
+    var var_minAmount = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_maxAmount = sse_decode_opt_box_autoadd_u_64(deserializer);
+    return MintMethodSettings(
+      method: var_method,
+      unit: var_unit,
+      minAmount: var_minAmount,
+      maxAmount: var_maxAmount,
+    );
+  }
+
+  @protected
+  MintQuote sse_decode_mint_quote(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_request = sse_decode_String(deserializer);
+    var var_amount = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_expiry = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_state = sse_decode_mint_quote_state(deserializer);
+    var var_token = sse_decode_opt_box_autoadd_token(deserializer);
+    var var_error = sse_decode_opt_String(deserializer);
+    return MintQuote(
+      id: var_id,
+      request: var_request,
+      amount: var_amount,
+      expiry: var_expiry,
+      state: var_state,
+      token: var_token,
+      error: var_error,
+    );
+  }
+
+  @protected
+  MintQuoteState sse_decode_mint_quote_state(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return MintQuoteState.values[inner];
+  }
+
+  @protected
+  MintVersion sse_decode_mint_version(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_version = sse_decode_String(deserializer);
+    return MintVersion(name: var_name, version: var_version);
+  }
+
+  @protected
+  Nut04Settings sse_decode_nut_04_settings(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_methods = sse_decode_list_mint_method_settings(deserializer);
+    var var_disabled = sse_decode_bool(deserializer);
+    return Nut04Settings(methods: var_methods, disabled: var_disabled);
+  }
+
+  @protected
+  Nut05Settings sse_decode_nut_05_settings(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_methods = sse_decode_list_melt_method_settings(deserializer);
+    var var_disabled = sse_decode_bool(deserializer);
+    return Nut05Settings(methods: var_methods, disabled: var_disabled);
+  }
+
+  @protected
+  Nuts sse_decode_nuts(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_nut04 = sse_decode_nut_04_settings(deserializer);
+    var var_nut05 = sse_decode_nut_05_settings(deserializer);
+    var var_nut07 = sse_decode_supported_settings(deserializer);
+    var var_nut08 = sse_decode_supported_settings(deserializer);
+    var var_nut09 = sse_decode_supported_settings(deserializer);
+    var var_nut10 = sse_decode_supported_settings(deserializer);
+    var var_nut11 = sse_decode_supported_settings(deserializer);
+    var var_nut12 = sse_decode_supported_settings(deserializer);
+    var var_nut14 = sse_decode_supported_settings(deserializer);
+    var var_nut20 = sse_decode_supported_settings(deserializer);
+    return Nuts(
+      nut04: var_nut04,
+      nut05: var_nut05,
+      nut07: var_nut07,
+      nut08: var_nut08,
+      nut09: var_nut09,
+      nut10: var_nut10,
+      nut11: var_nut11,
+      nut12: var_nut12,
+      nut14: var_nut14,
+      nut20: var_nut20,
+    );
+  }
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_bool(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  MintInfo? sse_decode_opt_box_autoadd_mint_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_mint_info(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  MintVersion? sse_decode_opt_box_autoadd_mint_version(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_mint_version(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ReceiveOptions? sse_decode_opt_box_autoadd_receive_options(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_receive_options(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  SendOptions? sse_decode_opt_box_autoadd_send_options(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_send_options(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  Token? sse_decode_opt_box_autoadd_token(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_token(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  TransactionDirection? sse_decode_opt_box_autoadd_transaction_direction(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_transaction_direction(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_u_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  BigInt? sse_decode_opt_box_autoadd_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_usize(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_String(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  List<ContactInfo>? sse_decode_opt_list_contact_info(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_contact_info(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_prim_u_8_strict(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ReceiveOptions sse_decode_receive_options(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_signingKeys = sse_decode_opt_list_String(deserializer);
+    var var_preimages = sse_decode_opt_list_String(deserializer);
+    return ReceiveOptions(
+      signingKeys: var_signingKeys,
+      preimages: var_preimages,
+    );
+  }
+
+  @protected
+  (String, String) sse_decode_record_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  SendOptions sse_decode_send_options(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_pubkey = sse_decode_opt_String(deserializer);
+    var var_includeFee = sse_decode_opt_box_autoadd_bool(deserializer);
+    return SendOptions(pubkey: var_pubkey, includeFee: var_includeFee);
+  }
+
+  @protected
+  SupportedSettings sse_decode_supported_settings(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_supported = sse_decode_bool(deserializer);
+    return SupportedSettings(supported: var_supported);
+  }
+
+  @protected
+  Token sse_decode_token(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_encoded = sse_decode_String(deserializer);
+    var var_raw = sse_decode_opt_list_prim_u_8_strict(deserializer);
+    var var_amount = sse_decode_u_64(deserializer);
+    var var_mintUrl = sse_decode_String(deserializer);
+    return Token(
+      encoded: var_encoded,
+      raw: var_raw,
+      amount: var_amount,
+      mintUrl: var_mintUrl,
+    );
+  }
+
+  @protected
+  Transaction sse_decode_transaction(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_mintUrl = sse_decode_String(deserializer);
+    var var_direction = sse_decode_transaction_direction(deserializer);
+    var var_amount = sse_decode_u_64(deserializer);
+    var var_fee = sse_decode_u_64(deserializer);
+    var var_unit = sse_decode_String(deserializer);
+    var var_ys = sse_decode_list_String(deserializer);
+    var var_timestamp = sse_decode_u_64(deserializer);
+    var var_memo = sse_decode_opt_String(deserializer);
+    var var_metadata = sse_decode_Map_String_String_None(deserializer);
+    var var_status = sse_decode_transaction_status(deserializer);
+    return Transaction(
+      id: var_id,
+      mintUrl: var_mintUrl,
+      direction: var_direction,
+      amount: var_amount,
+      fee: var_fee,
+      unit: var_unit,
+      ys: var_ys,
+      timestamp: var_timestamp,
+      memo: var_memo,
+      metadata: var_metadata,
+      status: var_status,
+    );
+  }
+
+  @protected
+  TransactionDirection sse_decode_transaction_direction(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return TransactionDirection.values[inner];
+  }
+
+  @protected
+  TransactionStatus sse_decode_transaction_status(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return TransactionStatus.values[inner];
+  }
+
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
+  int sse_decode_u_8(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8();
+  }
+
+  @protected
+  void sse_decode_unit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
+  void sse_encode_AnyhowException(
+    AnyhowException self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    PreparedSend self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as PreparedSendImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    TokenDecoder self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as TokenDecoderImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    Wallet self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as WalletImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    WalletDatabase self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as WalletDatabaseImpl).frbInternalSseEncode(move: true),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    PreparedSend self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as PreparedSendImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    Wallet self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as WalletImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    WalletDatabase self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as WalletDatabaseImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    PreparedSend self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as PreparedSendImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    TokenDecoder self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as TokenDecoderImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    Wallet self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as WalletImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    WalletDatabase self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as WalletDatabaseImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_Map_String_String_None(
+    Map<String, String> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_string_string(
+      self.entries.map((e) => (e.key, e.value)).toList(),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
+    PreparedSend self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as PreparedSendImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerTokenDecoder(
+    TokenDecoder self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as TokenDecoderImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWallet(
+    Wallet self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as WalletImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletDatabase(
+    WalletDatabase self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as WalletDatabaseImpl).frbInternalSseEncode(move: null),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_StreamSink_mint_quote_Sse(
+    RustStreamSink<MintQuote> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_mint_quote,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_StreamSink_u_64_Sse(
+    RustStreamSink<BigInt> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(
+      self.setupAndSerialize(
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_64,
+          decodeErrorData: sse_decode_AnyhowException,
+        ),
+      ),
+      serializer,
+    );
+  }
+
+  @protected
+  void sse_encode_String(String self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
   }
 
   @protected
@@ -106,4 +3752,820 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
   }
+
+  @protected
+  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_melt_quote(
+    MeltQuote self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_melt_quote(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_mint_info(
+    MintInfo self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_mint_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_mint_version(
+    MintVersion self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_mint_version(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_receive_options(
+    ReceiveOptions self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_receive_options(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_send_options(
+    SendOptions self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_send_options(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_token(Token self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_token(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_transaction_direction(
+    TransactionDirection self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_transaction_direction(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_64(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_usize(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self, serializer);
+  }
+
+  @protected
+  void sse_encode_contact_info(ContactInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.method, serializer);
+    sse_encode_String(self.info, serializer);
+  }
+
+  @protected
+  void sse_encode_error(Error self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case Error_Cdk(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_String(field0, serializer);
+      case Error_Database(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_String(field0, serializer);
+      case Error_InvalidInput():
+        sse_encode_i_32(2, serializer);
+      case Error_Network(field0: final field0):
+        sse_encode_i_32(3, serializer);
+        sse_encode_String(field0, serializer);
+      case Error_Ur(field0: final field0):
+        sse_encode_i_32(4, serializer);
+        sse_encode_String(field0, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putInt32(self);
+  }
+
+  @protected
+  void sse_encode_keyset_info(KeysetInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.unit, serializer);
+    sse_encode_bool(self.active, serializer);
+  }
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_String(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_contact_info(
+    List<ContactInfo> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_contact_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_keyset_info(
+    List<KeysetInfo> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_keyset_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_melt_method_settings(
+    List<MeltMethodSettings> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_melt_method_settings(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_mint_method_settings(
+    List<MintMethodSettings> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_mint_method_settings(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_loose(
+    List<int> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint8List(
+      self is Uint8List ? self : Uint8List.fromList(self),
+    );
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_strict(
+    Uint8List self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_list_record_string_string(
+    List<(String, String)> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_transaction(
+    List<Transaction> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_transaction(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_melt_method_settings(
+    MeltMethodSettings self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.method, serializer);
+    sse_encode_String(self.unit, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.minAmount, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.maxAmount, serializer);
+  }
+
+  @protected
+  void sse_encode_melt_quote(MeltQuote self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.request, serializer);
+    sse_encode_u_64(self.amount, serializer);
+    sse_encode_u_64(self.feeReserve, serializer);
+    sse_encode_u_64(self.expiry, serializer);
+  }
+
+  @protected
+  void sse_encode_mint_info(MintInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.name, serializer);
+    sse_encode_opt_String(self.pubkey, serializer);
+    sse_encode_opt_box_autoadd_mint_version(self.version, serializer);
+    sse_encode_opt_String(self.description, serializer);
+    sse_encode_opt_String(self.descriptionLong, serializer);
+    sse_encode_opt_list_contact_info(self.contact, serializer);
+    sse_encode_nuts(self.nuts, serializer);
+    sse_encode_opt_String(self.iconUrl, serializer);
+    sse_encode_opt_list_String(self.urls, serializer);
+    sse_encode_opt_String(self.motd, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.time, serializer);
+    sse_encode_opt_String(self.tosUrl, serializer);
+  }
+
+  @protected
+  void sse_encode_mint_method_settings(
+    MintMethodSettings self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.method, serializer);
+    sse_encode_String(self.unit, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.minAmount, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.maxAmount, serializer);
+  }
+
+  @protected
+  void sse_encode_mint_quote(MintQuote self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.request, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.amount, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.expiry, serializer);
+    sse_encode_mint_quote_state(self.state, serializer);
+    sse_encode_opt_box_autoadd_token(self.token, serializer);
+    sse_encode_opt_String(self.error, serializer);
+  }
+
+  @protected
+  void sse_encode_mint_quote_state(
+    MintQuoteState self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_mint_version(MintVersion self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.version, serializer);
+  }
+
+  @protected
+  void sse_encode_nut_04_settings(
+    Nut04Settings self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_mint_method_settings(self.methods, serializer);
+    sse_encode_bool(self.disabled, serializer);
+  }
+
+  @protected
+  void sse_encode_nut_05_settings(
+    Nut05Settings self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_melt_method_settings(self.methods, serializer);
+    sse_encode_bool(self.disabled, serializer);
+  }
+
+  @protected
+  void sse_encode_nuts(Nuts self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_nut_04_settings(self.nut04, serializer);
+    sse_encode_nut_05_settings(self.nut05, serializer);
+    sse_encode_supported_settings(self.nut07, serializer);
+    sse_encode_supported_settings(self.nut08, serializer);
+    sse_encode_supported_settings(self.nut09, serializer);
+    sse_encode_supported_settings(self.nut10, serializer);
+    sse_encode_supported_settings(self.nut11, serializer);
+    sse_encode_supported_settings(self.nut12, serializer);
+    sse_encode_supported_settings(self.nut14, serializer);
+    sse_encode_supported_settings(self.nut20, serializer);
+  }
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_bool(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_mint_info(
+    MintInfo? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_mint_info(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_mint_version(
+    MintVersion? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_mint_version(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_receive_options(
+    ReceiveOptions? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_receive_options(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_send_options(
+    SendOptions? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_send_options(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_token(Token? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_token(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_transaction_direction(
+    TransactionDirection? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_transaction_direction(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_u_64(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_usize(
+    BigInt? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_usize(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_String(
+    List<String>? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_String(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_contact_info(
+    List<ContactInfo>? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_contact_info(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_list_prim_u_8_strict(
+    Uint8List? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_prim_u_8_strict(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_receive_options(
+    ReceiveOptions self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_list_String(self.signingKeys, serializer);
+    sse_encode_opt_list_String(self.preimages, serializer);
+  }
+
+  @protected
+  void sse_encode_record_string_string(
+    (String, String) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_send_options(SendOptions self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.pubkey, serializer);
+    sse_encode_opt_box_autoadd_bool(self.includeFee, serializer);
+  }
+
+  @protected
+  void sse_encode_supported_settings(
+    SupportedSettings self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self.supported, serializer);
+  }
+
+  @protected
+  void sse_encode_token(Token self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.encoded, serializer);
+    sse_encode_opt_list_prim_u_8_strict(self.raw, serializer);
+    sse_encode_u_64(self.amount, serializer);
+    sse_encode_String(self.mintUrl, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction(Transaction self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.mintUrl, serializer);
+    sse_encode_transaction_direction(self.direction, serializer);
+    sse_encode_u_64(self.amount, serializer);
+    sse_encode_u_64(self.fee, serializer);
+    sse_encode_String(self.unit, serializer);
+    sse_encode_list_String(self.ys, serializer);
+    sse_encode_u_64(self.timestamp, serializer);
+    sse_encode_opt_String(self.memo, serializer);
+    sse_encode_Map_String_String_None(self.metadata, serializer);
+    sse_encode_transaction_status(self.status, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_direction(
+    TransactionDirection self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_transaction_status(
+    TransactionStatus self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
+  void sse_encode_u_8(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self);
+  }
+
+  @protected
+  void sse_encode_unit(void self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+}
+
+@sealed
+class PreparedSendImpl extends RustOpaque implements PreparedSend {
+  // Not to be used by end users
+  PreparedSendImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  PreparedSendImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_PreparedSend,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_PreparedSend,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_PreparedSendPtr,
+  );
+
+  BigInt get amount => RustLib.instance.api
+      .crateApiWalletPreparedSendAutoAccessorGetAmount(that: this);
+
+  BigInt get fee => RustLib.instance.api
+      .crateApiWalletPreparedSendAutoAccessorGetFee(that: this);
+
+  BigInt get sendFee => RustLib.instance.api
+      .crateApiWalletPreparedSendAutoAccessorGetSendFee(that: this);
+
+  BigInt get swapFee => RustLib.instance.api
+      .crateApiWalletPreparedSendAutoAccessorGetSwapFee(that: this);
+
+  set amount(BigInt amount) =>
+      RustLib.instance.api.crateApiWalletPreparedSendAutoAccessorSetAmount(
+        that: this,
+        amount: amount,
+      );
+
+  set fee(BigInt fee) => RustLib.instance.api
+      .crateApiWalletPreparedSendAutoAccessorSetFee(that: this, fee: fee);
+
+  set sendFee(BigInt sendFee) =>
+      RustLib.instance.api.crateApiWalletPreparedSendAutoAccessorSetSendFee(
+        that: this,
+        sendFee: sendFee,
+      );
+
+  set swapFee(BigInt swapFee) =>
+      RustLib.instance.api.crateApiWalletPreparedSendAutoAccessorSetSwapFee(
+        that: this,
+        swapFee: swapFee,
+      );
+}
+
+@sealed
+class TokenDecoderImpl extends RustOpaque implements TokenDecoder {
+  // Not to be used by end users
+  TokenDecoderImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  TokenDecoderImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_TokenDecoder,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_TokenDecoder,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_TokenDecoderPtr,
+  );
+
+  bool isComplete() =>
+      RustLib.instance.api.crateApiTokenTokenDecoderIsComplete(that: this);
+
+  void receive({required String input}) => RustLib.instance.api
+      .crateApiTokenTokenDecoderReceive(that: this, input: input);
+
+  Token? value() =>
+      RustLib.instance.api.crateApiTokenTokenDecoderValue(that: this);
+}
+
+@sealed
+class WalletDatabaseImpl extends RustOpaque implements WalletDatabase {
+  // Not to be used by end users
+  WalletDatabaseImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  WalletDatabaseImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_WalletDatabase,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_WalletDatabase,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_WalletDatabasePtr,
+  );
+
+  String get path => RustLib.instance.api
+      .crateApiWalletWalletDatabaseAutoAccessorGetPath(that: this);
+
+  set path(String path) => RustLib.instance.api
+      .crateApiWalletWalletDatabaseAutoAccessorSetPath(that: this, path: path);
+
+  Future<void> removeMint({required String mintUrl}) => RustLib.instance.api
+      .crateApiWalletWalletDatabaseRemoveMint(that: this, mintUrl: mintUrl);
+}
+
+@sealed
+class WalletImpl extends RustOpaque implements Wallet {
+  // Not to be used by end users
+  WalletImpl.frbInternalDcoDecode(List<dynamic> wire)
+    : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  WalletImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+    : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Wallet,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Wallet,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_WalletPtr,
+  );
+
+  String get mintUrl => RustLib.instance.api
+      .crateApiWalletWalletAutoAccessorGetMintUrl(that: this);
+
+  String get unit =>
+      RustLib.instance.api.crateApiWalletWalletAutoAccessorGetUnit(that: this);
+
+  set mintUrl(String mintUrl) => RustLib.instance.api
+      .crateApiWalletWalletAutoAccessorSetMintUrl(that: this, mintUrl: mintUrl);
+
+  set unit(String unit) => RustLib.instance.api
+      .crateApiWalletWalletAutoAccessorSetUnit(that: this, unit: unit);
+
+  Future<BigInt> balance() =>
+      RustLib.instance.api.crateApiWalletWalletBalance(that: this);
+
+  Future<void> cancelSend({required PreparedSend send}) => RustLib.instance.api
+      .crateApiWalletWalletCancelSend(that: this, send: send);
+
+  Future<void> checkAllMintQuotes() =>
+      RustLib.instance.api.crateApiWalletWalletCheckAllMintQuotes(that: this);
+
+  Future<void> checkPendingTransactions() => RustLib.instance.api
+      .crateApiWalletWalletCheckPendingTransactions(that: this);
+
+  Future<void> finalizePendingMelts() =>
+      RustLib.instance.api.crateApiWalletWalletFinalizePendingMelts(that: this);
+
+  Future<MintInfo?> getMint() =>
+      RustLib.instance.api.crateApiWalletWalletGetMint(that: this);
+
+  Future<bool> isTokenSpent({required Token token}) => RustLib.instance.api
+      .crateApiWalletWalletIsTokenSpent(that: this, token: token);
+
+  Future<List<Transaction>> listTransactions({
+    TransactionDirection? direction,
+  }) => RustLib.instance.api.crateApiWalletWalletListTransactions(
+    that: this,
+    direction: direction,
+  );
+
+  Future<BigInt> melt({required MeltQuote quote}) =>
+      RustLib.instance.api.crateApiWalletWalletMelt(that: this, quote: quote);
+
+  Future<MeltQuote> meltQuote({required String request}) => RustLib.instance.api
+      .crateApiWalletWalletMeltQuote(that: this, request: request);
+
+  Stream<MintQuote> mint({required BigInt amount, String? description}) =>
+      RustLib.instance.api.crateApiWalletWalletMint(
+        that: this,
+        amount: amount,
+        description: description,
+      );
+
+  Future<PreparedSend> prepareSend({
+    required BigInt amount,
+    SendOptions? opts,
+  }) => RustLib.instance.api.crateApiWalletWalletPrepareSend(
+    that: this,
+    amount: amount,
+    opts: opts,
+  );
+
+  Future<BigInt> receive({required Token token, ReceiveOptions? opts}) =>
+      RustLib.instance.api.crateApiWalletWalletReceive(
+        that: this,
+        token: token,
+        opts: opts,
+      );
+
+  Future<void> recoverIncompleteSagas() => RustLib.instance.api
+      .crateApiWalletWalletRecoverIncompleteSagas(that: this);
+
+  Future<void> restore() =>
+      RustLib.instance.api.crateApiWalletWalletRestore(that: this);
+
+  Future<Token> send({
+    required PreparedSend send,
+    String? memo,
+    bool? includeMemo,
+  }) => RustLib.instance.api.crateApiWalletWalletSend(
+    that: this,
+    send: send,
+    memo: memo,
+    includeMemo: includeMemo,
+  );
+
+  Stream<BigInt> streamBalance() =>
+      RustLib.instance.api.crateApiWalletWalletStreamBalance(that: this);
 }
