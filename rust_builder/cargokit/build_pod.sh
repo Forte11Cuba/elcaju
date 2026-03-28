@@ -11,7 +11,9 @@ NEW_PATH=`echo $PATH | tr ":" "\n" | grep -v "Contents/Developer/" | tr "\n" ":"
 
 export PATH=${NEW_PATH%?} # remove trailing :
 
-env
+if [ -n "$CARGOKIT_DEBUG" ]; then
+  env | grep -E '^(CARGOKIT|FLUTTER|PLATFORM_NAME|ARCHS|CONFIGURATION|PODS_)='
+fi
 
 # Platform name (macosx, iphoneos, iphonesimulator)
 export CARGOKIT_DARWIN_PLATFORM_NAME=$PLATFORM_NAME
