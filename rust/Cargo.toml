@@ -1,0 +1,56 @@
+[package]
+name = "elcaju_core"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+# Cashu — acceso directo, sin intermediarios
+cdk = { version = "0.15.1", default-features = false, features = ["wallet"] }
+cdk-common = { version = "0.15.1", default-features = false }
+cdk-sqlite = { version = "0.15.1", default-features = false, features = ["wallet"] }
+
+# Bridge Flutter <-> Rust
+flutter_rust_bridge = { version = "=2.11.1", default-features = false, features = [
+    "anyhow",
+    "dart-opaque",
+    "portable-atomic",
+    "rust-async",
+    "thread-pool",
+    "wasm-start",
+] }
+
+# QR multiframe (bc-ur)
+bc-ur = { version = "0.12.0", default-features = false }
+
+# Mnemonic
+bip39 = { version = "2.1", default-features = false, features = ["std"] }
+
+# Async runtime
+tokio = { version = "1", default-features = false }
+
+# HTTP (para ping_mint, fetch_keysets)
+reqwest = { version = "0.12", default-features = false, features = [
+    "deflate",
+    "gzip",
+    "json",
+    "rustls-tls",
+    "rustls-tls-native-roots",
+] }
+
+# Serialización
+serde_json = { version = "1.0", default-features = false, features = ["std"] }
+
+# Logging
+log = { version = "0.4", default-features = false }
+
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.15"
+
+[target.'cfg(any(target_os = "ios", target_os = "macos"))'.dependencies]
+oslog = "0.2.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }

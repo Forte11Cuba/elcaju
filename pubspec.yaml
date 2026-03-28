@@ -63,6 +63,7 @@ dependencies:
   # BIP32 for NIP-06 key derivation (P2PK)
   bip32: ^2.0.0
   package_info_plus: ^9.0.0
+  flutter_rust_bridge: 2.11.1
 
 dev_dependencies:
   flutter_test:
