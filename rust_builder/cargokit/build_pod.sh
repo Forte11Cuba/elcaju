@@ -51,7 +51,7 @@ do
   fi
 done
 
-bash "$BASEDIR/run_build_tool.sh" build-pod "$@"
+babash "$BASEDIR/run_build_tool.sh" build-pod "$@"
 
 # Make a symlink from built framework to phony file, which will be used as input to
 # build script. This should force rebuild (podspec currently doesn't support alwaysOutOfDate
