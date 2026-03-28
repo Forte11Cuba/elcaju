@@ -8,10 +8,11 @@ use super::error::Error;
 
 /// Generate a new 12-word BIP39 mnemonic
 #[frb(sync)]
-pub fn generate_mnemonic() -> String {
+pub fn generate_mnemonic() -> Result<String, Error> {
     let mut entropy = [0u8; 16]; // 128 bits → 12 words
-    getrandom::fill(&mut entropy).expect("Failed to generate entropy");
-    Mnemonic::from_entropy(&entropy).unwrap().to_string()
+    getrandom::fill(&mut entropy).map_err(|_| Error::InvalidInput)?;
+    let mnemonic = Mnemonic::from_entropy(&entropy).map_err(|_| Error::InvalidInput)?;
+    Ok(mnemonic.to_string())
 }
 
 /// Convert a mnemonic to a 64-byte seed

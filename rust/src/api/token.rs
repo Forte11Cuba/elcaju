@@ -60,7 +60,11 @@ impl TryFrom<CdkToken> for Token {
                 encoded: token_v3.to_string(),
                 raw: None,
                 amount: token_v3.value()?.into(),
-                mint_url: token_v3.mint_urls().first().unwrap().to_string(),
+                mint_url: token_v3
+                    .mint_urls()
+                    .first()
+                    .ok_or(Error::InvalidInput)?
+                    .to_string(),
             }),
             CdkToken::TokenV4(token_v4) => Ok(Token {
                 encoded: token_v4.to_string(),
@@ -143,9 +147,7 @@ pub fn encode_qr_token(
     let mut encoder = MultipartEncoder::new(&ur, max_fragment_length.unwrap_or(150))?;
     let mut parts = Vec::new();
     for _ in 0..encoder.parts_count() {
-        if let Ok(part) = encoder.next_part() {
-            parts.push(part);
-        }
+        parts.push(encoder.next_part()?);
     }
     Ok(parts)
 }

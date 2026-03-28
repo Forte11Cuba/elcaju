@@ -2146,8 +2146,8 @@ fn wire__crate__api__keys__generate_mnemonic_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let output_ok = Result::<_, ()>::Ok(crate::api::keys::generate_mnemonic())?;
+            transform_result_sse::<_, crate::api::error::Error>((move || {
+                let output_ok = crate::api::keys::generate_mnemonic()?;
                 Ok(output_ok)
             })())
         },
