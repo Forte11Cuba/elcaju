@@ -36,7 +36,7 @@ class QrScannerWidget extends StatefulWidget {
 class _QrScannerWidgetState extends State<QrScannerWidget> {
   late MobileScannerController _controller;
 
-  // Estado para QR animados (UR multipartes) usando TokenDecoder de cdk-flutter
+  // Estado para QR animados (UR multipartes) — TokenDecoder (Rust bridge)
   TokenDecoder? _urDecoder;
   bool _isCapturingUr = false;
   final Set<String> _urFragmentsSeen = {};  // Trackear fragmentos únicos
