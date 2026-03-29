@@ -5,7 +5,6 @@ use cdk::{
     mint_url::MintUrl,
     nuts::{
         CurrencyUnit, PaymentRequest as CdkPaymentRequest, Transport, TransportType,
-        TransportType as CdkTransportType,
     },
     wallet::ReceiveOptions as CdkReceiveOptions,
 };
@@ -84,8 +83,8 @@ fn parse_payment_request_inner(encoded: String) -> Result<PaymentRequestInfo, Er
     for t in &pr.transports {
         transports.push(TransportInfo {
             transport_type: match t._type {
-                CdkTransportType::Nostr => "nostr".into(),
-                CdkTransportType::HttpPost => "post".into(),
+                TransportType::Nostr => "nostr".into(),
+                TransportType::HttpPost => "post".into(),
             },
             target: t.target.clone(),
         });
@@ -382,7 +381,7 @@ async fn wait_for_nostr_payment_inner(
     sink: &StreamSink<NostrPaymentEvent>,
 ) -> Result<Amount, Error> {
     use cdk::nuts::{nut00::ProofsMethods, PaymentRequestPayload, Token as CdkToken};
-    use nostr_sdk::{Client, Filter};
+    use nostr_sdk::{Client, Filter, Kind};
     use std::time::Duration;
 
     // Create Nostr client with ephemeral keys
@@ -393,10 +392,14 @@ async fn wait_for_nostr_payment_inner(
             .await
             .map_err(|e| Error::Cdk(format!("Failed to add relay {relay}: {e}")))?;
     }
-    client.connect().await;
 
-    // Subscribe to events addressed to our ephemeral pubkey
-    let filter = Filter::new().pubkey(pubkey);
+    // Connect with timeout so we fail fast if relays are unreachable
+    tokio::time::timeout(Duration::from_secs(10), client.connect())
+        .await
+        .map_err(|_| Error::Network("Relay connection timed out".to_string()))?;
+
+    // Subscribe to NIP-17 gift-wrap events (kind 1059) addressed to our ephemeral pubkey
+    let filter = Filter::new().pubkey(pubkey).kind(Kind::GiftWrap);
     client
         .subscribe(filter, None)
         .await
