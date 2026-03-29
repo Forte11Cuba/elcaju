@@ -331,11 +331,16 @@ impl Wallet {
             mint_url,
         } = handle;
 
-        let _ = sink.add(NostrPaymentEvent {
-            state: NostrPaymentState::Waiting,
-            amount: None,
-            error: None,
-        });
+        if sink
+            .add(NostrPaymentEvent {
+                state: NostrPaymentState::Waiting,
+                amount: None,
+                error: None,
+            })
+            .is_err()
+        {
+            return Ok(());
+        }
 
         let _self = self.clone();
         flutter_rust_bridge::spawn(async move {
