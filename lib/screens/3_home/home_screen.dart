@@ -11,6 +11,7 @@ import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/animated_action_button.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../providers/p2pk_provider.dart';
 import '../4_receive/receive_screen.dart';
 import '../5_send/send_screen.dart';
 import '../6_mint/mint_screen.dart';
@@ -51,7 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!walletProvider.hasPendingTokens) return;
 
     try {
-      final result = await walletProvider.checkPendingTokens();
+      final p2pkProvider = context.read<P2PKProvider>();
+      final result = await walletProvider.checkPendingTokens(
+        p2pkKeyResolver: p2pkProvider.getPrivateKeyForToken,
+      );
       final claimed = (result['claimed'] as int?) ?? 0;
       final totalClaimed = result['totalClaimed'] as BigInt? ?? BigInt.zero;
       final unit = (result['unit'] as String?) ?? walletProvider.activeUnit;

@@ -80,10 +80,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 _onMintCompleted();
                 break;
 
-              default:
-                // Cualquier otro estado se trata como error
+              case MintQuoteState.error:
                 _status = MintStatus.error;
-                _errorMessage = L10n.of(context)!.unknownState;
+                _errorMessage = quote.error ?? L10n.of(context)!.unknownError;
             }
           });
         },
