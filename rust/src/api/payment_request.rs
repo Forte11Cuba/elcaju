@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use cdk::{
     amount::Amount,
+    mint_url::MintUrl,
     nuts::{
         CurrencyUnit, PaymentRequest as CdkPaymentRequest, Transport, TransportType,
         TransportType as CdkTransportType,
@@ -205,11 +206,18 @@ pub struct CreatedPaymentRequest {
 /// Opaque handle that keeps Nostr ephemeral keys in Rust memory.
 /// Dart receives this as an opaque reference and passes it back
 /// to wait_for_nostr_payment() without ever seeing the secret key.
+/// Also carries the expected payment parameters for validation.
 #[derive(Clone)]
 pub struct NostrListenerHandle {
     keys: NostrKeys,
     pubkey: PublicKey,
     relays: Vec<String>,
+    /// Expected amount (None = any amount accepted)
+    expected_amount: Option<Amount>,
+    /// Expected currency unit
+    expected_unit: CurrencyUnit,
+    /// This wallet's mint URL
+    mint_url: MintUrl,
 }
 
 /// State of a Nostr payment listener.
@@ -243,6 +251,10 @@ impl Wallet {
         let keys = NostrKeys::generate();
 
         // Parse relay URLs for nprofile
+        if params.nostr_relays.is_empty() {
+            return Err(Error::InvalidInput);
+        }
+
         let relay_urls: Vec<RelayUrl> = params
             .nostr_relays
             .iter()
@@ -273,9 +285,9 @@ impl Wallet {
         let pr = CdkPaymentRequest {
             payment_id: None,
             amount: params.amount.map(Amount::from),
-            unit: Some(unit),
+            unit: Some(unit.clone()),
             single_use: Some(true),
-            mints: Some(vec![mint_url]),
+            mints: Some(vec![mint_url.clone()]),
             description: params.description,
             transports: vec![nostr_transport],
             nut10: None,
@@ -295,6 +307,9 @@ impl Wallet {
                 keys,
                 pubkey,
                 relays: params.nostr_relays,
+                expected_amount: params.amount.map(Amount::from),
+                expected_unit: unit,
+                mint_url,
             },
         })
     }
@@ -312,6 +327,9 @@ impl Wallet {
             keys,
             pubkey,
             relays,
+            expected_amount,
+            expected_unit,
+            mint_url,
         } = handle;
 
         let _ = sink.add(NostrPaymentEvent {
@@ -322,7 +340,11 @@ impl Wallet {
 
         let _self = self.clone();
         flutter_rust_bridge::spawn(async move {
-            match wait_for_nostr_payment_inner(&_self, keys, pubkey, relays, &sink).await {
+            match wait_for_nostr_payment_inner(
+                &_self, keys, pubkey, relays, expected_amount, expected_unit, mint_url, &sink,
+            )
+            .await
+            {
                 Ok(amount) => {
                     let _ = sink.add(NostrPaymentEvent {
                         state: NostrPaymentState::Received,
@@ -346,15 +368,20 @@ impl Wallet {
 }
 
 /// Internal: connect to relays, listen for gift-wrapped payment, receive tokens.
+/// Validates incoming payments against expected amount/unit/mint before accepting.
 /// Periodically checks if the Dart stream is still alive and disconnects if not.
+#[allow(clippy::too_many_arguments)]
 async fn wait_for_nostr_payment_inner(
     wallet: &Wallet,
     keys: NostrKeys,
     pubkey: PublicKey,
     relays: Vec<String>,
+    expected_amount: Option<Amount>,
+    expected_unit: CurrencyUnit,
+    expected_mint: MintUrl,
     sink: &StreamSink<NostrPaymentEvent>,
 ) -> Result<Amount, Error> {
-    use cdk::nuts::{PaymentRequestPayload, Token as CdkToken};
+    use cdk::nuts::{nut00::ProofsMethods, PaymentRequestPayload, Token as CdkToken};
     use nostr_sdk::{Client, Filter};
     use std::time::Duration;
 
@@ -397,7 +424,40 @@ async fn wait_for_nostr_payment_inner(
                             Err(_) => continue,
                         };
 
-                    // Build a token from the payload and receive it
+                    // Validate unit matches
+                    if payload.unit != expected_unit {
+                        log::warn!(
+                            "Ignoring payment: unit mismatch (expected {}, got {})",
+                            expected_unit,
+                            payload.unit
+                        );
+                        continue;
+                    }
+
+                    // Validate mint matches
+                    if payload.mint != expected_mint {
+                        log::warn!(
+                            "Ignoring payment: mint mismatch (expected {}, got {})",
+                            expected_mint,
+                            payload.mint
+                        );
+                        continue;
+                    }
+
+                    // Validate amount if a specific amount was requested
+                    if let Some(expected) = expected_amount {
+                        let received_amount = payload.proofs.total_amount().unwrap_or_default();
+                        if received_amount < expected {
+                            log::warn!(
+                                "Ignoring payment: underpayment (expected {}, got {})",
+                                expected,
+                                received_amount
+                            );
+                            continue;
+                        }
+                    }
+
+                    // Build a token from the validated payload and receive it
                     let token = CdkToken::new(
                         payload.mint,
                         payload.proofs,
@@ -405,13 +465,22 @@ async fn wait_for_nostr_payment_inner(
                         payload.unit,
                     );
                     let token_str = token.to_string();
-                    let received = wallet
+
+                    // Continue listening on receive errors (e.g. already-spent proofs)
+                    match wallet
                         .inner
                         .receive(&token_str, CdkReceiveOptions::default())
-                        .await?;
-
-                    client.disconnect().await;
-                    return Ok(received);
+                        .await
+                    {
+                        Ok(received) => {
+                            client.disconnect().await;
+                            return Ok(received);
+                        }
+                        Err(e) => {
+                            log::warn!("Failed to receive token, continuing: {e}");
+                            continue;
+                        }
+                    }
                 }
             }
             Ok(Err(_)) => {
