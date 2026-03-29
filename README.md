@@ -323,7 +323,7 @@ You can add other Cashu mints from the settings.
 ## CI/CD
 
 Automated releases via GitHub Actions (`.github/workflows/release.yml`):
-- Triggers on git tags (`v*`)
+- Triggers on Git tags (`v*`)
 - Builds multi-architecture APKs (arm64, armv7, x86_64) + universal APK
 - Creates GitHub releases automatically
 
