@@ -86,7 +86,7 @@ Cashu is an ecash protocol that enables Bitcoin transactions with maximum privac
 - **QR Flutter + Mobile Scanner**: QR generation and scanning
 
 ### Backend & Core
-- **elcaju_core**: Internal Rust library via [flutter_rust_bridge](https://github.com/aspect-build/aspect-cli) v2.11.1 (FFI)
+- **elcaju_core**: Internal Rust library via [flutter_rust_bridge](https://github.com/fzyzcjy/flutter_rust_bridge) v2.11.1 (FFI)
 - **[CDK](https://github.com/cashubtc/cdk) 0.15.1**: Cashu Development Kit (wallet, SQLite, HTTP client, signatory)
 - **SQLite**: Local persistence via cdk-sqlite
 - **Flutter Secure Storage**: Encrypted storage for seed and PIN
@@ -112,7 +112,7 @@ Cashu is an ecash protocol that enables Bitcoin transactions with maximum privac
 - Dart SDK (>=3.11.0)
 - Android Studio with Android SDK
 - Android NDK 27.0+ (install via Android Studio > SDK Manager > SDK Tools)
-- Rust toolchain (edition 2024)
+- Rust toolchain (edition 2024; rustc >= 1.85.0)
 
 ### Clone the Repository
 
@@ -203,7 +203,7 @@ flutter build apk --release --target-platform android-arm64
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │          Flutter UI (Dart 3.11+)        │
 │   Provider + Streams + Intl (11 langs)  │
@@ -220,7 +220,7 @@ flutter build apk --release --target-platform android-arm64
 
 ### Project Structure
 
-```
+```text
 elcaju/
 ├── lib/
 │   ├── main.dart                  # Entry point (RustLib.init + Providers)
@@ -312,7 +312,7 @@ elcaju/
 
 ElCaju comes preconfigured with the Cuba Bitcoin mint:
 
-```
+```text
 https://mint.cubabitcoin.org
 ```
 
@@ -359,7 +359,7 @@ This project is under the MIT License - see the [LICENSE](LICENSE) file for more
 
 - **[Cashu](https://cashu.space)** - Ecash protocol
 - **[CDK](https://github.com/cashubtc/cdk)** - Cashu Development Kit
-- **[flutter_rust_bridge](https://github.com/aspect-build/aspect-cli)** - Rust-Dart FFI
+- **[flutter_rust_bridge](https://github.com/fzyzcjy/flutter_rust_bridge)** - Rust-Dart FFI
 - **[Cashu4Community](https://cashu4community.xyz)** - Global Cashu community
 - **[Cuba Bitcoin](https://cubabitcoin.org)** - Cuban Bitcoin community
 
