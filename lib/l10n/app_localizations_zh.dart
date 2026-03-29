@@ -1046,10 +1046,10 @@ class L10nZh extends L10n {
   String get paymentRequestDescription => '描述';
 
   @override
-  String get paymentRequestMints => '接受的铸币厂';
+  String get paymentRequestMints => '接受的铸造厂';
 
   @override
-  String get paymentRequestAnyMint => '任何铸币厂';
+  String get paymentRequestAnyMint => '任何铸造厂';
 
   @override
   String get paymentRequestPay => '支付';
@@ -1064,7 +1064,10 @@ class L10nZh extends L10n {
   String get paymentRequestNoTransport => '此请求未配置交付方式';
 
   @override
-  String get paymentRequestMintNotAccepted => '您的活跃铸币厂不在接受的铸币厂列表中';
+  String get paymentRequestTransport => '传输方式';
+
+  @override
+  String get paymentRequestMintNotAccepted => '您的活跃铸造厂不在接受的铸造厂列表中';
 
   @override
   String paymentRequestUnitMismatch(String unit) {

@@ -98,18 +98,44 @@ fn parse_payment_request_inner(encoded: String) -> Result<PaymentRequestInfo, Er
 
 /// Extract creq parameter from a BIP-321 bitcoin: URI.
 /// e.g. "bitcoin:?creq=CREQB1...&lightning=lnbc..." → "CREQB1..."
+/// Handles percent-encoding and case-insensitive key matching.
 fn extract_creq_from_uri(input: &str) -> Option<String> {
-    let lower = input.to_lowercase();
-    if !lower.starts_with("bitcoin:") {
+    if !input
+        .get(..8)
+        .is_some_and(|scheme| scheme.eq_ignore_ascii_case("bitcoin:"))
+    {
         return None;
     }
-    let query = input.splitn(2, '?').nth(1)?;
+    let query = input.split_once('?')?.1;
     for param in query.split('&') {
-        if param.len() > 5 && param[..5].eq_ignore_ascii_case("creq=") {
-            return Some(param[5..].to_string());
+        let (key, value) = param.split_once('=')?;
+        if key.eq_ignore_ascii_case("creq") {
+            return Some(percent_decode(value));
         }
     }
     None
+}
+
+/// Simple percent-decoding for URI query values.
+fn percent_decode(value: &str) -> String {
+    let bytes = value.as_bytes();
+    let mut out = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'%' && i + 2 < bytes.len() {
+            if let Ok(byte) = u8::from_str_radix(
+                std::str::from_utf8(&bytes[i + 1..i + 3]).unwrap_or(""),
+                16,
+            ) {
+                out.push(byte);
+                i += 3;
+                continue;
+            }
+        }
+        out.push(bytes[i]);
+        i += 1;
+    }
+    String::from_utf8(out).unwrap_or_else(|_| value.to_string())
 }
 
 // ========================================================================

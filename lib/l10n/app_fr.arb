@@ -512,6 +512,7 @@
   "paymentRequestPaying": "Paiement en cours...",
   "paymentRequestSuccess": "Paiement envoyé avec succès",
   "paymentRequestNoTransport": "Cette demande n'a pas de méthode de livraison configurée",
+  "paymentRequestTransport": "Transport",
   "paymentRequestMintNotAccepted": "Votre mint actif n'est pas dans la liste des mints acceptés",
   "paymentRequestUnitMismatch": "Unité incompatible : la demande nécessite {unit}",
   "paymentRequestInsufficientBalance": "Solde insuffisant",

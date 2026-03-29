@@ -1085,6 +1085,9 @@ class L10nRu extends L10n {
       'В этом запросе не настроен метод доставки';
 
   @override
+  String get paymentRequestTransport => 'Транспорт';
+
+  @override
   String get paymentRequestMintNotAccepted =>
       'Ваш активный минт не в списке принимаемых';
 

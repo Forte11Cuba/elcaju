@@ -1000,6 +1000,7 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
         _isValidToken = false;
         _tokenInfo = null;
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

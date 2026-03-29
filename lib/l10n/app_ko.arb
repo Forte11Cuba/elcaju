@@ -512,6 +512,7 @@
   "paymentRequestPaying": "결제 중...",
   "paymentRequestSuccess": "결제가 성공적으로 전송되었습니다",
   "paymentRequestNoTransport": "이 요청에는 전달 방법이 설정되지 않았습니다",
+  "paymentRequestTransport": "전송 방식",
   "paymentRequestMintNotAccepted": "활성 민트가 허용된 민트 목록에 없습니다",
   "paymentRequestUnitMismatch": "호환되지 않는 단위: 요청에 {unit}이(가) 필요합니다",
   "paymentRequestInsufficientBalance": "잔액 부족",

@@ -1070,6 +1070,9 @@ class L10nKo extends L10n {
   String get paymentRequestNoTransport => '이 요청에는 전달 방법이 설정되지 않았습니다';
 
   @override
+  String get paymentRequestTransport => '전송 방식';
+
+  @override
   String get paymentRequestMintNotAccepted => '활성 민트가 허용된 민트 목록에 없습니다';
 
   @override

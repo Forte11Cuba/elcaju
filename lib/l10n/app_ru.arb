@@ -512,6 +512,7 @@
   "paymentRequestPaying": "Оплата...",
   "paymentRequestSuccess": "Платёж успешно отправлен",
   "paymentRequestNoTransport": "В этом запросе не настроен метод доставки",
+  "paymentRequestTransport": "Транспорт",
   "paymentRequestMintNotAccepted": "Ваш активный минт не в списке принимаемых",
   "paymentRequestUnitMismatch": "Несовместимая единица: запрос требует {unit}",
   "paymentRequestInsufficientBalance": "Недостаточный баланс",

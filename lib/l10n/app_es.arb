@@ -520,6 +520,7 @@
   "paymentRequestPaying": "Pagando...",
   "paymentRequestSuccess": "Pago enviado correctamente",
   "paymentRequestNoTransport": "Esta solicitud no tiene método de entrega configurado",
+  "paymentRequestTransport": "Transporte",
   "paymentRequestMintNotAccepted": "Tu mint activo no está en la lista de mints aceptados",
   "paymentRequestUnitMismatch": "Unidad incompatible: la solicitud requiere {unit}",
   "@paymentRequestUnitMismatch": {

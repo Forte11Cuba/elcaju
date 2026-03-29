@@ -2077,6 +2077,12 @@ abstract class L10n {
   /// **'Esta solicitud no tiene método de entrega configurado'**
   String get paymentRequestNoTransport;
 
+  /// No description provided for @paymentRequestTransport.
+  ///
+  /// In es, this message translates to:
+  /// **'Transporte'**
+  String get paymentRequestTransport;
+
   /// No description provided for @paymentRequestMintNotAccepted.
   ///
   /// In es, this message translates to:

@@ -512,6 +512,7 @@
   "paymentRequestPaying": "Inalipa...",
   "paymentRequestSuccess": "Malipo yametumwa kwa mafanikio",
   "paymentRequestNoTransport": "Ombi hili halina njia ya uwasilishaji iliyosanidiwa",
+  "paymentRequestTransport": "Njia ya usafirishaji",
   "paymentRequestMintNotAccepted": "Mint yako hai haiko kwenye orodha ya mint zinazokubaliwa",
   "paymentRequestUnitMismatch": "Kitengo kisichooana: ombi linahitaji {unit}",
   "paymentRequestInsufficientBalance": "Salio haitoshi",

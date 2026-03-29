@@ -1088,6 +1088,9 @@ class L10nSw extends L10n {
       'Ombi hili halina njia ya uwasilishaji iliyosanidiwa';
 
   @override
+  String get paymentRequestTransport => 'Njia ya usafirishaji';
+
+  @override
   String get paymentRequestMintNotAccepted =>
       'Mint yako hai haiko kwenye orodha ya mint zinazokubaliwa';
 

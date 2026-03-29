@@ -512,6 +512,7 @@
   "paymentRequestPaying": "支払い中...",
   "paymentRequestSuccess": "支払いが正常に送信されました",
   "paymentRequestNoTransport": "このリクエストには配信方法が設定されていません",
+  "paymentRequestTransport": "トランスポート",
   "paymentRequestMintNotAccepted": "アクティブなミントは対応ミントリストにありません",
   "paymentRequestUnitMismatch": "単位が互換性がありません：リクエストには{unit}が必要です",
   "paymentRequestInsufficientBalance": "残高不足",

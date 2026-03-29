@@ -1088,6 +1088,9 @@ class L10nPt extends L10n {
       'Esta solicitação não tem método de entrega configurado';
 
   @override
+  String get paymentRequestTransport => 'Transporte';
+
+  @override
   String get paymentRequestMintNotAccepted =>
       'Seu mint ativo não está na lista de mints aceitos';
 

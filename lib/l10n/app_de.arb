@@ -512,6 +512,7 @@
   "paymentRequestPaying": "Bezahle...",
   "paymentRequestSuccess": "Zahlung erfolgreich gesendet",
   "paymentRequestNoTransport": "Diese Anfrage hat keine konfigurierte Zustellmethode",
+  "paymentRequestTransport": "Transport",
   "paymentRequestMintNotAccepted": "Dein aktiver Mint ist nicht in der Liste der akzeptierten Mints",
   "paymentRequestUnitMismatch": "Inkompatible Einheit: Anfrage erfordert {unit}",
   "paymentRequestInsufficientBalance": "Unzureichendes Guthaben",

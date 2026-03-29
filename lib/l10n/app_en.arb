@@ -400,8 +400,14 @@
   "paymentRequestPaying": "Paying...",
   "paymentRequestSuccess": "Payment sent successfully",
   "paymentRequestNoTransport": "This request has no delivery method configured",
+  "paymentRequestTransport": "Transport",
   "paymentRequestMintNotAccepted": "Your active mint is not in the list of accepted mints",
   "paymentRequestUnitMismatch": "Incompatible unit: request requires {unit}",
+  "@paymentRequestUnitMismatch": {
+    "placeholders": {
+      "unit": { "type": "String" }
+    }
+  },
   "paymentRequestInsufficientBalance": "Insufficient balance",
   "paymentRequestErrorParsing": "Error reading payment request",
 

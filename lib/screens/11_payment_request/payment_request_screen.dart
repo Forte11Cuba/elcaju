@@ -158,18 +158,17 @@ class _PaymentRequestScreenState extends State<PaymentRequestScreen> {
                       : info.mints.map((m) => Uri.parse(m).host).join(', '),
                 ),
 
-                const SizedBox(height: 12),
-
-                // Transporte
-                _buildDetailRow(
-                  LucideIcons.send,
-                  'Transport',
-                  info.transports.isEmpty
-                      ? 'In-band'
-                      : info.transports
-                          .map((t) => t.transportType == 'nostr' ? 'Nostr (NIP-17)' : 'HTTP POST')
-                          .join(', '),
-                ),
+                // Transporte (solo mostrar si hay transporte configurado)
+                if (info.transports.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    LucideIcons.send,
+                    l10n.paymentRequestTransport,
+                    info.transports
+                        .map((t) => t.transportType == 'nostr' ? 'Nostr (NIP-17)' : 'HTTP POST')
+                        .join(', '),
+                  ),
+                ],
               ],
             ),
           ),
@@ -205,7 +204,7 @@ class _PaymentRequestScreenState extends State<PaymentRequestScreen> {
             text: _isPaying ? l10n.paymentRequestPaying : l10n.paymentRequestPay,
             icon: LucideIcons.zap,
             isLoading: _isPaying,
-            onPressed: (unitMismatch || mintNotAccepted || !hasTransport || _isPaying)
+            onPressed: (!hasTransport || _isPaying)
                 ? null
                 : _pay,
           ),

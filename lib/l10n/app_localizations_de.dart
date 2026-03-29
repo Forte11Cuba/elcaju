@@ -1094,6 +1094,9 @@ class L10nDe extends L10n {
       'Diese Anfrage hat keine konfigurierte Zustellmethode';
 
   @override
+  String get paymentRequestTransport => 'Transport';
+
+  @override
   String get paymentRequestMintNotAccepted =>
       'Dein aktiver Mint ist nicht in der Liste der akzeptierten Mints';
 

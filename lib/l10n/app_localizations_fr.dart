@@ -1099,6 +1099,9 @@ class L10nFr extends L10n {
       'Cette demande n\'a pas de méthode de livraison configurée';
 
   @override
+  String get paymentRequestTransport => 'Transport';
+
+  @override
   String get paymentRequestMintNotAccepted =>
       'Votre mint actif n\'est pas dans la liste des mints acceptés';
 

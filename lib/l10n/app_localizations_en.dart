@@ -1081,6 +1081,9 @@ class L10nEn extends L10n {
       'This request has no delivery method configured';
 
   @override
+  String get paymentRequestTransport => 'Transport';
+
+  @override
   String get paymentRequestMintNotAccepted =>
       'Your active mint is not in the list of accepted mints';
 

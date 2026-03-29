@@ -1068,6 +1068,9 @@ class L10nJa extends L10n {
   String get paymentRequestNoTransport => 'このリクエストには配信方法が設定されていません';
 
   @override
+  String get paymentRequestTransport => 'トランスポート';
+
+  @override
   String get paymentRequestMintNotAccepted => 'アクティブなミントは対応ミントリストにありません';
 
   @override
