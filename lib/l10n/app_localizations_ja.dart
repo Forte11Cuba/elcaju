@@ -1038,7 +1038,48 @@ class L10nJa extends L10n {
   String get cameraPermissionDenied => 'カメラの許可が拒否されました';
 
   @override
-  String get paymentRequestNotSupported => '支払いリクエストはまだサポートされていません';
+  String get paymentRequestTitle => '支払いリクエスト';
+
+  @override
+  String get paymentRequestFrom => 'リクエスト元';
+
+  @override
+  String get paymentRequestAmount => 'リクエスト金額';
+
+  @override
+  String get paymentRequestDescription => '説明';
+
+  @override
+  String get paymentRequestMints => '対応ミント';
+
+  @override
+  String get paymentRequestAnyMint => 'すべてのミント';
+
+  @override
+  String get paymentRequestPay => '支払う';
+
+  @override
+  String get paymentRequestPaying => '支払い中...';
+
+  @override
+  String get paymentRequestSuccess => '支払いが正常に送信されました';
+
+  @override
+  String get paymentRequestNoTransport => 'このリクエストには配信方法が設定されていません';
+
+  @override
+  String get paymentRequestMintNotAccepted => 'アクティブなミントは対応ミントリストにありません';
+
+  @override
+  String paymentRequestUnitMismatch(String unit) {
+    return '単位が互換性がありません：リクエストには$unitが必要です';
+  }
+
+  @override
+  String get paymentRequestInsufficientBalance => '残高不足';
+
+  @override
+  String get paymentRequestErrorParsing => '支払いリクエストの読み取りエラー';
 
   @override
   String get p2pkTitle => 'P2PK鍵';

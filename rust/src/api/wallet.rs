@@ -45,7 +45,7 @@ pub struct Wallet {
     pub unit: String,
 
     balance_broadcast: broadcast::Sender<u64>,
-    inner: CdkWallet,
+    pub(crate) inner: CdkWallet,
     seed: [u8; 64],
 }
 
@@ -391,7 +391,7 @@ impl Wallet {
         CurrencyUnit::from_str(&self.unit).unwrap_or(CurrencyUnit::Custom(self.unit.clone()))
     }
 
-    async fn update_balance_streams(&self) {
+    pub(crate) async fn update_balance_streams(&self) {
         let balance = self
             .inner
             .total_balance()

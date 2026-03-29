@@ -1034,7 +1034,48 @@ class L10nZh extends L10n {
   String get cameraPermissionDenied => '相机权限被拒绝';
 
   @override
-  String get paymentRequestNotSupported => '付款请求尚不支持';
+  String get paymentRequestTitle => '付款请求';
+
+  @override
+  String get paymentRequestFrom => '来自';
+
+  @override
+  String get paymentRequestAmount => '请求金额';
+
+  @override
+  String get paymentRequestDescription => '描述';
+
+  @override
+  String get paymentRequestMints => '接受的铸币厂';
+
+  @override
+  String get paymentRequestAnyMint => '任何铸币厂';
+
+  @override
+  String get paymentRequestPay => '支付';
+
+  @override
+  String get paymentRequestPaying => '支付中...';
+
+  @override
+  String get paymentRequestSuccess => '付款发送成功';
+
+  @override
+  String get paymentRequestNoTransport => '此请求未配置交付方式';
+
+  @override
+  String get paymentRequestMintNotAccepted => '您的活跃铸币厂不在接受的铸币厂列表中';
+
+  @override
+  String paymentRequestUnitMismatch(String unit) {
+    return '单位不兼容：请求需要 $unit';
+  }
+
+  @override
+  String get paymentRequestInsufficientBalance => '余额不足';
+
+  @override
+  String get paymentRequestErrorParsing => '读取付款请求时出错';
 
   @override
   String get p2pkTitle => 'P2PK密钥';

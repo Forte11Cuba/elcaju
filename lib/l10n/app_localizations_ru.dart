@@ -1054,8 +1054,50 @@ class L10nRu extends L10n {
   String get cameraPermissionDenied => 'Доступ к камере запрещён';
 
   @override
-  String get paymentRequestNotSupported =>
-      'Запросы на оплату пока не поддерживаются';
+  String get paymentRequestTitle => 'Запрос на оплату';
+
+  @override
+  String get paymentRequestFrom => 'Запрос от';
+
+  @override
+  String get paymentRequestAmount => 'Запрошенная сумма';
+
+  @override
+  String get paymentRequestDescription => 'Описание';
+
+  @override
+  String get paymentRequestMints => 'Принимаемые минты';
+
+  @override
+  String get paymentRequestAnyMint => 'Любой минт';
+
+  @override
+  String get paymentRequestPay => 'Оплатить';
+
+  @override
+  String get paymentRequestPaying => 'Оплата...';
+
+  @override
+  String get paymentRequestSuccess => 'Платёж успешно отправлен';
+
+  @override
+  String get paymentRequestNoTransport =>
+      'В этом запросе не настроен метод доставки';
+
+  @override
+  String get paymentRequestMintNotAccepted =>
+      'Ваш активный минт не в списке принимаемых';
+
+  @override
+  String paymentRequestUnitMismatch(String unit) {
+    return 'Несовместимая единица: запрос требует $unit';
+  }
+
+  @override
+  String get paymentRequestInsufficientBalance => 'Недостаточный баланс';
+
+  @override
+  String get paymentRequestErrorParsing => 'Ошибка чтения запроса на оплату';
 
   @override
   String get p2pkTitle => 'Ключи P2PK';

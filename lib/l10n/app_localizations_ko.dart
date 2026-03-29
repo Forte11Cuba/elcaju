@@ -1040,7 +1040,48 @@ class L10nKo extends L10n {
   String get cameraPermissionDenied => '카메라 권한이 거부되었습니다';
 
   @override
-  String get paymentRequestNotSupported => '결제 요청은 아직 지원되지 않습니다';
+  String get paymentRequestTitle => '결제 요청';
+
+  @override
+  String get paymentRequestFrom => '요청자';
+
+  @override
+  String get paymentRequestAmount => '요청 금액';
+
+  @override
+  String get paymentRequestDescription => '설명';
+
+  @override
+  String get paymentRequestMints => '허용된 민트';
+
+  @override
+  String get paymentRequestAnyMint => '모든 민트';
+
+  @override
+  String get paymentRequestPay => '결제';
+
+  @override
+  String get paymentRequestPaying => '결제 중...';
+
+  @override
+  String get paymentRequestSuccess => '결제가 성공적으로 전송되었습니다';
+
+  @override
+  String get paymentRequestNoTransport => '이 요청에는 전달 방법이 설정되지 않았습니다';
+
+  @override
+  String get paymentRequestMintNotAccepted => '활성 민트가 허용된 민트 목록에 없습니다';
+
+  @override
+  String paymentRequestUnitMismatch(String unit) {
+    return '호환되지 않는 단위: 요청에 $unit이(가) 필요합니다';
+  }
+
+  @override
+  String get paymentRequestInsufficientBalance => '잔액 부족';
+
+  @override
+  String get paymentRequestErrorParsing => '결제 요청을 읽는 중 오류 발생';
 
   @override
   String get p2pkTitle => 'P2PK 키';

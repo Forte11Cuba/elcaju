@@ -15,7 +15,7 @@ enum IncomingDataType {
   cashuToken,       // cashuA... / cashuB...
   lightningInvoice, // lnbc... / lntb... / lnbcrt...
   mintUrl,          // https://...
-  paymentRequest,   // creqA... (post-MVP, Cashu payment request)
+  paymentRequest,   // creqA/creqB/bitcoin:?creq= (NUT-18/26 payment request)
   unknown,
 }
 
@@ -103,8 +103,14 @@ class IncomingDataParser {
       );
     }
 
-    // Payment Request (creqA...)
-    if (lower.startsWith('creqa')) {
+    // Payment Request: creqA (NUT-18), creqB/CREQB1 (NUT-26), bitcoin:?creq= (BIP-321)
+    if (lower.startsWith('creqa') || lower.startsWith('creqb')) {
+      return ParsedData(
+        type: IncomingDataType.paymentRequest,
+        raw: trimmed,
+      );
+    }
+    if (lower.startsWith('bitcoin:') && lower.contains('creq=')) {
       return ParsedData(
         type: IncomingDataType.paymentRequest,
         raw: trimmed,

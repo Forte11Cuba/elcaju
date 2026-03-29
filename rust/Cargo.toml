@@ -8,8 +8,8 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 # Cashu — acceso directo, sin intermediarios
-cdk = { version = "0.15.1", default-features = false, features = ["wallet"] }
-cdk-common = { version = "0.15.1", default-features = false }
+cdk = { version = "0.15.1", default-features = false, features = ["wallet", "nostr"] }
+cdk-common = { version = "0.15.1", default-features = false, features = ["nostr"] }
 cdk-sqlite = { version = "0.15.1", default-features = false, features = ["wallet"] }
 
 # Bridge Flutter <-> Rust

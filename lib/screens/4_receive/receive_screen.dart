@@ -16,6 +16,7 @@ import '../../widgets/common/primary_button.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/p2pk_provider.dart';
 import '../10_scanner/scan_screen.dart';
+import '../11_payment_request/payment_request_screen.dart';
 
 /// Pantalla para recibir tokens Cashu
 class ReceiveScreen extends StatefulWidget {
@@ -990,6 +991,24 @@ class _ReceiveScreenState extends State<ReceiveScreen> {
       if (tokenValue.isEmpty) {
         _isValidToken = false;
         _tokenInfo = null;
+        return;
+      }
+
+      // Detectar payment request y redirigir
+      final parsed = IncomingDataParser.parse(tokenValue);
+      if (parsed.type == IncomingDataType.paymentRequest) {
+        _isValidToken = false;
+        _tokenInfo = null;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaymentRequestScreen(
+                encodedRequest: tokenValue,
+              ),
+            ),
+          );
+        });
         return;
       }
 
