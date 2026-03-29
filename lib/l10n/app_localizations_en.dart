@@ -1050,8 +1050,53 @@ class L10nEn extends L10n {
   String get cameraPermissionDenied => 'Camera permission denied';
 
   @override
-  String get paymentRequestNotSupported =>
-      'Payment requests are not yet supported';
+  String get paymentRequestTitle => 'Payment Request';
+
+  @override
+  String get paymentRequestFrom => 'Request from';
+
+  @override
+  String get paymentRequestAmount => 'Requested amount';
+
+  @override
+  String get paymentRequestDescription => 'Description';
+
+  @override
+  String get paymentRequestMints => 'Accepted mints';
+
+  @override
+  String get paymentRequestAnyMint => 'Any mint';
+
+  @override
+  String get paymentRequestPay => 'Pay';
+
+  @override
+  String get paymentRequestPaying => 'Paying...';
+
+  @override
+  String get paymentRequestSuccess => 'Payment sent successfully';
+
+  @override
+  String get paymentRequestNoTransport =>
+      'This request has no delivery method configured';
+
+  @override
+  String get paymentRequestTransport => 'Transport';
+
+  @override
+  String get paymentRequestMintNotAccepted =>
+      'Your active mint is not in the list of accepted mints';
+
+  @override
+  String paymentRequestUnitMismatch(String unit) {
+    return 'Incompatible unit: request requires $unit';
+  }
+
+  @override
+  String get paymentRequestInsufficientBalance => 'Insufficient balance';
+
+  @override
+  String get paymentRequestErrorParsing => 'Error reading payment request';
 
   @override
   String get p2pkTitle => 'P2PK Keys';

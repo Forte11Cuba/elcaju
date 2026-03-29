@@ -2017,11 +2017,95 @@ abstract class L10n {
   /// **'Permiso de cámara denegado'**
   String get cameraPermissionDenied;
 
-  /// No description provided for @paymentRequestNotSupported.
+  /// No description provided for @paymentRequestTitle.
   ///
   /// In es, this message translates to:
-  /// **'Los payment requests aún no están soportados'**
-  String get paymentRequestNotSupported;
+  /// **'Solicitud de pago'**
+  String get paymentRequestTitle;
+
+  /// No description provided for @paymentRequestFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'Solicitud de'**
+  String get paymentRequestFrom;
+
+  /// No description provided for @paymentRequestAmount.
+  ///
+  /// In es, this message translates to:
+  /// **'Monto solicitado'**
+  String get paymentRequestAmount;
+
+  /// No description provided for @paymentRequestDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Descripción'**
+  String get paymentRequestDescription;
+
+  /// No description provided for @paymentRequestMints.
+  ///
+  /// In es, this message translates to:
+  /// **'Mints aceptados'**
+  String get paymentRequestMints;
+
+  /// No description provided for @paymentRequestAnyMint.
+  ///
+  /// In es, this message translates to:
+  /// **'Cualquier mint'**
+  String get paymentRequestAnyMint;
+
+  /// No description provided for @paymentRequestPay.
+  ///
+  /// In es, this message translates to:
+  /// **'Pagar'**
+  String get paymentRequestPay;
+
+  /// No description provided for @paymentRequestPaying.
+  ///
+  /// In es, this message translates to:
+  /// **'Pagando...'**
+  String get paymentRequestPaying;
+
+  /// No description provided for @paymentRequestSuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Pago enviado correctamente'**
+  String get paymentRequestSuccess;
+
+  /// No description provided for @paymentRequestNoTransport.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta solicitud no tiene método de entrega configurado'**
+  String get paymentRequestNoTransport;
+
+  /// No description provided for @paymentRequestTransport.
+  ///
+  /// In es, this message translates to:
+  /// **'Transporte'**
+  String get paymentRequestTransport;
+
+  /// No description provided for @paymentRequestMintNotAccepted.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu mint activo no está en la lista de mints aceptados'**
+  String get paymentRequestMintNotAccepted;
+
+  /// No description provided for @paymentRequestUnitMismatch.
+  ///
+  /// In es, this message translates to:
+  /// **'Unidad incompatible: la solicitud requiere {unit}'**
+  String paymentRequestUnitMismatch(String unit);
+
+  /// No description provided for @paymentRequestInsufficientBalance.
+  ///
+  /// In es, this message translates to:
+  /// **'Balance insuficiente'**
+  String get paymentRequestInsufficientBalance;
+
+  /// No description provided for @paymentRequestErrorParsing.
+  ///
+  /// In es, this message translates to:
+  /// **'Error al leer la solicitud de pago'**
+  String get paymentRequestErrorParsing;
 
   /// No description provided for @p2pkTitle.
   ///

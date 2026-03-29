@@ -8,6 +8,7 @@ import '../../widgets/scanner/qr_scanner_widget.dart';
 import '../../providers/wallet_provider.dart';
 import '../4_receive/receive_screen.dart';
 import '../7_melt/melt_screen.dart';
+import '../11_payment_request/payment_request_screen.dart';
 
 /// Pantalla de escaneo QR con soporte para diferentes modos
 class ScanScreen extends StatefulWidget {
@@ -195,8 +196,17 @@ class _ScanScreenState extends State<ScanScreen> {
         break;
 
       case IncomingDataType.paymentRequest:
-        // TODO: Implementar manejo de payment requests (post-MVP)
-        _showError(l10n.paymentRequestNotSupported);
+        if (mounted) {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaymentRequestScreen(
+                encodedRequest: data.raw,
+              ),
+            ),
+          );
+        }
         break;
 
       case IncomingDataType.unknown:

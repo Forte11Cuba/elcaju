@@ -1057,7 +1057,54 @@ class L10nSw extends L10n {
   String get cameraPermissionDenied => 'Ruhusa ya kamera imekataliwa';
 
   @override
-  String get paymentRequestNotSupported => 'Maombi ya malipo bado hayatumiki';
+  String get paymentRequestTitle => 'Ombi la malipo';
+
+  @override
+  String get paymentRequestFrom => 'Ombi kutoka';
+
+  @override
+  String get paymentRequestAmount => 'Kiasi kilichoombwa';
+
+  @override
+  String get paymentRequestDescription => 'Maelezo';
+
+  @override
+  String get paymentRequestMints => 'Mint zinazokubaliwa';
+
+  @override
+  String get paymentRequestAnyMint => 'Mint yoyote';
+
+  @override
+  String get paymentRequestPay => 'Lipa';
+
+  @override
+  String get paymentRequestPaying => 'Inalipa...';
+
+  @override
+  String get paymentRequestSuccess => 'Malipo yametumwa kwa mafanikio';
+
+  @override
+  String get paymentRequestNoTransport =>
+      'Ombi hili halina njia ya uwasilishaji iliyosanidiwa';
+
+  @override
+  String get paymentRequestTransport => 'Njia ya usafirishaji';
+
+  @override
+  String get paymentRequestMintNotAccepted =>
+      'Mint yako hai haiko kwenye orodha ya mint zinazokubaliwa';
+
+  @override
+  String paymentRequestUnitMismatch(String unit) {
+    return 'Kitengo kisichooana: ombi linahitaji $unit';
+  }
+
+  @override
+  String get paymentRequestInsufficientBalance => 'Salio haitoshi';
+
+  @override
+  String get paymentRequestErrorParsing =>
+      'Hitilafu wakati wa kusoma ombi la malipo';
 
   @override
   String get p2pkTitle => 'Funguo za P2PK';

@@ -9,6 +9,7 @@
 import 'api/error.dart';
 import 'api/keys.dart';
 import 'api/mint_info.dart';
+import 'api/payment_request.dart';
 import 'api/token.dart';
 import 'api/wallet.dart';
 import 'dart:async';
@@ -220,6 +221,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Transaction> dco_decode_list_transaction(dynamic raw);
 
   @protected
+  List<TransportInfo> dco_decode_list_transport_info(dynamic raw);
+
+  @protected
   MeltMethodSettings dco_decode_melt_method_settings(dynamic raw);
 
   @protected
@@ -291,6 +295,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  PaymentRequestInfo dco_decode_payment_request_info(dynamic raw);
+
+  @protected
   ReceiveOptions dco_decode_receive_options(dynamic raw);
 
   @protected
@@ -313,6 +320,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TransactionStatus dco_decode_transaction_status(dynamic raw);
+
+  @protected
+  TransportInfo dco_decode_transport_info(dynamic raw);
 
   @protected
   BigInt dco_decode_u_64(dynamic raw);
@@ -520,6 +530,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Transaction> sse_decode_list_transaction(SseDeserializer deserializer);
 
   @protected
+  List<TransportInfo> sse_decode_list_transport_info(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   MeltMethodSettings sse_decode_melt_method_settings(
     SseDeserializer deserializer,
   );
@@ -603,6 +618,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  PaymentRequestInfo sse_decode_payment_request_info(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ReceiveOptions sse_decode_receive_options(SseDeserializer deserializer);
 
   @protected
@@ -629,6 +649,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   TransactionStatus sse_decode_transaction_status(SseDeserializer deserializer);
+
+  @protected
+  TransportInfo sse_decode_transport_info(SseDeserializer deserializer);
 
   @protected
   BigInt sse_decode_u_64(SseDeserializer deserializer);
@@ -886,6 +909,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_transport_info(
+    List<TransportInfo> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_melt_method_settings(
     MeltMethodSettings self,
     SseSerializer serializer,
@@ -985,6 +1014,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_payment_request_info(
+    PaymentRequestInfo self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_receive_options(
     ReceiveOptions self,
     SseSerializer serializer,
@@ -1022,6 +1057,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     TransactionStatus self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_transport_info(TransportInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_64(BigInt self, SseSerializer serializer);

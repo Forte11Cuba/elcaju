@@ -1064,6 +1064,27 @@ class WalletProvider extends ChangeNotifier {
   }
 
   // ============================================================
+  // PAYMENT REQUEST (NUT-18/26)
+  // ============================================================
+
+  /// Paga un Payment Request (NUT-18 creqA / NUT-26 creqB / BIP-321).
+  /// CDK maneja: NUT-10 spending conditions, transporte (Nostr/HTTP POST),
+  /// preparación del token y entrega automática.
+  Future<void> payPaymentRequest(
+    String encodedRequest, {
+    BigInt? customAmount,
+  }) async {
+    final wallet = await getActiveWallet();
+    debugPrint('[PAY_REQUEST] Paying payment request via ${wallet.mintUrl}');
+    await wallet.payPaymentRequest(
+      encoded: encodedRequest,
+      customAmount: customAmount,
+    );
+    debugPrint('[PAY_REQUEST] Payment delivered successfully');
+    notifyListeners();
+  }
+
+  // ============================================================
   // MINT (Depositar via Lightning)
   // ============================================================
 

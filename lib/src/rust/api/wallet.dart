@@ -77,6 +77,16 @@ abstract class Wallet implements RustOpaqueInterface {
     db: db,
   );
 
+  /// Pay a NUT-18 payment request.
+  /// Uses CDK's pay_request() which handles:
+  /// - NUT-10 spending conditions
+  /// - Transport selection (Nostr preferred, HTTP POST fallback)
+  /// - Token preparation and delivery
+  Future<void> payPaymentRequest({
+    required String encoded,
+    BigInt? customAmount,
+  });
+
   Future<PreparedSend> prepareSend({required BigInt amount, SendOptions? opts});
 
   Future<BigInt> receive({required Token token, ReceiveOptions? opts});

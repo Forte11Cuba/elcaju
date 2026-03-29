@@ -1057,8 +1057,54 @@ class L10nPt extends L10n {
   String get cameraPermissionDenied => 'Permissão de câmera negada';
 
   @override
-  String get paymentRequestNotSupported =>
-      'Solicitações de pagamento ainda não são suportadas';
+  String get paymentRequestTitle => 'Solicitação de pagamento';
+
+  @override
+  String get paymentRequestFrom => 'Solicitação de';
+
+  @override
+  String get paymentRequestAmount => 'Valor solicitado';
+
+  @override
+  String get paymentRequestDescription => 'Descrição';
+
+  @override
+  String get paymentRequestMints => 'Mints aceitos';
+
+  @override
+  String get paymentRequestAnyMint => 'Qualquer mint';
+
+  @override
+  String get paymentRequestPay => 'Pagar';
+
+  @override
+  String get paymentRequestPaying => 'Pagando...';
+
+  @override
+  String get paymentRequestSuccess => 'Pagamento enviado com sucesso';
+
+  @override
+  String get paymentRequestNoTransport =>
+      'Esta solicitação não tem método de entrega configurado';
+
+  @override
+  String get paymentRequestTransport => 'Transporte';
+
+  @override
+  String get paymentRequestMintNotAccepted =>
+      'Seu mint ativo não está na lista de mints aceitos';
+
+  @override
+  String paymentRequestUnitMismatch(String unit) {
+    return 'Unidade incompatível: a solicitação requer $unit';
+  }
+
+  @override
+  String get paymentRequestInsufficientBalance => 'Saldo insuficiente';
+
+  @override
+  String get paymentRequestErrorParsing =>
+      'Erro ao ler a solicitação de pagamento';
 
   @override
   String get p2pkTitle => 'Chaves P2PK';

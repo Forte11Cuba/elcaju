@@ -390,7 +390,26 @@
   "scanLightningInvoiceHint": "Scan a Lightning invoice (lnbc...)",
   "addMintQuestion": "Add this mint?",
   "cameraPermissionDenied": "Camera permission denied",
-  "paymentRequestNotSupported": "Payment requests are not yet supported",
+  "paymentRequestTitle": "Payment Request",
+  "paymentRequestFrom": "Request from",
+  "paymentRequestAmount": "Requested amount",
+  "paymentRequestDescription": "Description",
+  "paymentRequestMints": "Accepted mints",
+  "paymentRequestAnyMint": "Any mint",
+  "paymentRequestPay": "Pay",
+  "paymentRequestPaying": "Paying...",
+  "paymentRequestSuccess": "Payment sent successfully",
+  "paymentRequestNoTransport": "This request has no delivery method configured",
+  "paymentRequestTransport": "Transport",
+  "paymentRequestMintNotAccepted": "Your active mint is not in the list of accepted mints",
+  "paymentRequestUnitMismatch": "Incompatible unit: request requires {unit}",
+  "@paymentRequestUnitMismatch": {
+    "placeholders": {
+      "unit": { "type": "String" }
+    }
+  },
+  "paymentRequestInsufficientBalance": "Insufficient balance",
+  "paymentRequestErrorParsing": "Error reading payment request",
 
   "p2pkTitle": "P2PK Keys",
   "p2pkSettingsDescription": "Receive locked ecash",
