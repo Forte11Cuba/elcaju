@@ -499,7 +499,7 @@ async fn wait_for_nostr_payment_inner(
                 {
                     // Dart side cancelled the stream, clean up
                     client.disconnect().await;
-                    return Ok(Amount::ZERO);
+                    return Err(Error::Network("Listener cancelled by client".to_string()));
                 }
             }
         }
