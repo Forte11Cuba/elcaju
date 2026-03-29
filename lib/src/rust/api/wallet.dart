@@ -7,6 +7,7 @@ import '../frb_generated.dart';
 import 'error.dart';
 import 'mint_info.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'payment_request.dart';
 import 'token.dart';
 
 // These functions are ignored because they are not marked as `pub`: `mint_url`, `unit`, `update_balance_streams`
@@ -48,6 +49,15 @@ abstract class Wallet implements RustOpaqueInterface {
   Future<void> checkAllMintQuotes();
 
   Future<void> checkPendingTransactions();
+
+  /// Create a NUT-18 payment request with Nostr transport.
+  ///
+  /// Builds a PaymentRequest with the wallet's mint URL and unit,
+  /// generates ephemeral Nostr keys, and returns both creqA and creqB
+  /// encodings plus the keys needed for the Nostr listener.
+  Future<CreatedPaymentRequest> createPaymentRequest({
+    required CreateRequestParams params,
+  });
 
   Future<void> finalizePendingMelts();
 
@@ -102,6 +112,17 @@ abstract class Wallet implements RustOpaqueInterface {
   });
 
   Stream<BigInt> streamBalance();
+
+  /// Wait for an incoming Nostr payment (NIP-17 gift-wrap).
+  ///
+  /// Connects to the specified relays with the ephemeral keys,
+  /// subscribes for events addressed to the pubkey, unwraps the
+  /// gift-wrapped payment, and auto-receives tokens into the wallet.
+  Stream<NostrPaymentEvent> waitForNostrPayment({
+    required String nostrSecretHex,
+    required String nostrPubkeyHex,
+    required List<String> relays,
+  });
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletDatabase>>

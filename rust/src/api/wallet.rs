@@ -383,7 +383,7 @@ impl Wallet {
 
     // === Internal helpers ===
 
-    fn mint_url(&self) -> Result<MintUrl, Error> {
+    pub(crate) fn mint_url(&self) -> Result<MintUrl, Error> {
         Ok(MintUrl::from_str(&self.mint_url)?)
     }
 

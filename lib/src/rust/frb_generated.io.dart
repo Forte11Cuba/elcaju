@@ -139,6 +139,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustStreamSink<MintQuote> dco_decode_StreamSink_mint_quote_Sse(dynamic raw);
 
   @protected
+  RustStreamSink<NostrPaymentEvent>
+  dco_decode_StreamSink_nostr_payment_event_Sse(dynamic raw);
+
+  @protected
   RustStreamSink<BigInt> dco_decode_StreamSink_u_64_Sse(dynamic raw);
 
   @protected
@@ -149,6 +153,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool dco_decode_box_autoadd_bool(dynamic raw);
+
+  @protected
+  CreateRequestParams dco_decode_box_autoadd_create_request_params(dynamic raw);
 
   @protected
   MeltQuote dco_decode_box_autoadd_melt_quote(dynamic raw);
@@ -181,6 +188,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ContactInfo dco_decode_contact_info(dynamic raw);
+
+  @protected
+  CreateRequestParams dco_decode_create_request_params(dynamic raw);
+
+  @protected
+  CreatedPaymentRequest dco_decode_created_payment_request(dynamic raw);
 
   @protected
   Error dco_decode_error(dynamic raw);
@@ -241,6 +254,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MintVersion dco_decode_mint_version(dynamic raw);
+
+  @protected
+  NostrPaymentEvent dco_decode_nostr_payment_event(dynamic raw);
+
+  @protected
+  NostrPaymentState dco_decode_nostr_payment_state(dynamic raw);
 
   @protected
   Nut04Settings dco_decode_nut_04_settings(dynamic raw);
@@ -438,6 +457,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  RustStreamSink<NostrPaymentEvent>
+  sse_decode_StreamSink_nostr_payment_event_Sse(SseDeserializer deserializer);
+
+  @protected
   RustStreamSink<BigInt> sse_decode_StreamSink_u_64_Sse(
     SseDeserializer deserializer,
   );
@@ -450,6 +473,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
+
+  @protected
+  CreateRequestParams sse_decode_box_autoadd_create_request_params(
+    SseDeserializer deserializer,
+  );
 
   @protected
   MeltQuote sse_decode_box_autoadd_melt_quote(SseDeserializer deserializer);
@@ -484,6 +512,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ContactInfo sse_decode_contact_info(SseDeserializer deserializer);
+
+  @protected
+  CreateRequestParams sse_decode_create_request_params(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  CreatedPaymentRequest sse_decode_created_payment_request(
+    SseDeserializer deserializer,
+  );
 
   @protected
   Error sse_decode_error(SseDeserializer deserializer);
@@ -556,6 +594,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MintVersion sse_decode_mint_version(SseDeserializer deserializer);
+
+  @protected
+  NostrPaymentEvent sse_decode_nostr_payment_event(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  NostrPaymentState sse_decode_nostr_payment_state(
+    SseDeserializer deserializer,
+  );
 
   @protected
   Nut04Settings sse_decode_nut_04_settings(SseDeserializer deserializer);
@@ -787,6 +835,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_StreamSink_nostr_payment_event_Sse(
+    RustStreamSink<NostrPaymentEvent> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_StreamSink_u_64_Sse(
     RustStreamSink<BigInt> self,
     SseSerializer serializer,
@@ -800,6 +854,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_create_request_params(
+    CreateRequestParams self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_melt_quote(
@@ -848,6 +908,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_contact_info(ContactInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_create_request_params(
+    CreateRequestParams self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_created_payment_request(
+    CreatedPaymentRequest self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_error(Error self, SseSerializer serializer);
@@ -941,6 +1013,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_mint_version(MintVersion self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_nostr_payment_event(
+    NostrPaymentEvent self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_nostr_payment_state(
+    NostrPaymentState self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_nut_04_settings(Nut04Settings self, SseSerializer serializer);

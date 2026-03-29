@@ -1080,6 +1080,7 @@ dependencies = [
  "flutter_rust_bridge",
  "getrandom 0.3.4",
  "log",
+ "nostr-sdk",
  "oslog",
  "reqwest",
  "serde_json",
