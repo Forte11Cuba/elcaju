@@ -9,6 +9,24 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `extract_creq_from_uri`, `parse_payment_request_inner`, `percent_decode`, `wait_for_nostr_payment_inner`
 
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<CreatedPaymentRequest>>
+abstract class CreatedPaymentRequest implements RustOpaqueInterface {
+  String get creqA;
+
+  String get creqB;
+
+  NostrListenerHandle get listenerHandle;
+
+  set creqA(String creqA);
+
+  set creqB(String creqB);
+
+  set listenerHandle(NostrListenerHandle listenerHandle);
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NostrListenerHandle>>
+abstract class NostrListenerHandle implements RustOpaqueInterface {}
+
 /// Parameters for creating a payment request.
 class CreateRequestParams {
   /// Amount to request (in smallest unit, e.g. sats)
@@ -46,51 +64,6 @@ class CreateRequestParams {
           unit == other.unit &&
           description == other.description &&
           nostrRelays == other.nostrRelays;
-}
-
-/// Result of creating a payment request.
-class CreatedPaymentRequest {
-  /// NUT-18 encoding: creqA... (CBOR+base64url)
-  final String creqA;
-
-  /// NUT-26 encoding: CREQB1... (Bech32m, uppercase for QR)
-  final String creqB;
-
-  /// Nostr ephemeral public key (hex) — needed for the listener
-  final String nostrPubkeyHex;
-
-  /// Nostr ephemeral secret key (hex) — needed for the listener
-  final String nostrSecretHex;
-
-  /// Relay URLs used in the request
-  final List<String> relays;
-
-  const CreatedPaymentRequest({
-    required this.creqA,
-    required this.creqB,
-    required this.nostrPubkeyHex,
-    required this.nostrSecretHex,
-    required this.relays,
-  });
-
-  @override
-  int get hashCode =>
-      creqA.hashCode ^
-      creqB.hashCode ^
-      nostrPubkeyHex.hashCode ^
-      nostrSecretHex.hashCode ^
-      relays.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CreatedPaymentRequest &&
-          runtimeType == other.runtimeType &&
-          creqA == other.creqA &&
-          creqB == other.creqB &&
-          nostrPubkeyHex == other.nostrPubkeyHex &&
-          nostrSecretHex == other.nostrSecretHex &&
-          relays == other.relays;
 }
 
 /// Event emitted by the Nostr payment listener.

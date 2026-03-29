@@ -11,7 +11,7 @@ use cdk::{
 use flutter_rust_bridge::frb;
 use nostr_sdk::{
     nips::nip19::{Nip19Profile, ToBech32},
-    Keys as NostrKeys, PublicKey, RelayUrl, SecretKey,
+    Keys as NostrKeys, PublicKey, RelayUrl,
 };
 
 use crate::frb_generated::StreamSink;
@@ -197,12 +197,19 @@ pub struct CreatedPaymentRequest {
     pub creq_a: String,
     /// NUT-26 encoding: CREQB1... (Bech32m, uppercase for QR)
     pub creq_b: String,
-    /// Nostr ephemeral public key (hex) — needed for the listener
-    pub nostr_pubkey_hex: String,
-    /// Nostr ephemeral secret key (hex) — needed for the listener
-    pub nostr_secret_hex: String,
-    /// Relay URLs used in the request
-    pub relays: Vec<String>,
+    /// Opaque handle holding the ephemeral Nostr keys — pass to wait_for_nostr_payment().
+    /// The secret key never leaves Rust.
+    pub listener_handle: NostrListenerHandle,
+}
+
+/// Opaque handle that keeps Nostr ephemeral keys in Rust memory.
+/// Dart receives this as an opaque reference and passes it back
+/// to wait_for_nostr_payment() without ever seeing the secret key.
+#[derive(Clone)]
+pub struct NostrListenerHandle {
+    keys: NostrKeys,
+    pubkey: PublicKey,
+    relays: Vec<String>,
 }
 
 /// State of a Nostr payment listener.
@@ -255,10 +262,13 @@ impl Wallet {
             tags: Some(vec![vec!["n".to_string(), "17".to_string()]]),
         };
 
-        // Build the PaymentRequest with this wallet's mint
+        // Build the PaymentRequest with this wallet's mint and unit
         let mint_url = self.mint_url()?;
-        let unit = CurrencyUnit::from_str(&params.unit)
-            .unwrap_or(CurrencyUnit::Custom(params.unit.clone()));
+        if params.unit != self.unit {
+            return Err(Error::InvalidInput);
+        }
+        let unit = CurrencyUnit::from_str(&self.unit)
+            .unwrap_or(CurrencyUnit::Custom(self.unit.clone()));
 
         let pr = CdkPaymentRequest {
             payment_id: None,
@@ -277,32 +287,32 @@ impl Wallet {
             .to_bech32_string()
             .map_err(|e| Error::Cdk(format!("Bech32m encoding failed: {e}")))?;
 
+        let pubkey = keys.public_key;
         Ok(CreatedPaymentRequest {
             creq_a,
             creq_b,
-            nostr_pubkey_hex: keys.public_key.to_hex(),
-            nostr_secret_hex: keys.secret_key().to_secret_hex(),
-            relays: params.nostr_relays,
+            listener_handle: NostrListenerHandle {
+                keys,
+                pubkey,
+                relays: params.nostr_relays,
+            },
         })
     }
 
     /// Wait for an incoming Nostr payment (NIP-17 gift-wrap).
     ///
-    /// Connects to the specified relays with the ephemeral keys,
-    /// subscribes for events addressed to the pubkey, unwraps the
-    /// gift-wrapped payment, and auto-receives tokens into the wallet.
+    /// Takes the opaque NostrListenerHandle returned by create_payment_request().
+    /// The secret key never leaves Rust memory.
     pub async fn wait_for_nostr_payment(
         &self,
-        nostr_secret_hex: String,
-        nostr_pubkey_hex: String,
-        relays: Vec<String>,
+        handle: NostrListenerHandle,
         sink: StreamSink<NostrPaymentEvent>,
     ) -> Result<(), Error> {
-        let secret_key = SecretKey::from_hex(&nostr_secret_hex)
-            .map_err(|e| Error::Cdk(format!("Invalid Nostr secret key: {e}")))?;
-        let keys = NostrKeys::new(secret_key);
-        let pubkey = PublicKey::from_hex(&nostr_pubkey_hex)
-            .map_err(|e| Error::Cdk(format!("Invalid Nostr public key: {e}")))?;
+        let NostrListenerHandle {
+            keys,
+            pubkey,
+            relays,
+        } = handle;
 
         let _ = sink.add(NostrPaymentEvent {
             state: NostrPaymentState::Waiting,
@@ -312,7 +322,7 @@ impl Wallet {
 
         let _self = self.clone();
         flutter_rust_bridge::spawn(async move {
-            match wait_for_nostr_payment_inner(&_self, keys, pubkey, relays).await {
+            match wait_for_nostr_payment_inner(&_self, keys, pubkey, relays, &sink).await {
                 Ok(amount) => {
                     let _ = sink.add(NostrPaymentEvent {
                         state: NostrPaymentState::Received,
@@ -336,14 +346,17 @@ impl Wallet {
 }
 
 /// Internal: connect to relays, listen for gift-wrapped payment, receive tokens.
+/// Periodically checks if the Dart stream is still alive and disconnects if not.
 async fn wait_for_nostr_payment_inner(
     wallet: &Wallet,
     keys: NostrKeys,
     pubkey: PublicKey,
     relays: Vec<String>,
+    sink: &StreamSink<NostrPaymentEvent>,
 ) -> Result<Amount, Error> {
     use cdk::nuts::{PaymentRequestPayload, Token as CdkToken};
     use nostr_sdk::{Client, Filter};
+    use std::time::Duration;
 
     // Create Nostr client with ephemeral keys
     let client = Client::new(keys.clone());
@@ -362,41 +375,69 @@ async fn wait_for_nostr_payment_inner(
         .await
         .map_err(|e| Error::Cdk(format!("Subscription failed: {e}")))?;
 
-    // Listen for notifications
+    // Listen for notifications with periodic cancellation check.
+    // Every 5s we check if the Dart stream is still alive by attempting
+    // a sink.add(). If it fails, the Dart side disposed the stream and
+    // we disconnect cleanly.
     let mut notifications = client.notifications();
-    while let Ok(notification) = notifications.recv().await {
-        if let nostr_sdk::RelayPoolNotification::Event { event, .. } = notification {
-            // Try to unwrap NIP-17 gift-wrap
-            let unwrapped = match client.unwrap_gift_wrap(&event).await {
-                Ok(rumor) => rumor,
-                Err(_) => continue,
-            };
+    loop {
+        match tokio::time::timeout(Duration::from_secs(5), notifications.recv()).await {
+            Ok(Ok(notification)) => {
+                if let nostr_sdk::RelayPoolNotification::Event { event, .. } = notification {
+                    // Try to unwrap NIP-17 gift-wrap
+                    let unwrapped = match client.unwrap_gift_wrap(&event).await {
+                        Ok(rumor) => rumor,
+                        Err(_) => continue,
+                    };
 
-            // Parse PaymentRequestPayload from the rumor content
-            let payload: PaymentRequestPayload =
-                match serde_json::from_str(&unwrapped.rumor.content) {
-                    Ok(p) => p,
-                    Err(_) => continue,
-                };
+                    // Parse PaymentRequestPayload from the rumor content
+                    let payload: PaymentRequestPayload =
+                        match serde_json::from_str(&unwrapped.rumor.content) {
+                            Ok(p) => p,
+                            Err(_) => continue,
+                        };
 
-            // Build a token from the payload and receive it
-            let token = CdkToken::new(
-                payload.mint,
-                payload.proofs,
-                payload.memo,
-                payload.unit,
-            );
-            let token_str = token.to_string();
-            let received = wallet
-                .inner
-                .receive(&token_str, CdkReceiveOptions::default())
-                .await?;
+                    // Build a token from the payload and receive it
+                    let token = CdkToken::new(
+                        payload.mint,
+                        payload.proofs,
+                        payload.memo,
+                        payload.unit,
+                    );
+                    let token_str = token.to_string();
+                    let received = wallet
+                        .inner
+                        .receive(&token_str, CdkReceiveOptions::default())
+                        .await?;
 
-            client.disconnect().await;
-            return Ok(received);
+                    client.disconnect().await;
+                    return Ok(received);
+                }
+            }
+            Ok(Err(_)) => {
+                // Notification channel closed
+                break;
+            }
+            Err(_) => {
+                // Timeout — check if the Dart stream is still alive
+                if sink
+                    .add(NostrPaymentEvent {
+                        state: NostrPaymentState::Waiting,
+                        amount: None,
+                        error: None,
+                    })
+                    .is_err()
+                {
+                    // Dart side cancelled the stream, clean up
+                    client.disconnect().await;
+                    return Ok(Amount::ZERO);
+                }
+            }
         }
     }
 
     client.disconnect().await;
-    Ok(Amount::ZERO)
+    Err(Error::Network(
+        "Nostr listener ended before a payment was received".to_string(),
+    ))
 }

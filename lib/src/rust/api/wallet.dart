@@ -115,13 +115,10 @@ abstract class Wallet implements RustOpaqueInterface {
 
   /// Wait for an incoming Nostr payment (NIP-17 gift-wrap).
   ///
-  /// Connects to the specified relays with the ephemeral keys,
-  /// subscribes for events addressed to the pubkey, unwraps the
-  /// gift-wrapped payment, and auto-receives tokens into the wallet.
+  /// Takes the opaque NostrListenerHandle returned by create_payment_request().
+  /// The secret key never leaves Rust memory.
   Stream<NostrPaymentEvent> waitForNostrPayment({
-    required String nostrSecretHex,
-    required String nostrPubkeyHex,
-    required List<String> relays,
+    required NostrListenerHandle handle,
   });
 }
 
