@@ -1718,15 +1718,14 @@ class WalletProvider extends ChangeNotifier {
     try {
       BigInt amount;
 
-      // Detectar si el token es P2PK y usar el flujo correspondiente
-      if (P2PKUtils.isP2PKLocked(pending.encoded)) {
-        if (p2pkPrivateKey == null) {
-          throw Exception('P2PK token requires a private key to claim');
-        }
-        amount = await receiveP2pkToken(pending.encoded, [p2pkPrivateKey]);
-      } else {
-        amount = await receiveToken(pending.encoded);
+      if (P2PKUtils.isP2PKLocked(pending.encoded) && p2pkPrivateKey == null) {
+        throw Exception('P2PK token requires a private key to claim');
       }
+
+      amount = await receiveToken(
+        pending.encoded,
+        p2pkPrivateKey: p2pkPrivateKey,
+      );
 
       // Éxito: eliminar de pending
       await _pendingTokenStorage.remove(id);
