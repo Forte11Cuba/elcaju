@@ -119,8 +119,12 @@ class _PaymentRequestScreenState extends State<PaymentRequestScreen> {
 
     // Validaciones
     final unitMismatch = info.unit != null && info.unit != activeUnit;
-    final mintNotAccepted = info.mints.isNotEmpty &&
-        !info.mints.contains(walletProvider.activeMintUrl);
+    String stripSlash(String url) =>
+        url.endsWith('/') ? url.substring(0, url.length - 1) : url;
+    final normalizedMints = info.mints.map(stripSlash).toSet();
+    final activeMint = walletProvider.activeMintUrl;
+    final mintNotAccepted = normalizedMints.isNotEmpty &&
+        (activeMint == null || !normalizedMints.contains(stripSlash(activeMint)));
     final hasTransport = info.transports.isNotEmpty;
 
     return SingleChildScrollView(
