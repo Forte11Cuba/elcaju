@@ -14,6 +14,7 @@ import '../data/transaction_meta_storage.dart';
 import '../data/pending_token.dart';
 import '../data/pending_token_storage.dart';
 import '../core/utils/keyset_debug.dart';
+import '../core/utils/p2pk_utils.dart';
 import '../widgets/effects/cashu_confetti.dart';
 
 /// Helper class para info de token parseado
@@ -1701,7 +1702,8 @@ class WalletProvider extends ChangeNotifier {
   /// Retorna el monto recibido si tiene éxito, o lanza excepción.
   /// Si el token está gastado o es inválido, lo elimina automáticamente.
   /// Verifica conectividad al mint antes de intentar reclamar.
-  Future<BigInt> claimPendingToken(String id) async {
+  /// [p2pkPrivateKey] clave privada para desbloquear tokens P2PK.
+  Future<BigInt> claimPendingToken(String id, {String? p2pkPrivateKey}) async {
     final pending = _pendingTokenStorage.get(id);
     if (pending == null) {
       throw Exception('Token pendiente no encontrado');
@@ -1714,8 +1716,16 @@ class WalletProvider extends ChangeNotifier {
     }
 
     try {
-      // Intentar reclamar usando el método existente
-      final amount = await receiveToken(pending.encoded);
+      BigInt amount;
+
+      if (P2PKUtils.isP2PKLocked(pending.encoded) && p2pkPrivateKey == null) {
+        throw Exception('P2PK token requires a private key to claim');
+      }
+
+      amount = await receiveToken(
+        pending.encoded,
+        p2pkPrivateKey: p2pkPrivateKey,
+      );
 
       // Éxito: eliminar de pending
       await _pendingTokenStorage.remove(id);
@@ -1744,7 +1754,8 @@ class WalletProvider extends ChangeNotifier {
 
   /// Verifica y reclama automáticamente tokens pendientes.
   /// Retorna un mapa con estadísticas: claimed, failed, removed, totalClaimed, unit.
-  Future<Map<String, dynamic>> checkPendingTokens() async {
+  /// [p2pkKeyResolver] función que dado un token encoded retorna la clave privada P2PK (o null).
+  Future<Map<String, dynamic>> checkPendingTokens({String? Function(String encodedToken)? p2pkKeyResolver}) async {
     final tokens = _pendingTokenStorage.listValid();
     if (tokens.isEmpty) {
       return {'claimed': 0, 'failed': 0, 'removed': 0, 'totalClaimed': BigInt.zero, 'unit': _activeUnit};
@@ -1758,7 +1769,8 @@ class WalletProvider extends ChangeNotifier {
 
     for (final token in tokens) {
       try {
-        final amount = await claimPendingToken(token.id);
+        final p2pkKey = p2pkKeyResolver?.call(token.encoded);
+        final amount = await claimPendingToken(token.id, p2pkPrivateKey: p2pkKey);
         claimed++;
         totalClaimed += amount;
         claimedUnit ??= token.unit; // Usar la unidad del primer token reclamado

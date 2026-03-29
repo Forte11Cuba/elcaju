@@ -14,6 +14,8 @@ import '../../core/utils/formatters.dart';
 import '../../data/transaction_meta_storage.dart';
 import '../../data/pending_token.dart';
 import '../../providers/wallet_provider.dart';
+import '../../providers/p2pk_provider.dart';
+import '../../core/utils/p2pk_utils.dart';
 import '../../widgets/common/gradient_background.dart';
 
 /// Filtros disponibles para el historial
@@ -222,9 +224,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> _claimPendingToken(PendingToken token) async {
     final l10n = L10n.of(context)!;
     final walletProvider = context.read<WalletProvider>();
+    final p2pkProvider = context.read<P2PKProvider>();
 
     try {
-      final amount = await walletProvider.claimPendingToken(token.id);
+      // Detectar P2PK y obtener clave privada si es necesario
+      String? p2pkKey;
+      if (P2PKUtils.isP2PKLocked(token.encoded)) {
+        p2pkKey = p2pkProvider.getPrivateKeyForToken(token.encoded);
+      }
+
+      final amount = await walletProvider.claimPendingToken(token.id, p2pkPrivateKey: p2pkKey);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
