@@ -10,6 +10,7 @@ import '../src/rust/api/keys.dart';
 import '../src/rust/api/payment_request.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 import '../data/transaction_meta_storage.dart';
 import '../data/pending_token.dart';
@@ -1253,13 +1254,23 @@ class WalletProvider extends ChangeNotifier {
 
   /// TTL for pending Nostr requests (24 hours).
   static const _pendingNostrRequestTtl = Duration(hours: 24);
+  StreamSubscription<NostrPaymentEvent>? _pendingNostrSubscription;
+  bool _pendingNostrResumeAttempted = false;
+  static const _pendingNostrSecretKey = 'pending_nostr_secret';
+  static const _secureStorage = FlutterSecureStorage();
 
   /// Save a pending Nostr payment request for recovery after app restart.
+  /// Secret key goes to FlutterSecureStorage, metadata to SharedPreferences.
   Future<void> savePendingNostrRequest(PersistedRequestData data) async {
     try {
+      // Secret key in encrypted storage
+      await _secureStorage.write(
+        key: _pendingNostrSecretKey,
+        value: data.secretHex,
+      );
+      // Metadata in SharedPreferences (no secrets)
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_pendingNostrRequestKey, jsonEncode({
-        'secretHex': data.secretHex,
         'pubkeyHex': data.pubkeyHex,
         'relays': data.relays,
         'amount': data.amount?.toString(),
@@ -1275,6 +1286,7 @@ class WalletProvider extends ChangeNotifier {
   /// Remove the pending Nostr payment request (payment received or cancelled).
   Future<void> removePendingNostrRequest() async {
     try {
+      await _secureStorage.delete(key: _pendingNostrSecretKey);
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_pendingNostrRequestKey);
     } catch (e) {
@@ -1283,8 +1295,12 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Check for a pending Nostr payment request and resume listening.
-  /// Called automatically during app startup.
+  /// Called automatically during app startup. Guarded against duplicate calls.
   Future<void> resumePendingNostrRequest() async {
+    if (_pendingNostrResumeAttempted) return;
+    _pendingNostrResumeAttempted = true;
+    await _pendingNostrSubscription?.cancel();
+    _pendingNostrSubscription = null;
     try {
       final prefs = await SharedPreferences.getInstance();
       final jsonStr = prefs.getString(_pendingNostrRequestKey);
@@ -1296,14 +1312,22 @@ class WalletProvider extends ChangeNotifier {
       final createdAt = DateTime.tryParse(map['createdAt'] ?? '');
       if (createdAt == null ||
           DateTime.now().difference(createdAt) > _pendingNostrRequestTtl) {
-        await prefs.remove(_pendingNostrRequestKey);
+        await removePendingNostrRequest();
         debugPrint('Pending Nostr request expired, removed');
+        return;
+      }
+
+      // Read secret from secure storage
+      final secretHex = await _secureStorage.read(key: _pendingNostrSecretKey);
+      if (secretHex == null) {
+        await prefs.remove(_pendingNostrRequestKey);
+        debugPrint('Pending Nostr request has no secret key, removed');
         return;
       }
 
       // Reconstruct handle
       final data = PersistedRequestData(
-        secretHex: map['secretHex'] as String,
+        secretHex: secretHex,
         pubkeyHex: map['pubkeyHex'] as String,
         relays: List<String>.from(map['relays']),
         amount: map['amount'] != null
@@ -1315,27 +1339,33 @@ class WalletProvider extends ChangeNotifier {
 
       final handle = NostrListenerHandle.fromPersisted(data: data);
 
-      // Find the wallet for this mint+unit (key format: "mintUrl:unit")
-      final walletKey = '${data.mintUrl}:${data.unit}';
-      final wallet = _wallets[walletKey];
-
-      if (wallet == null) {
-        debugPrint('No wallet found for pending Nostr request, removing');
-        await prefs.remove(_pendingNostrRequestKey);
+      // Get or create the wallet for this mint+unit (lazy instantiation)
+      Wallet wallet;
+      try {
+        wallet = await getWallet(data.mintUrl, data.unit);
+      } catch (e) {
+        debugPrint('No wallet for pending Nostr request: $e');
+        await removePendingNostrRequest();
         return;
       }
 
       // Resume listening in background
       debugPrint('Resuming pending Nostr payment request...');
-      wallet.waitForNostrPayment(handle: handle).listen(
+      _pendingNostrSubscription = wallet.waitForNostrPayment(handle: handle).listen(
         (event) {
           if (event.state == NostrPaymentState.received) {
             debugPrint('Pending Nostr payment received: ${event.amount}');
             removePendingNostrRequest();
             confettiController.fire();
+            _pendingNostrSubscription?.cancel();
+            _pendingNostrSubscription = null;
           }
         },
-        onError: (_) => removePendingNostrRequest(),
+        onError: (error) {
+          debugPrint('Pending Nostr listener error (kept for retry): $error');
+          _pendingNostrSubscription = null;
+          _pendingNostrResumeAttempted = false; // Allow retry on next startup
+        },
       );
     } catch (e) {
       debugPrint('Error resuming pending Nostr request: $e');

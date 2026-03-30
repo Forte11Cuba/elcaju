@@ -251,8 +251,8 @@ impl NostrListenerHandle {
         let secret_key = nostr_sdk::SecretKey::from_hex(&data.secret_hex)
             .map_err(|e| Error::Cdk(format!("Invalid persisted secret key: {e}")))?;
         let keys = NostrKeys::new(secret_key);
-        let pubkey = PublicKey::from_hex(&data.pubkey_hex)
-            .map_err(|e| Error::Cdk(format!("Invalid persisted public key: {e}")))?;
+        // Derive pubkey from secret — don't trust the persisted copy
+        let pubkey = keys.public_key;
         let unit = CurrencyUnit::from_str(&data.unit)
             .unwrap_or(CurrencyUnit::Custom(data.unit));
         let mint_url = MintUrl::from_str(&data.mint_url)

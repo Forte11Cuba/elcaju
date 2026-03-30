@@ -72,6 +72,10 @@ class _RequestScreenState extends State<RequestScreen> {
     _nostrSubscription?.cancel();
     _mintSubscription?.cancel();
     if (_nfcEmulating) NfcService.stopEmulating();
+    // Clear persisted request if user abandoned without receiving payment
+    if (!_paymentHandled && _creqB != null) {
+      context.read<WalletProvider>().removePendingNostrRequest();
+    }
     super.dispose();
   }
 
@@ -757,7 +761,7 @@ class _RequestScreenState extends State<RequestScreen> {
       _creqB = request.creqB;
 
       // Persist handle for recovery if app is killed
-      walletProvider.savePendingNostrRequest(
+      await walletProvider.savePendingNostrRequest(
         request.listenerHandle.toPersisted(),
       );
 
@@ -816,7 +820,7 @@ class _RequestScreenState extends State<RequestScreen> {
     }
   }
 
-  void _onPaymentSuccess(BigInt amount) {
+  Future<void> _onPaymentSuccess(BigInt amount) async {
     if (_nfcEmulating) NfcService.stopEmulating();
     setState(() {
       _status = RequestStatus.received;
@@ -824,7 +828,7 @@ class _RequestScreenState extends State<RequestScreen> {
     });
     final walletProvider = context.read<WalletProvider>();
     walletProvider.confettiController.fire();
-    walletProvider.removePendingNostrRequest();
+    await walletProvider.removePendingNostrRequest();
   }
 
   // ─── QR Content ───
