@@ -231,8 +231,10 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   void _handleInvoiceOnlyMode(ParsedData data) {
-    if (data.type == IncomingDataType.lightningInvoice) {
-      // Retornar el invoice vía callback
+    if (data.type == IncomingDataType.lightningInvoice ||
+        (data.type == IncomingDataType.paymentRequest &&
+            data.invoiceBolt11 != null)) {
+      // Return the invoice — works for pure BOLT11 and BIP-321 URIs with lightning=
       Navigator.pop(context, data.invoiceBolt11 ?? data.raw);
       widget.onDataScanned?.call(data.invoiceBolt11 ?? data.raw);
     } else {
