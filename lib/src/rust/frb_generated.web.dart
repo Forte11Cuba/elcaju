@@ -119,6 +119,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  NostrListenerHandle
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNostrListenerHandle(
+    dynamic raw,
+  );
+
+  @protected
   PreparedSend
   dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
     dynamic raw,
@@ -211,6 +217,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MintVersion dco_decode_box_autoadd_mint_version(dynamic raw);
+
+  @protected
+  PersistedRequestData dco_decode_box_autoadd_persisted_request_data(
+    dynamic raw,
+  );
 
   @protected
   ReceiveOptions dco_decode_box_autoadd_receive_options(dynamic raw);
@@ -358,6 +369,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PaymentRequestInfo dco_decode_payment_request_info(dynamic raw);
 
   @protected
+  PersistedRequestData dco_decode_persisted_request_data(dynamic raw);
+
+  @protected
   ReceiveOptions dco_decode_receive_options(dynamic raw);
 
   @protected
@@ -466,6 +480,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  NostrListenerHandle
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNostrListenerHandle(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   PreparedSend
   sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
     SseDeserializer deserializer,
@@ -566,6 +586,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   MintVersion sse_decode_box_autoadd_mint_version(SseDeserializer deserializer);
+
+  @protected
+  PersistedRequestData sse_decode_box_autoadd_persisted_request_data(
+    SseDeserializer deserializer,
+  );
 
   @protected
   ReceiveOptions sse_decode_box_autoadd_receive_options(
@@ -743,6 +768,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PersistedRequestData sse_decode_persisted_request_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   ReceiveOptions sse_decode_receive_options(SseDeserializer deserializer);
 
   @protected
@@ -870,6 +900,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNostrListenerHandle(
+    NostrListenerHandle self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
   sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPreparedSend(
     PreparedSend self,
     SseSerializer serializer,
@@ -992,6 +1029,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_mint_version(
     MintVersion self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_persisted_request_data(
+    PersistedRequestData self,
     SseSerializer serializer,
   );
 
@@ -1208,6 +1251,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_payment_request_info(
     PaymentRequestInfo self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_persisted_request_data(
+    PersistedRequestData self,
     SseSerializer serializer,
   );
 

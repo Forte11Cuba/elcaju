@@ -72,6 +72,10 @@ class _RequestScreenState extends State<RequestScreen> {
     _nostrSubscription?.cancel();
     _mintSubscription?.cancel();
     if (_nfcEmulating) NfcService.stopEmulating();
+    // Clear persisted request if user abandoned without receiving payment
+    if (!_paymentHandled && _creqB != null) {
+      context.read<WalletProvider>().removePendingNostrRequest();
+    }
     super.dispose();
   }
 
@@ -745,7 +749,6 @@ class _RequestScreenState extends State<RequestScreen> {
           : null;
 
       // 1. Create payment request (creqB + Nostr keys)
-      debugPrint('[RequestScreen] Creating payment request...');
       final request = await wallet.createPaymentRequest(
         params: CreateRequestParams(
           amount: _amount,
@@ -754,25 +757,23 @@ class _RequestScreenState extends State<RequestScreen> {
           nostrRelays: _defaultNostrRelays,
         ),
       );
-      debugPrint('[RequestScreen] Payment request created: ${request.creqB.substring(0, 20)}...');
 
       _creqB = request.creqB;
 
+      // Persist handle for recovery if app is killed
+      await walletProvider.savePendingNostrRequest(
+        request.listenerHandle.toPersisted(),
+      );
+
       // 2. Start Nostr listener
-      debugPrint('[RequestScreen] Starting Nostr listener...');
       _nostrSubscription = wallet
           .waitForNostrPayment(handle: request.listenerHandle)
           .listen(_onNostrEvent);
-      debugPrint('[RequestScreen] Nostr listener started');
 
       // 3. Start Lightning invoice generation directly via CDK
-      // We use wallet.mint() directly instead of walletProvider.mintTokens()
-      // to avoid conflicts with the provider's single-stream state management.
-      debugPrint('[RequestScreen] Generating Lightning invoice...');
       _mintSubscription = wallet
           .mint(amount: _amount, description: description)
           .listen(_onMintEvent);
-      debugPrint('[RequestScreen] Lightning invoice listener started');
 
       setState(() => _status = RequestStatus.waiting);
     } catch (e) {
@@ -819,13 +820,15 @@ class _RequestScreenState extends State<RequestScreen> {
     }
   }
 
-  void _onPaymentSuccess(BigInt amount) {
+  Future<void> _onPaymentSuccess(BigInt amount) async {
     if (_nfcEmulating) NfcService.stopEmulating();
     setState(() {
       _status = RequestStatus.received;
       _receivedAmount = amount;
     });
-    context.read<WalletProvider>().confettiController.fire();
+    final walletProvider = context.read<WalletProvider>();
+    walletProvider.confettiController.fire();
+    await walletProvider.removePendingNostrRequest();
   }
 
   // ─── QR Content ───
