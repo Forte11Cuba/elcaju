@@ -326,7 +326,7 @@ class _RequestScreenState extends State<RequestScreen> {
                 ),
                 const SizedBox(height: AppDimensions.paddingLarge),
 
-                // QR Code
+                // QR Code with logo overlay
                 Center(
                   child: Container(
                     padding: const EdgeInsets.all(16),
@@ -334,12 +334,51 @@ class _RequestScreenState extends State<RequestScreen> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: QrImageView(
-                      data: _getActiveQrContent(),
-                      version: QrVersions.auto,
-                      size: 260,
-                      backgroundColor: Colors.white,
-                      errorCorrectionLevel: QrErrorCorrectLevel.M,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        QrImageView(
+                          data: _getActiveQrContent(),
+                          version: QrVersions.auto,
+                          size: 260,
+                          backgroundColor: Colors.white,
+                          errorCorrectionLevel: _activeMode == QrMode.universal
+                              ? QrErrorCorrectLevel.M
+                              : QrErrorCorrectLevel.H,
+                        ),
+                        if (_activeMode == QrMode.cashu)
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.white, width: 4),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.asset(
+                                'assets/img/cashu.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        if (_activeMode == QrMode.lightning)
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF7931A),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.white, width: 4),
+                            ),
+                            child: const Icon(
+                              LucideIcons.zap,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ),
