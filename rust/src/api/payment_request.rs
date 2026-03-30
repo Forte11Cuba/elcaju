@@ -331,6 +331,14 @@ impl Wallet {
             mint_url,
         } = handle;
 
+        // Fail fast if the handle was created for a different wallet
+        let current_mint = self.mint_url()?;
+        let current_unit = CurrencyUnit::from_str(&self.unit)
+            .unwrap_or(CurrencyUnit::Custom(self.unit.clone()));
+        if mint_url != current_mint || expected_unit != current_unit {
+            return Err(Error::InvalidInput);
+        }
+
         if sink
             .add(NostrPaymentEvent {
                 state: NostrPaymentState::Waiting,
