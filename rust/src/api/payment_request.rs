@@ -469,13 +469,26 @@ async fn wait_for_nostr_payment_inner(
         .map_err(|e| Error::Cdk(format!("Subscription failed: {e}")))?;
 
     // Listen for notifications with periodic cancellation check.
-    // Every 5s we check if the Dart stream is still alive by attempting
+    // Every 1s we check if the Dart stream is still alive by attempting
     // a sink.add(). If it fails, the Dart side disposed the stream and
-    // we disconnect cleanly.
+    // we disconnect cleanly. Short interval minimizes "Fail to post" spam.
     let mut notifications = client.notifications();
     loop {
-        match tokio::time::timeout(Duration::from_secs(5), notifications.recv()).await {
+        match tokio::time::timeout(Duration::from_secs(1), notifications.recv()).await {
             Ok(Ok(notification)) => {
+                // Check sink is alive before processing
+                if sink
+                    .add(NostrPaymentEvent {
+                        state: NostrPaymentState::Waiting,
+                        amount: None,
+                        error: None,
+                    })
+                    .is_err()
+                {
+                    client.disconnect().await;
+                    return Err(Error::Network("Listener cancelled by client".to_string()));
+                }
+
                 if let nostr_sdk::RelayPoolNotification::Event { event, .. } = notification {
                     // Try to unwrap NIP-17 gift-wrap
                     let unwrapped = match client.unwrap_gift_wrap(&event).await {
