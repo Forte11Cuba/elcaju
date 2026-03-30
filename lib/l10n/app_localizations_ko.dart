@@ -1182,4 +1182,31 @@ class L10nKo extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => '기본 키는 삭제할 수 없습니다';
+
+  @override
+  String get request => '요청';
+
+  @override
+  String get requestPayment => '결제 요청';
+
+  @override
+  String get requestPaymentDescription => '통합 결제 요청 생성';
+
+  @override
+  String get generateRequest => '요청 생성';
+
+  @override
+  String get generatingRequest => '생성 중...';
+
+  @override
+  String get requestPaymentReceived => '결제가 수신되었습니다';
+
+  @override
+  String get requestDescriptionHint => '설명 (선택사항)';
+
+  @override
+  String get universal => '유니버설';
+
+  @override
+  String get copiedToClipboard => '클립보드에 복사되었습니다';
 }

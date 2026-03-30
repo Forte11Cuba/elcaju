@@ -1180,4 +1180,31 @@ class L10nJa extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => 'プライマリ鍵は削除できません';
+
+  @override
+  String get request => 'リクエスト';
+
+  @override
+  String get requestPayment => '支払いをリクエスト';
+
+  @override
+  String get requestPaymentDescription => '統合支払いリクエストを生成';
+
+  @override
+  String get generateRequest => 'リクエストを生成';
+
+  @override
+  String get generatingRequest => '生成中...';
+
+  @override
+  String get requestPaymentReceived => '支払いを受け取りました';
+
+  @override
+  String get requestDescriptionHint => '説明（任意）';
+
+  @override
+  String get universal => 'ユニバーサル';
+
+  @override
+  String get copiedToClipboard => 'クリップボードにコピーしました';
 }

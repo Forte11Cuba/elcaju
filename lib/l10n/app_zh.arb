@@ -549,5 +549,15 @@
   "p2pkErrorInvalidNsec": "无效的nsec",
   "p2pkErrorKeyAlreadyExists": "此密钥已存在",
   "p2pkErrorKeyNotFound": "未找到密钥",
-  "p2pkErrorCannotDeletePrimary": "无法删除主密钥"
+  "p2pkErrorCannotDeletePrimary": "无法删除主密钥",
+
+  "request": "请求",
+  "requestPayment": "请求付款",
+  "requestPaymentDescription": "生成统一付款请求",
+  "generateRequest": "生成请求",
+  "generatingRequest": "正在生成请求...",
+  "requestPaymentReceived": "已收到付款",
+  "requestDescriptionHint": "描述（可选）",
+  "universal": "通用",
+  "copiedToClipboard": "已复制到剪贴板"
 }

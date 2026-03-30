@@ -1206,4 +1206,32 @@ class L10nPt extends L10n {
   @override
   String get p2pkErrorCannotDeletePrimary =>
       'Não é possível excluir a chave principal';
+
+  @override
+  String get request => 'Solicitar';
+
+  @override
+  String get requestPayment => 'Solicitar pagamento';
+
+  @override
+  String get requestPaymentDescription =>
+      'Gerar solicitação de pagamento unificada';
+
+  @override
+  String get generateRequest => 'Gerar solicitação';
+
+  @override
+  String get generatingRequest => 'Gerando solicitação...';
+
+  @override
+  String get requestPaymentReceived => 'Pagamento recebido';
+
+  @override
+  String get requestDescriptionHint => 'Descrição (opcional)';
+
+  @override
+  String get universal => 'Universal';
+
+  @override
+  String get copiedToClipboard => 'Copiado para a área de transferência';
 }

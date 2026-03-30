@@ -442,5 +442,15 @@
   "p2pkErrorInvalidNsec": "Invalid nsec",
   "p2pkErrorKeyAlreadyExists": "This key already exists",
   "p2pkErrorKeyNotFound": "Key not found",
-  "p2pkErrorCannotDeletePrimary": "Cannot delete primary key"
+  "p2pkErrorCannotDeletePrimary": "Cannot delete primary key",
+
+  "request": "Request",
+  "requestPayment": "Request Payment",
+  "requestPaymentDescription": "Generate unified payment request",
+  "generateRequest": "Generate Request",
+  "generatingRequest": "Generating request...",
+  "requestPaymentReceived": "Payment received",
+  "requestDescriptionHint": "Description (optional)",
+  "universal": "Universal",
+  "copiedToClipboard": "Copied to clipboard"
 }

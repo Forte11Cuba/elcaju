@@ -1218,4 +1218,32 @@ class L10nFr extends L10n {
   @override
   String get p2pkErrorCannotDeletePrimary =>
       'Impossible de supprimer la clé principale';
+
+  @override
+  String get request => 'Demander';
+
+  @override
+  String get requestPayment => 'Demander un paiement';
+
+  @override
+  String get requestPaymentDescription =>
+      'Générer une demande de paiement unifiée';
+
+  @override
+  String get generateRequest => 'Générer la demande';
+
+  @override
+  String get generatingRequest => 'Génération en cours...';
+
+  @override
+  String get requestPaymentReceived => 'Paiement reçu';
+
+  @override
+  String get requestDescriptionHint => 'Description (facultatif)';
+
+  @override
+  String get universal => 'Universel';
+
+  @override
+  String get copiedToClipboard => 'Copié dans le presse-papiers';
 }

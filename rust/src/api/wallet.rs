@@ -179,12 +179,33 @@ impl Wallet {
             .inner
             .mint_quote(PaymentMethod::BOLT11, Some(amount.into()), description, None)
             .await?;
-        let _ = sink.add(MintQuote::from(quote.clone()));
+
+        if sink.add(MintQuote::from(quote.clone())).is_err() {
+            return Ok(());
+        }
 
         let _self = self.clone();
         flutter_rust_bridge::spawn(async move {
             loop {
                 sleep(Duration::from_secs(3)).await;
+
+                // Check if the Dart stream is still alive before polling
+                if sink
+                    .add(MintQuote {
+                        id: quote.id.clone(),
+                        request: quote.request.clone(),
+                        amount: quote.amount.map(|a| a.into()),
+                        expiry: Some(quote.expiry),
+                        state: MintQuoteState::Unpaid,
+                        token: None,
+                        error: None,
+                    })
+                    .is_err()
+                {
+                    info!("Mint polling stopped: Dart stream closed for {}", quote.id);
+                    break;
+                }
+
                 info!("Checking mint quote state for {}", quote.id);
                 match _self.inner.check_mint_quote_status(&quote.id).await {
                     Ok(state_res) => match state_res.state {

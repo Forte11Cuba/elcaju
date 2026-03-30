@@ -549,5 +549,15 @@
   "p2pkErrorInvalidNsec": "Ungültiger nsec",
   "p2pkErrorKeyAlreadyExists": "Dieser Schlüssel existiert bereits",
   "p2pkErrorKeyNotFound": "Schlüssel nicht gefunden",
-  "p2pkErrorCannotDeletePrimary": "Primärschlüssel kann nicht gelöscht werden"
+  "p2pkErrorCannotDeletePrimary": "Primärschlüssel kann nicht gelöscht werden",
+
+  "request": "Anfordern",
+  "requestPayment": "Zahlung anfordern",
+  "requestPaymentDescription": "Einheitliche Zahlungsanforderung erstellen",
+  "generateRequest": "Anforderung erstellen",
+  "generatingRequest": "Anforderung wird erstellt...",
+  "requestPaymentReceived": "Zahlung erhalten",
+  "requestDescriptionHint": "Beschreibung (optional)",
+  "universal": "Universal",
+  "copiedToClipboard": "In die Zwischenablage kopiert"
 }

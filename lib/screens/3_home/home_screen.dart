@@ -14,7 +14,7 @@ import '../../providers/settings_provider.dart';
 import '../../providers/p2pk_provider.dart';
 import '../4_receive/receive_screen.dart';
 import '../5_send/send_screen.dart';
-import '../6_mint/mint_screen.dart';
+import '../12_request/request_screen.dart';
 import '../7_melt/melt_screen.dart';
 import '../8_settings/settings_screen.dart';
 import '../8_settings/mints_screen.dart';
@@ -437,14 +437,14 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           _MethodOption(
-            icon: LucideIcons.zap,
-            label: l10n.lightning,
-            description: l10n.generateInvoiceToDeposit,
+            icon: LucideIcons.bellRing,
+            label: l10n.request,
+            description: l10n.requestPaymentDescription,
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MintScreen()),
+                MaterialPageRoute(builder: (context) => const RequestScreen()),
               );
             },
           ),

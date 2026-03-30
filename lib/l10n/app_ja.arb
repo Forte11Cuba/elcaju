@@ -549,5 +549,15 @@
   "p2pkErrorInvalidNsec": "無効なnsec",
   "p2pkErrorKeyAlreadyExists": "この鍵は既に存在します",
   "p2pkErrorKeyNotFound": "鍵が見つかりません",
-  "p2pkErrorCannotDeletePrimary": "プライマリ鍵は削除できません"
+  "p2pkErrorCannotDeletePrimary": "プライマリ鍵は削除できません",
+
+  "request": "リクエスト",
+  "requestPayment": "支払いをリクエスト",
+  "requestPaymentDescription": "統合支払いリクエストを生成",
+  "generateRequest": "リクエストを生成",
+  "generatingRequest": "生成中...",
+  "requestPaymentReceived": "支払いを受け取りました",
+  "requestDescriptionHint": "説明（任意）",
+  "universal": "ユニバーサル",
+  "copiedToClipboard": "クリップボードにコピーしました"
 }

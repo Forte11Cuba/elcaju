@@ -1195,4 +1195,31 @@ class L10nEn extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => 'Cannot delete primary key';
+
+  @override
+  String get request => 'Request';
+
+  @override
+  String get requestPayment => 'Request Payment';
+
+  @override
+  String get requestPaymentDescription => 'Generate unified payment request';
+
+  @override
+  String get generateRequest => 'Generate Request';
+
+  @override
+  String get generatingRequest => 'Generating request...';
+
+  @override
+  String get requestPaymentReceived => 'Payment received';
+
+  @override
+  String get requestDescriptionHint => 'Description (optional)';
+
+  @override
+  String get universal => 'Universal';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
 }

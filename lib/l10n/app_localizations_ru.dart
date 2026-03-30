@@ -1202,4 +1202,32 @@ class L10nRu extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => 'Невозможно удалить основной ключ';
+
+  @override
+  String get request => 'Запросить';
+
+  @override
+  String get requestPayment => 'Запросить платёж';
+
+  @override
+  String get requestPaymentDescription =>
+      'Создать унифицированный запрос на оплату';
+
+  @override
+  String get generateRequest => 'Создать запрос';
+
+  @override
+  String get generatingRequest => 'Создание запроса...';
+
+  @override
+  String get requestPaymentReceived => 'Платёж получен';
+
+  @override
+  String get requestDescriptionHint => 'Описание (необязательно)';
+
+  @override
+  String get universal => 'Универсальный';
+
+  @override
+  String get copiedToClipboard => 'Скопировано в буфер обмена';
 }
