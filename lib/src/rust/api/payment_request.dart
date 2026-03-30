@@ -7,7 +7,97 @@ import '../frb_generated.dart';
 import 'error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `extract_creq_from_uri`, `parse_payment_request_inner`
+// These functions are ignored because they are not marked as `pub`: `extract_creq_from_uri`, `parse_payment_request_inner`, `percent_decode`, `wait_for_nostr_payment_inner`
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<CreatedPaymentRequest>>
+abstract class CreatedPaymentRequest implements RustOpaqueInterface {
+  String get creqA;
+
+  String get creqB;
+
+  NostrListenerHandle get listenerHandle;
+
+  set creqA(String creqA);
+
+  set creqB(String creqB);
+
+  set listenerHandle(NostrListenerHandle listenerHandle);
+}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NostrListenerHandle>>
+abstract class NostrListenerHandle implements RustOpaqueInterface {}
+
+/// Parameters for creating a payment request.
+class CreateRequestParams {
+  /// Amount to request (in smallest unit, e.g. sats)
+  final BigInt? amount;
+
+  /// Currency unit ("sat", "usd", etc.)
+  final String unit;
+
+  /// Human-readable description
+  final String? description;
+
+  /// Nostr relay URLs for the transport
+  final List<String> nostrRelays;
+
+  const CreateRequestParams({
+    this.amount,
+    required this.unit,
+    this.description,
+    required this.nostrRelays,
+  });
+
+  @override
+  int get hashCode =>
+      amount.hashCode ^
+      unit.hashCode ^
+      description.hashCode ^
+      nostrRelays.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateRequestParams &&
+          runtimeType == other.runtimeType &&
+          amount == other.amount &&
+          unit == other.unit &&
+          description == other.description &&
+          nostrRelays == other.nostrRelays;
+}
+
+/// Event emitted by the Nostr payment listener.
+class NostrPaymentEvent {
+  final NostrPaymentState state;
+  final BigInt? amount;
+  final String? error;
+
+  const NostrPaymentEvent({required this.state, this.amount, this.error});
+
+  @override
+  int get hashCode => state.hashCode ^ amount.hashCode ^ error.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NostrPaymentEvent &&
+          runtimeType == other.runtimeType &&
+          state == other.state &&
+          amount == other.amount &&
+          error == other.error;
+}
+
+/// State of a Nostr payment listener.
+enum NostrPaymentState {
+  /// Connected to relays, waiting for payment
+  waiting,
+
+  /// Payment received and tokens claimed
+  received,
+
+  /// Error occurred
+  error,
+}
 
 /// Parsed payment request info exposed to Flutter.
 /// CDK's FromStr auto-detects creqA (CBOR) vs creqB (Bech32m).
