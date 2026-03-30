@@ -249,6 +249,7 @@ class _MintScreenState extends State<MintScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (context) => _ConfirmationModal(
         amount: _amount,
         unit: _activeUnit,

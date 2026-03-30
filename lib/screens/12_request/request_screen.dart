@@ -59,10 +59,13 @@ class _RequestScreenState extends State<RequestScreen> {
   // Success
   BigInt _receivedAmount = BigInt.zero;
 
+  late final WalletProvider _walletProvider;
+
   @override
   void initState() {
     super.initState();
-    _activeUnit = context.read<WalletProvider>().activeUnit;
+    _walletProvider = context.read<WalletProvider>();
+    _activeUnit = _walletProvider.activeUnit;
     _checkNfc();
   }
 
@@ -74,7 +77,7 @@ class _RequestScreenState extends State<RequestScreen> {
     if (_nfcEmulating) NfcService.stopEmulating();
     // Clear persisted request if user abandoned without receiving payment
     if (!_paymentHandled && _creqB != null) {
-      context.read<WalletProvider>().removePendingNostrRequest();
+      _walletProvider.removePendingNostrRequest();
     }
     super.dispose();
   }
