@@ -368,7 +368,7 @@ class _RequestScreenState extends State<RequestScreen> {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF7931A),
+                              color: AppColors.bitcoinOrange,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: Colors.white, width: 4),
                             ),

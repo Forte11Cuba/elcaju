@@ -22,6 +22,7 @@ class AppColors {
   // === ACCENT COLORS ===
   static const Color primaryAction = Color(0xFFE35D33); // Naranja vibrante
   static const Color secondaryAction = Color(0xFFFFB74D); // Amarillo pulpa/Bitcoin
+  static const Color bitcoinOrange = Color(0xFFF7931A); // Bitcoin brand orange
   static const Color success = Color(0xFF00E676); // Verde neón
   static const Color error = Color(0xFFFF5252); // Rojo suave
   static const Color warning = Color(0xFFFFB74D); // Amarillo
