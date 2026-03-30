@@ -2338,7 +2338,7 @@ abstract class L10n {
   /// No description provided for @requestDescriptionHint.
   ///
   /// In es, this message translates to:
-  /// **'Descripcion (opcional)'**
+  /// **'Descripción (opcional)'**
   String get requestDescriptionHint;
 
   /// No description provided for @universal.

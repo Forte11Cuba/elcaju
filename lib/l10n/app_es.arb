@@ -570,7 +570,7 @@
   "generateRequest": "Generar solicitud",
   "generatingRequest": "Generando solicitud...",
   "requestPaymentReceived": "Pago recibido",
-  "requestDescriptionHint": "Descripcion (opcional)",
+  "requestDescriptionHint": "Descripción (opcional)",
   "universal": "Universal",
   "copiedToClipboard": "Copiado al portapapeles"
 }

@@ -234,7 +234,15 @@ class IncomingDataParser {
       if (eqIndex < 0) continue;
       final k = param.substring(0, eqIndex);
       if (k.toLowerCase() == key.toLowerCase()) {
-        return Uri.decodeComponent(param.substring(eqIndex + 1));
+        final rawValue = param.substring(eqIndex + 1);
+        if (rawValue.isEmpty) continue;
+        try {
+          final value = Uri.decodeComponent(rawValue);
+          if (value.isEmpty) continue;
+          return value;
+        } on ArgumentError {
+          continue;
+        }
       }
     }
     return null;

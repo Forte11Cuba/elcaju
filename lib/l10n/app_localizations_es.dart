@@ -1223,7 +1223,7 @@ class L10nEs extends L10n {
   String get requestPaymentReceived => 'Pago recibido';
 
   @override
-  String get requestDescriptionHint => 'Descripcion (opcional)';
+  String get requestDescriptionHint => 'Descripción (opcional)';
 
   @override
   String get universal => 'Universal';
