@@ -1204,4 +1204,31 @@ class L10nSw extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => 'Haiwezekani kufuta ufunguo mkuu';
+
+  @override
+  String get request => 'Omba';
+
+  @override
+  String get requestPayment => 'Omba malipo';
+
+  @override
+  String get requestPaymentDescription => 'Tengeneza ombi la malipo la pamoja';
+
+  @override
+  String get generateRequest => 'Tengeneza ombi';
+
+  @override
+  String get generatingRequest => 'Inatengeneza ombi...';
+
+  @override
+  String get requestPaymentReceived => 'Malipo limepokelewa';
+
+  @override
+  String get requestDescriptionHint => 'Maelezo (si lazima)';
+
+  @override
+  String get universal => 'Universal';
+
+  @override
+  String get copiedToClipboard => 'Imenakiliwa kwenye ubao wa kunakili';
 }

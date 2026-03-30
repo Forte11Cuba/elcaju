@@ -1213,4 +1213,32 @@ class L10nDe extends L10n {
   @override
   String get p2pkErrorCannotDeletePrimary =>
       'Primärschlüssel kann nicht gelöscht werden';
+
+  @override
+  String get request => 'Anfordern';
+
+  @override
+  String get requestPayment => 'Zahlung anfordern';
+
+  @override
+  String get requestPaymentDescription =>
+      'Einheitliche Zahlungsanforderung erstellen';
+
+  @override
+  String get generateRequest => 'Anforderung erstellen';
+
+  @override
+  String get generatingRequest => 'Anforderung wird erstellt...';
+
+  @override
+  String get requestPaymentReceived => 'Zahlung erhalten';
+
+  @override
+  String get requestDescriptionHint => 'Beschreibung (optional)';
+
+  @override
+  String get universal => 'Universal';
+
+  @override
+  String get copiedToClipboard => 'In die Zwischenablage kopiert';
 }

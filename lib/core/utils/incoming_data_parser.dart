@@ -103,14 +103,31 @@ class IncomingDataParser {
       );
     }
 
-    // Payment Request: creqA (NUT-18), creqB/CREQB1 (NUT-26), bitcoin:?creq= (BIP-321)
-    if (lower.startsWith('creqa') || lower.startsWith('creqb')) {
-      return ParsedData(
-        type: IncomingDataType.paymentRequest,
-        raw: trimmed,
-      );
+    // BIP-321 unified URI: bitcoin:?lightning=...&creq=...
+    // Detect as paymentRequest but also extract the lightning invoice
+    if (lower.startsWith('bitcoin:')) {
+      final bolt11 = _extractBip321Param(trimmed, 'lightning');
+      final creq = _extractBip321Param(trimmed, 'creq');
+
+      if (creq != null) {
+        return ParsedData(
+          type: IncomingDataType.paymentRequest,
+          raw: trimmed,
+          invoiceBolt11: bolt11,
+        );
+      }
+      // bitcoin: URI with only lightning= (no creq)
+      if (bolt11 != null) {
+        return ParsedData(
+          type: IncomingDataType.lightningInvoice,
+          raw: trimmed,
+          invoiceBolt11: bolt11,
+        );
+      }
     }
-    if (lower.startsWith('bitcoin:') && lower.contains('creq=')) {
+
+    // Payment Request: creqA (NUT-18), creqB/CREQB1 (NUT-26)
+    if (lower.startsWith('creqa') || lower.startsWith('creqb')) {
       return ParsedData(
         type: IncomingDataType.paymentRequest,
         raw: trimmed,
@@ -199,7 +216,35 @@ class IncomingDataParser {
       case ScanMode.cashuOnly:
         return data.type == IncomingDataType.cashuToken;
       case ScanMode.invoiceOnly:
-        return data.type == IncomingDataType.lightningInvoice;
+        // Accept pure invoices and BIP-321 URIs that contain a lightning invoice
+        return data.type == IncomingDataType.lightningInvoice ||
+            (data.type == IncomingDataType.paymentRequest &&
+                data.invoiceBolt11 != null);
     }
+  }
+
+  /// Extract a query parameter value from a BIP-321 URI.
+  /// Case-insensitive key matching, handles percent-encoding.
+  static String? _extractBip321Param(String uri, String key) {
+    final qIndex = uri.indexOf('?');
+    if (qIndex < 0) return null;
+    final query = uri.substring(qIndex + 1);
+    for (final param in query.split('&')) {
+      final eqIndex = param.indexOf('=');
+      if (eqIndex < 0) continue;
+      final k = param.substring(0, eqIndex);
+      if (k.toLowerCase() == key.toLowerCase()) {
+        final rawValue = param.substring(eqIndex + 1);
+        if (rawValue.isEmpty) continue;
+        try {
+          final value = Uri.decodeComponent(rawValue);
+          if (value.isEmpty) continue;
+          return value;
+        } on ArgumentError {
+          continue;
+        }
+      }
+    }
+    return null;
   }
 }

@@ -473,11 +473,13 @@ class NfcService {
     return null;
   }
 
-  /// Check if a string looks like a Cashu token.
+  /// Check if a string looks like a Cashu token or payment request.
   static bool _isCashuToken(String text) {
     final lower = text.toLowerCase().trim();
     return lower.startsWith('cashua') ||
         lower.startsWith('cashub') ||
-        lower.startsWith('creqa');
+        lower.startsWith('creqa') ||
+        lower.startsWith('creqb') ||
+        lower.startsWith('bitcoin:');
   }
 }

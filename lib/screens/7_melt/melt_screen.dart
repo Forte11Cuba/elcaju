@@ -594,15 +594,28 @@ class _MeltScreenState extends State<MeltScreen> {
       }
     });
 
+    // Extract lightning invoice from BIP-321 URI if present
+    var inputValue = value;
+    if (value.trim().toLowerCase().startsWith('bitcoin:')) {
+      final parsed = IncomingDataParser.parse(value.trim());
+      if (parsed.invoiceBolt11 != null) {
+        inputValue = parsed.invoiceBolt11!;
+        _invoiceController.text = inputValue;
+        _invoiceController.selection = TextSelection.fromPosition(
+          TextPosition(offset: inputValue.length),
+        );
+      }
+    }
+
     // Detectar tipo de input (sin mostrar error, solo detectar)
-    final inputType = LnurlService.detectType(value);
+    final inputType = LnurlService.detectType(inputValue);
     setState(() => _inputType = inputType);
 
     // Solo procesar automáticamente invoices BOLT11
     // LNURL y Lightning Address requieren botón explícito
     if (inputType == LnInputType.bolt11Invoice) {
       // BOLT11 invoices son 200+ chars; evitar llamar API con input parcial
-      final cleaned = LnurlService.cleanInput(value);
+      final cleaned = LnurlService.cleanInput(inputValue);
       if (cleaned.length > 50) {
         _getQuote(cleaned);
       }

@@ -1175,4 +1175,31 @@ class L10nZh extends L10n {
 
   @override
   String get p2pkErrorCannotDeletePrimary => '无法删除主密钥';
+
+  @override
+  String get request => '请求';
+
+  @override
+  String get requestPayment => '请求付款';
+
+  @override
+  String get requestPaymentDescription => '生成统一付款请求';
+
+  @override
+  String get generateRequest => '生成请求';
+
+  @override
+  String get generatingRequest => '正在生成请求...';
+
+  @override
+  String get requestPaymentReceived => '已收到付款';
+
+  @override
+  String get requestDescriptionHint => '描述（可选）';
+
+  @override
+  String get universal => '通用';
+
+  @override
+  String get copiedToClipboard => '已复制到剪贴板';
 }

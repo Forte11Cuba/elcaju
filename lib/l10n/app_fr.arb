@@ -549,5 +549,15 @@
   "p2pkErrorInvalidNsec": "nsec invalide",
   "p2pkErrorKeyAlreadyExists": "Cette clé existe déjà",
   "p2pkErrorKeyNotFound": "Clé non trouvée",
-  "p2pkErrorCannotDeletePrimary": "Impossible de supprimer la clé principale"
+  "p2pkErrorCannotDeletePrimary": "Impossible de supprimer la clé principale",
+
+  "request": "Demander",
+  "requestPayment": "Demander un paiement",
+  "requestPaymentDescription": "Générer une demande de paiement unifiée",
+  "generateRequest": "Générer la demande",
+  "generatingRequest": "Génération en cours...",
+  "requestPaymentReceived": "Paiement reçu",
+  "requestDescriptionHint": "Description (facultatif)",
+  "universal": "Universel",
+  "copiedToClipboard": "Copié dans le presse-papiers"
 }

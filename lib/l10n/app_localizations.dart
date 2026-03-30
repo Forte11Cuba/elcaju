@@ -2298,6 +2298,60 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'No se puede eliminar la clave principal'**
   String get p2pkErrorCannotDeletePrimary;
+
+  /// No description provided for @request.
+  ///
+  /// In es, this message translates to:
+  /// **'Solicitar'**
+  String get request;
+
+  /// No description provided for @requestPayment.
+  ///
+  /// In es, this message translates to:
+  /// **'Solicitar pago'**
+  String get requestPayment;
+
+  /// No description provided for @requestPaymentDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Generar solicitud de pago unificada'**
+  String get requestPaymentDescription;
+
+  /// No description provided for @generateRequest.
+  ///
+  /// In es, this message translates to:
+  /// **'Generar solicitud'**
+  String get generateRequest;
+
+  /// No description provided for @generatingRequest.
+  ///
+  /// In es, this message translates to:
+  /// **'Generando solicitud...'**
+  String get generatingRequest;
+
+  /// No description provided for @requestPaymentReceived.
+  ///
+  /// In es, this message translates to:
+  /// **'Pago recibido'**
+  String get requestPaymentReceived;
+
+  /// No description provided for @requestDescriptionHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Descripción (opcional)'**
+  String get requestDescriptionHint;
+
+  /// No description provided for @universal.
+  ///
+  /// In es, this message translates to:
+  /// **'Universal'**
+  String get universal;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Copiado al portapapeles'**
+  String get copiedToClipboard;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

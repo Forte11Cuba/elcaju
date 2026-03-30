@@ -1203,4 +1203,31 @@ class L10nEs extends L10n {
   @override
   String get p2pkErrorCannotDeletePrimary =>
       'No se puede eliminar la clave principal';
+
+  @override
+  String get request => 'Solicitar';
+
+  @override
+  String get requestPayment => 'Solicitar pago';
+
+  @override
+  String get requestPaymentDescription => 'Generar solicitud de pago unificada';
+
+  @override
+  String get generateRequest => 'Generar solicitud';
+
+  @override
+  String get generatingRequest => 'Generando solicitud...';
+
+  @override
+  String get requestPaymentReceived => 'Pago recibido';
+
+  @override
+  String get requestDescriptionHint => 'Descripción (opcional)';
+
+  @override
+  String get universal => 'Universal';
+
+  @override
+  String get copiedToClipboard => 'Copiado al portapapeles';
 }
