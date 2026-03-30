@@ -219,6 +219,56 @@ pub struct NostrListenerHandle {
     mint_url: MintUrl,
 }
 
+/// Serializable data for persisting a NostrListenerHandle across app restarts.
+pub struct PersistedRequestData {
+    pub secret_hex: String,
+    pub pubkey_hex: String,
+    pub relays: Vec<String>,
+    pub amount: Option<u64>,
+    pub unit: String,
+    pub mint_url: String,
+}
+
+impl NostrListenerHandle {
+    /// Export handle data for persistence (e.g. SharedPreferences).
+    /// The secret key is exposed as hex — the caller is responsible
+    /// for storing it securely.
+    #[frb(sync)]
+    pub fn to_persisted(&self) -> PersistedRequestData {
+        PersistedRequestData {
+            secret_hex: self.keys.secret_key().to_secret_hex(),
+            pubkey_hex: self.pubkey.to_hex(),
+            relays: self.relays.clone(),
+            amount: self.expected_amount.map(|a| a.into()),
+            unit: self.expected_unit.to_string(),
+            mint_url: self.mint_url.to_string(),
+        }
+    }
+
+    /// Reconstruct a handle from persisted data (e.g. after app restart).
+    #[frb(sync)]
+    pub fn from_persisted(data: PersistedRequestData) -> Result<NostrListenerHandle, Error> {
+        let secret_key = nostr_sdk::SecretKey::from_hex(&data.secret_hex)
+            .map_err(|e| Error::Cdk(format!("Invalid persisted secret key: {e}")))?;
+        let keys = NostrKeys::new(secret_key);
+        let pubkey = PublicKey::from_hex(&data.pubkey_hex)
+            .map_err(|e| Error::Cdk(format!("Invalid persisted public key: {e}")))?;
+        let unit = CurrencyUnit::from_str(&data.unit)
+            .unwrap_or(CurrencyUnit::Custom(data.unit));
+        let mint_url = MintUrl::from_str(&data.mint_url)
+            .map_err(|e| Error::Cdk(format!("Invalid persisted mint URL: {e}")))?;
+
+        Ok(NostrListenerHandle {
+            keys,
+            pubkey,
+            relays: data.relays,
+            expected_amount: data.amount.map(Amount::from),
+            expected_unit: unit,
+            mint_url,
+        })
+    }
+}
+
 /// State of a Nostr payment listener.
 pub enum NostrPaymentState {
     /// Connected to relays, waiting for payment

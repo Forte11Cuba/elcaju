@@ -7,6 +7,7 @@ import '../src/rust/api/wallet.dart';
 import '../src/rust/api/token.dart';
 import '../src/rust/api/mint_info.dart';
 import '../src/rust/api/keys.dart';
+import '../src/rust/api/payment_request.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -77,6 +78,7 @@ class WalletProvider extends ChangeNotifier {
   static const _activeMintKey = 'wallet_active_mint';
   static const _activeUnitKey = 'wallet_active_unit';
   static const _pendingMintInvoicesKey = 'pending_mint_invoices';
+  static const _pendingNostrRequestKey = 'pending_nostr_request';
 
   /// Mint de Cuba Bitcoin - siempre aparece primero en la lista
   static const cubaBitcoinMint = 'https://mint.cubabitcoin.org';
@@ -1245,6 +1247,101 @@ class WalletProvider extends ChangeNotifier {
     return null;
   }
 
+  // ============================================================
+  // PENDING NOSTR PAYMENT REQUESTS
+  // ============================================================
+
+  /// TTL for pending Nostr requests (24 hours).
+  static const _pendingNostrRequestTtl = Duration(hours: 24);
+
+  /// Save a pending Nostr payment request for recovery after app restart.
+  Future<void> savePendingNostrRequest(PersistedRequestData data) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_pendingNostrRequestKey, jsonEncode({
+        'secretHex': data.secretHex,
+        'pubkeyHex': data.pubkeyHex,
+        'relays': data.relays,
+        'amount': data.amount?.toString(),
+        'unit': data.unit,
+        'mintUrl': data.mintUrl,
+        'createdAt': DateTime.now().toIso8601String(),
+      }));
+    } catch (e) {
+      debugPrint('Error saving pending Nostr request: $e');
+    }
+  }
+
+  /// Remove the pending Nostr payment request (payment received or cancelled).
+  Future<void> removePendingNostrRequest() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_pendingNostrRequestKey);
+    } catch (e) {
+      debugPrint('Error removing pending Nostr request: $e');
+    }
+  }
+
+  /// Check for a pending Nostr payment request and resume listening.
+  /// Called automatically during app startup.
+  Future<void> resumePendingNostrRequest() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_pendingNostrRequestKey);
+      if (jsonStr == null) return;
+
+      final map = Map<String, dynamic>.from(jsonDecode(jsonStr));
+
+      // Check TTL
+      final createdAt = DateTime.tryParse(map['createdAt'] ?? '');
+      if (createdAt == null ||
+          DateTime.now().difference(createdAt) > _pendingNostrRequestTtl) {
+        await prefs.remove(_pendingNostrRequestKey);
+        debugPrint('Pending Nostr request expired, removed');
+        return;
+      }
+
+      // Reconstruct handle
+      final data = PersistedRequestData(
+        secretHex: map['secretHex'] as String,
+        pubkeyHex: map['pubkeyHex'] as String,
+        relays: List<String>.from(map['relays']),
+        amount: map['amount'] != null
+            ? BigInt.tryParse(map['amount'] as String)
+            : null,
+        unit: map['unit'] as String,
+        mintUrl: map['mintUrl'] as String,
+      );
+
+      final handle = NostrListenerHandle.fromPersisted(data: data);
+
+      // Find the wallet for this mint+unit (key format: "mintUrl:unit")
+      final walletKey = '${data.mintUrl}:${data.unit}';
+      final wallet = _wallets[walletKey];
+
+      if (wallet == null) {
+        debugPrint('No wallet found for pending Nostr request, removing');
+        await prefs.remove(_pendingNostrRequestKey);
+        return;
+      }
+
+      // Resume listening in background
+      debugPrint('Resuming pending Nostr payment request...');
+      wallet.waitForNostrPayment(handle: handle).listen(
+        (event) {
+          if (event.state == NostrPaymentState.received) {
+            debugPrint('Pending Nostr payment received: ${event.amount}');
+            removePendingNostrRequest();
+            confettiController.fire();
+          }
+        },
+        onError: (_) => removePendingNostrRequest(),
+      );
+    } catch (e) {
+      debugPrint('Error resuming pending Nostr request: $e');
+    }
+  }
+
   /// Guarda metadata para una transacción de mint (Lightning deposit).
   Future<void> _saveMintMetadata(Wallet wallet, String invoice) async {
     try {
@@ -1439,6 +1536,9 @@ class WalletProvider extends ChangeNotifier {
 
     // Vincular transacciones incoming sin metadata con pending invoices
     await _matchPendingMintInvoices();
+
+    // Resume pending Nostr payment request if app was killed mid-wait
+    await resumePendingNostrRequest();
   }
 
   /// Busca transacciones incoming sin metadata y las vincula con

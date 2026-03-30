@@ -26,7 +26,18 @@ abstract class CreatedPaymentRequest implements RustOpaqueInterface {
 }
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NostrListenerHandle>>
-abstract class NostrListenerHandle implements RustOpaqueInterface {}
+abstract class NostrListenerHandle implements RustOpaqueInterface {
+  /// Reconstruct a handle from persisted data (e.g. after app restart).
+  static NostrListenerHandle fromPersisted({
+    required PersistedRequestData data,
+  }) => RustLib.instance.api
+      .crateApiPaymentRequestNostrListenerHandleFromPersisted(data: data);
+
+  /// Export handle data for persistence (e.g. SharedPreferences).
+  /// The secret key is exposed as hex — the caller is responsible
+  /// for storing it securely.
+  PersistedRequestData toPersisted();
+}
 
 /// Parameters for creating a payment request.
 class CreateRequestParams {
@@ -175,6 +186,46 @@ class PaymentRequestInfo {
           description == other.description &&
           transports == other.transports &&
           hasNut10 == other.hasNut10;
+}
+
+/// Serializable data for persisting a NostrListenerHandle across app restarts.
+class PersistedRequestData {
+  final String secretHex;
+  final String pubkeyHex;
+  final List<String> relays;
+  final BigInt? amount;
+  final String unit;
+  final String mintUrl;
+
+  const PersistedRequestData({
+    required this.secretHex,
+    required this.pubkeyHex,
+    required this.relays,
+    this.amount,
+    required this.unit,
+    required this.mintUrl,
+  });
+
+  @override
+  int get hashCode =>
+      secretHex.hashCode ^
+      pubkeyHex.hashCode ^
+      relays.hashCode ^
+      amount.hashCode ^
+      unit.hashCode ^
+      mintUrl.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PersistedRequestData &&
+          runtimeType == other.runtimeType &&
+          secretHex == other.secretHex &&
+          pubkeyHex == other.pubkeyHex &&
+          relays == other.relays &&
+          amount == other.amount &&
+          unit == other.unit &&
+          mintUrl == other.mintUrl;
 }
 
 /// Transport info exposed to Flutter
