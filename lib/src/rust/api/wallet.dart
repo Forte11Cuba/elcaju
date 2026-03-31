@@ -101,6 +101,10 @@ abstract class Wallet implements RustOpaqueInterface {
 
   Future<BigInt> receive({required Token token, ReceiveOptions? opts});
 
+  /// Check pending-spent proofs with the mint and revert unspent ones.
+  /// Returns the number of proofs recovered.
+  Future<BigInt> reclaimPendingProofs();
+
   Future<void> recoverIncompleteSagas();
 
   Future<void> restore();

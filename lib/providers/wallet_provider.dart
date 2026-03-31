@@ -844,7 +844,20 @@ class WalletProvider extends ChangeNotifier {
     // DEBUG: transacciones ANTES del receive
     await _debugLogTransactions(wallet, 'BEFORE receive');
 
-    final amount = await wallet.receive(token: token, opts: opts);
+    BigInt amount;
+    try {
+      amount = await wallet.receive(token: token, opts: opts);
+    } catch (e) {
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('already signed')) {
+        debugPrint('[RECEIVE] Already signed error, restoring wallet counters...');
+        await wallet.restore();
+        // Retry once after counter resync
+        amount = await wallet.receive(token: token, opts: opts);
+      } else {
+        rethrow;
+      }
+    }
 
     // DEBUG: counters después de receive
     await KeysetDebug.logCounters('AFTER receive ($unit)');
