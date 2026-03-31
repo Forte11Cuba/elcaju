@@ -47,7 +47,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
   @override
   void dispose() {
     _memoController.dispose();
-    _proofService.close();
+    if (!_isCreating) _proofService.close();
     super.dispose();
   }
 
