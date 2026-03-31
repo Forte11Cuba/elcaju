@@ -323,15 +323,17 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
   }
 
   Future<void> _createOfflineToken() async {
+    final selectedProofs = _selectedProofs;
+    var proofsMarkedPending = false;
+
     setState(() {
       _isCreating = true;
     });
 
     try {
-      final selectedProofs = _selectedProofs;
-
       // Marcar proofs como PENDING_SPENT
       await _proofService.markProofsPendingSpent(selectedProofs);
+      proofsMarkedPending = true;
 
       // Crear token via CDK (produce V4/cashuB válido)
       final memo = _memoController.text.isNotEmpty ? _memoController.text : null;
@@ -360,6 +362,11 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
         );
       }
     } catch (e) {
+      if (proofsMarkedPending) {
+        try {
+          await _proofService.markProofsUnspent(selectedProofs);
+        } catch (_) {}
+      }
       if (!mounted) return;
       final errorMessage = L10n.of(context)!.creatingTokenError(e.toString());
       setState(() {
