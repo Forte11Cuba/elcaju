@@ -365,7 +365,9 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
       if (proofsMarkedPending) {
         try {
           await _proofService.markProofsUnspent(selectedProofs);
-        } catch (_) {}
+        } catch (rollbackErr) {
+          debugPrint('Failed to rollback proofs to UNSPENT: $rollbackErr');
+        }
       }
       if (!mounted) return;
       final errorMessage = L10n.of(context)!.creatingTokenError(e.toString());
