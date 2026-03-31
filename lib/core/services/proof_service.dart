@@ -33,7 +33,7 @@ class ProofService {
     final dir = await getApplicationDocumentsDirectory();
     final dbPath = '${dir.path}/elcaju_wallet.sqlite';
 
-    _db = await openDatabase(dbPath);
+    _db = await openDatabase(dbPath, singleInstance: false);
     return _db!;
   }
 

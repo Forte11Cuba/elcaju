@@ -4,7 +4,10 @@ use std::{
 };
 
 use bc_ur::{prelude::CBOR, MultipartDecoder, MultipartEncoder, UR};
-use cdk::nuts::Token as CdkToken;
+use cdk::{
+    mint_url::MintUrl,
+    nuts::{CurrencyUnit, Proof, Token as CdkToken},
+};
 use cdk_common::{KeySetInfo, Proofs};
 use flutter_rust_bridge::frb;
 
@@ -90,6 +93,27 @@ impl TryInto<CdkToken> for &Token {
     fn try_into(self) -> Result<CdkToken, Error> {
         Ok(CdkToken::from_str(&self.encoded)?)
     }
+}
+
+// === Offline token creation ===
+
+/// Create a token from raw proof data without network access.
+/// Uses CDK's CdkToken::new to produce a valid V4 (cashuB) token.
+/// `proofs_json` is a JSON array of proofs: [{"id":"...","amount":1,"secret":"...","C":"..."}, ...]
+#[frb(sync)]
+pub fn create_offline_token(
+    mint_url: &str,
+    proofs_json: &str,
+    memo: Option<String>,
+    unit: Option<String>,
+) -> Result<Token, Error> {
+    let mint_url = MintUrl::from_str(mint_url)?;
+    let unit = unit
+        .map(|u| CurrencyUnit::from_str(&u).unwrap_or(CurrencyUnit::Custom(u)))
+        .unwrap_or(CurrencyUnit::Sat);
+    let proofs: Vec<Proof> = serde_json::from_str(proofs_json)?;
+    let token = CdkToken::new(mint_url, proofs, memo, unit);
+    Token::try_from(token)
 }
 
 // === QR Multiframe (bc-ur) ===

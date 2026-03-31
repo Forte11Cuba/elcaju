@@ -10,6 +10,21 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // These functions are ignored because they are not marked as `pub`: `proofs`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `from_str`, `try_from`, `try_into`, `try_into`
 
+/// Create a token from raw proof data without network access.
+/// Uses CDK's CdkToken::new to produce a valid V4 (cashuB) token.
+/// `proofs_json` is a JSON array of proofs: [{"id":"...","amount":1,"secret":"...","C":"..."}, ...]
+Token createOfflineToken({
+  required String mintUrl,
+  required String proofsJson,
+  String? memo,
+  String? unit,
+}) => RustLib.instance.api.crateApiTokenCreateOfflineToken(
+  mintUrl: mintUrl,
+  proofsJson: proofsJson,
+  memo: memo,
+  unit: unit,
+);
+
 List<String> encodeQrToken({required Token token, BigInt? maxFragmentLength}) =>
     RustLib.instance.api.crateApiTokenEncodeQrToken(
       token: token,

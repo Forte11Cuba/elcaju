@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:elcaju/l10n/app_localizations.dart';
@@ -5,6 +6,7 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/models/proof.dart';
 import '../../core/services/proof_service.dart';
+import '../../src/rust/api/token.dart' as cdk;
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -45,7 +47,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
   @override
   void dispose() {
     _memoController.dispose();
-    _proofService.close();
+    if (!_isCreating) _proofService.close();
     super.dispose();
   }
 
@@ -321,32 +323,40 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
   }
 
   Future<void> _createOfflineToken() async {
+    final selectedProofs = _selectedProofs;
+    final selectedTotal = _proofService.calculateTotal(selectedProofs);
+    var proofsMarkedPending = false;
+
     setState(() {
       _isCreating = true;
     });
 
     try {
-      final selectedProofs = _selectedProofs;
-
       // Marcar proofs como PENDING_SPENT
       await _proofService.markProofsPendingSpent(selectedProofs);
+      proofsMarkedPending = true;
 
-      // Crear token V3
+      // Crear token via CDK (produce V4/cashuB válido)
       final memo = _memoController.text.isNotEmpty ? _memoController.text : null;
-      final token = _proofService.createTokenV3(
+      final proofsJson = jsonEncode(
+        selectedProofs.map((p) => p.toTokenProof()).toList(),
+      );
+      final cdkToken = cdk.createOfflineToken(
         mintUrl: widget.mintUrl,
-        proofs: selectedProofs,
+        proofsJson: proofsJson,
         memo: memo,
         unit: widget.unit,
       );
+      final token = cdkToken.encoded;
 
       if (mounted) {
+        _isCreating = false;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => ShareTokenScreen(
               token: token,
-              amount: _selectedTotal,
+              amount: selectedTotal,
               unit: widget.unit,
               memo: memo,
             ),
@@ -354,7 +364,17 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
         );
       }
     } catch (e) {
-      if (!mounted) return;
+      if (proofsMarkedPending) {
+        try {
+          await _proofService.markProofsUnspent(selectedProofs);
+        } catch (rollbackErr) {
+          debugPrint('Failed to rollback proofs to UNSPENT: $rollbackErr');
+        }
+      }
+      if (!mounted) {
+        _proofService.close();
+        return;
+      }
       final errorMessage = L10n.of(context)!.creatingTokenError(e.toString());
       setState(() {
         _errorMessage = errorMessage;

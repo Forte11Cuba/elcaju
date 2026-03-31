@@ -72,8 +72,13 @@ class _ShareTokenScreenState extends State<ShareTokenScreen> {
   }
 
   void _encodeTokenToUR() {
-    // Parsear el token string a objeto Token de cdk-flutter
-    final token = cdk.Token.parse(encoded: widget.token);
+    // Construir Token directamente sin Token.parse para evitar validación
+    // estricta de keyset IDs. encodeQrToken solo usa token.encoded.
+    final token = cdk.Token(
+      encoded: widget.token,
+      amount: widget.amount,
+      mintUrl: '',
+    );
 
     // Codificar a fragmentos UR usando cdk-flutter
     // maxFragmentLength por defecto es 150 bytes
