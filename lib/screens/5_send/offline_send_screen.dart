@@ -324,6 +324,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
 
   Future<void> _createOfflineToken() async {
     final selectedProofs = _selectedProofs;
+    final selectedTotal = _proofService.calculateTotal(selectedProofs);
     var proofsMarkedPending = false;
 
     setState(() {
@@ -349,12 +350,13 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
       final token = cdkToken.encoded;
 
       if (mounted) {
+        _isCreating = false;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => ShareTokenScreen(
               token: token,
-              amount: _selectedTotal,
+              amount: selectedTotal,
               unit: widget.unit,
               memo: memo,
             ),
@@ -369,7 +371,10 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
           debugPrint('Failed to rollback proofs to UNSPENT: $rollbackErr');
         }
       }
-      if (!mounted) return;
+      if (!mounted) {
+        _proofService.close();
+        return;
+      }
       final errorMessage = L10n.of(context)!.creatingTokenError(e.toString());
       setState(() {
         _errorMessage = errorMessage;
