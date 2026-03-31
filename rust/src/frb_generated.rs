@@ -40,7 +40,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -262065523;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -413939836;
 
 // Section: executor
 
@@ -2618,6 +2618,44 @@ fn wire__crate__api__wallet__Wallet_wait_for_nostr_payment_impl(
         },
     )
 }
+fn wire__crate__api__token__create_offline_token_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "create_offline_token",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_mint_url = <String>::sse_decode(&mut deserializer);
+            let api_proofs_json = <String>::sse_decode(&mut deserializer);
+            let api_memo = <Option<String>>::sse_decode(&mut deserializer);
+            let api_unit = <Option<String>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, crate::api::error::Error>((move || {
+                let output_ok = crate::api::token::create_offline_token(
+                    &api_mint_url,
+                    &api_proofs_json,
+                    api_memo,
+                    api_unit,
+                )?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__token__encode_qr_token_impl(
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -4058,16 +4096,16 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        51 => wire__crate__api__mint_info__fetch_keysets_impl(port, ptr, rust_vec_len, data_len),
-        53 => wire__crate__api__mint_info__get_mint_info_impl(port, ptr, rust_vec_len, data_len),
-        57 => wire__crate__api__mint_info__ping_mint_impl(port, ptr, rust_vec_len, data_len),
-        58 => wire__crate__api__wallet__receive_options_default_impl(
+        52 => wire__crate__api__mint_info__fetch_keysets_impl(port, ptr, rust_vec_len, data_len),
+        54 => wire__crate__api__mint_info__get_mint_info_impl(port, ptr, rust_vec_len, data_len),
+        58 => wire__crate__api__mint_info__ping_mint_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__api__wallet__receive_options_default_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        59 => {
+        60 => {
             wire__crate__api__wallet__send_options_default_impl(port, ptr, rust_vec_len, data_len)
         }
         _ => unreachable!(),
@@ -4109,13 +4147,14 @@ fn pde_ffi_dispatcher_sync_impl(
 27 => wire__crate__api__wallet__Wallet_auto_accessor_set_mint_url_impl(ptr, rust_vec_len, data_len),
 28 => wire__crate__api__wallet__Wallet_auto_accessor_set_unit_impl(ptr, rust_vec_len, data_len),
 41 => wire__crate__api__wallet__Wallet_new_impl(ptr, rust_vec_len, data_len),
-50 => wire__crate__api__token__encode_qr_token_impl(ptr, rust_vec_len, data_len),
-52 => wire__crate__api__keys__generate_mnemonic_impl(ptr, rust_vec_len, data_len),
-54 => wire__crate__api__keys__get_pub_key_impl(ptr, rust_vec_len, data_len),
-55 => wire__crate__api__keys__mnemonic_to_seed_impl(ptr, rust_vec_len, data_len),
-56 => wire__crate__api__payment_request__payment_request_info_parse_impl(ptr, rust_vec_len, data_len),
-60 => wire__crate__api__token__token_from_raw_bytes_impl(ptr, rust_vec_len, data_len),
-61 => wire__crate__api__token__token_parse_impl(ptr, rust_vec_len, data_len),
+50 => wire__crate__api__token__create_offline_token_impl(ptr, rust_vec_len, data_len),
+51 => wire__crate__api__token__encode_qr_token_impl(ptr, rust_vec_len, data_len),
+53 => wire__crate__api__keys__generate_mnemonic_impl(ptr, rust_vec_len, data_len),
+55 => wire__crate__api__keys__get_pub_key_impl(ptr, rust_vec_len, data_len),
+56 => wire__crate__api__keys__mnemonic_to_seed_impl(ptr, rust_vec_len, data_len),
+57 => wire__crate__api__payment_request__payment_request_info_parse_impl(ptr, rust_vec_len, data_len),
+61 => wire__crate__api__token__token_from_raw_bytes_impl(ptr, rust_vec_len, data_len),
+62 => wire__crate__api__token__token_parse_impl(ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
 }
