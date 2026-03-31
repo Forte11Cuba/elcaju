@@ -384,6 +384,36 @@ impl Wallet {
         Ok(())
     }
 
+    // === Reclaim orphaned proofs ===
+
+    /// Check pending-spent proofs with the mint and revert unspent ones.
+    /// Returns the number of proofs recovered.
+    pub async fn reclaim_pending_proofs(&self) -> Result<u64, Error> {
+        let pending = self.inner.get_pending_spent_proofs().await?;
+        if pending.is_empty() {
+            return Ok(0);
+        }
+
+        // check_proofs_spent: queries mint AND removes spent proofs from local DB
+        let states = self.inner.check_proofs_spent(pending).await?;
+
+        // Collect Y values of proofs the mint says are NOT spent
+        let unspent_ys: Vec<PublicKey> = states
+            .into_iter()
+            .filter(|s| s.state != ProofState::Spent)
+            .map(|s| s.y)
+            .collect();
+
+        let count = unspent_ys.len() as u64;
+        if count > 0 {
+            // Revert from PendingSpent to Unspent
+            self.inner.unreserve_proofs(unspent_ys).await?;
+            self.update_balance_streams().await;
+        }
+
+        Ok(count)
+    }
+
     // === Utility ===
 
     pub async fn is_token_spent(&self, token: Token) -> Result<bool, Error> {
