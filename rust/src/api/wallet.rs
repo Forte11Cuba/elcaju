@@ -398,9 +398,11 @@ impl Wallet {
         let states = self.inner.check_proofs_spent(pending).await?;
 
         // Collect Y values of proofs the mint says are NOT spent
+        // Only reclaim proofs the mint explicitly reports as Unspent.
+        // Pending proofs (still being processed) must not be unreserved.
         let unspent_ys: Vec<PublicKey> = states
             .into_iter()
-            .filter(|s| s.state != ProofState::Spent)
+            .filter(|s| s.state == ProofState::Unspent)
             .map(|s| s.y)
             .collect();
 
@@ -408,9 +410,10 @@ impl Wallet {
         if count > 0 {
             // Revert from PendingSpent to Unspent
             self.inner.unreserve_proofs(unspent_ys).await?;
-            self.update_balance_streams().await;
         }
 
+        // Always refresh: check_proofs_spent may have removed spent proofs
+        self.update_balance_streams().await;
         Ok(count)
     }
 
