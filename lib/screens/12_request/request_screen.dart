@@ -785,8 +785,6 @@ class _RequestScreenState extends State<RequestScreen> {
       _mintSubscription = wallet
           .mint(amount: _amount, description: description)
           .listen(_onMintEvent);
-
-      setState(() => _status = RequestStatus.waiting);
     } catch (e) {
       setState(() {
         _status = RequestStatus.error;
@@ -814,6 +812,7 @@ class _RequestScreenState extends State<RequestScreen> {
             _bolt11 = quote.request;
             // TODO: switch to QrMode.universal once CDK fixes NIP-17 (cashubtc/cdk#1807)
             _activeMode = QrMode.lightning;
+            _status = RequestStatus.waiting;
           });
           _updateNfcPayload();
         }
