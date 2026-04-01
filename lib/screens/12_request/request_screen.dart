@@ -817,7 +817,17 @@ class _RequestScreenState extends State<RequestScreen> {
         }
         break;
       case MintQuoteState.error:
-        // Lightning failed, but Nostr listener continues
+        // No Nostr fallback while CDK NIP-17 bug is open (cashubtc/cdk#1807)
+        if (!_paymentHandled) {
+          if (_nfcEmulating) {
+            NfcService.stopEmulating();
+            _nfcEmulating = false;
+          }
+          setState(() {
+            _status = RequestStatus.error;
+            _errorMessage = quote.error ?? L10n.of(context)!.unknownError;
+          });
+        }
         break;
       default:
         break;
@@ -832,7 +842,11 @@ class _RequestScreenState extends State<RequestScreen> {
     });
     final walletProvider = context.read<WalletProvider>();
     walletProvider.confettiController.fire();
-    await walletProvider.removePendingNostrRequest();
+    // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+    // Only remove pending Nostr request if this screen created one.
+    // Disabled while Nostr payment requests are disabled to avoid
+    // deleting a recovery record from a previous session.
+    // await walletProvider.removePendingNostrRequest();
   }
 
   // ─── QR Content ───
