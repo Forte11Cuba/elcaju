@@ -12,7 +12,7 @@ use cdk::{
     wallet::{
         MeltQuote as CdkMeltQuote, MintQuote as CdkMintQuote, PreparedSend as CdkPreparedSend,
         ReceiveOptions as CdkReceiveOptions, SendMemo, SendOptions as CdkSendOptions,
-        Wallet as CdkWallet,
+        Wallet as CdkWallet, WalletSubscription,
     },
 };
 use cdk_common::{
@@ -20,11 +20,12 @@ use cdk_common::{
     wallet::{
         Transaction as CdkTransaction, TransactionDirection as CdkTransactionDirection,
     },
+    NotificationPayload,
 };
 use cdk_sqlite::WalletSqliteDatabase;
 use flutter_rust_bridge::frb;
 use log::info;
-use tokio::{sync::broadcast, time::sleep};
+use tokio::sync::broadcast;
 use uuid::Uuid;
 
 use crate::frb_generated::StreamSink;
@@ -184,50 +185,38 @@ impl Wallet {
             return Ok(());
         }
 
+        // Subscribe to quote state changes via WebSocket (NUT-17) with HTTP polling fallback
+        let mut subscription = self
+            .inner
+            .subscribe(WalletSubscription::Bolt11MintQuoteState(vec![quote.id.clone()]))
+            .await
+            .map_err(|e| Error::Cdk(e.to_string()))?;
+
         let _self = self.clone();
         flutter_rust_bridge::spawn(async move {
-            loop {
-                sleep(Duration::from_secs(3)).await;
+            // Timeout: time until quote expires + 30s buffer, or 1 hour if no expiry
+            let remaining = quote.expiry.saturating_sub(unix_time());
+            let timeout_dur = if remaining > 0 {
+                Duration::from_secs(remaining + 30)
+            } else {
+                Duration::from_secs(3600)
+            };
 
-                // Check if the Dart stream is still alive before polling
-                if sink
-                    .add(MintQuote {
-                        id: quote.id.clone(),
-                        request: quote.request.clone(),
-                        amount: quote.amount.map(|a| a.into()),
-                        expiry: Some(quote.expiry),
-                        state: MintQuoteState::Unpaid,
-                        token: None,
-                        error: None,
-                    })
-                    .is_err()
-                {
-                    info!("Mint polling stopped: Dart stream closed for {}", quote.id);
-                    break;
-                }
+            // Clone for the timeout error path (originals are moved into the async block)
+            let expired_id = quote.id.clone();
+            let expired_request = quote.request.clone();
+            let expired_amount = quote.amount;
+            let expired_expiry = quote.expiry;
 
-                info!("Checking mint quote state for {}", quote.id);
-                match _self.inner.check_mint_quote_status(&quote.id).await {
-                    Ok(state_res) => match state_res.state {
-                        CdkMintQuoteState::Unpaid => {
-                            if state_res.expiry < unix_time() {
-                                let _ = sink.add(MintQuote {
-                                    id: quote.id,
-                                    request: quote.request,
-                                    amount: quote.amount.map(|a| a.into()),
-                                    expiry: Some(state_res.expiry),
-                                    state: MintQuoteState::Error,
-                                    token: None,
-                                    error: Some("Quote expired".to_string()),
-                                });
-                                break;
-                            }
-                            continue;
-                        }
-                        CdkMintQuoteState::Issued => {
-                            break;
-                        }
-                        CdkMintQuoteState::Paid => {
+            let result = tokio::time::timeout(timeout_dur, async {
+                while let Some(event) = subscription.recv().await {
+                    match event.into_inner() {
+                        NotificationPayload::MintQuoteBolt11Response(info)
+                            if info.state == CdkMintQuoteState::Paid =>
+                        {
+                            info!("Mint quote {} paid via subscription", quote.id);
+
+                            // Notify Dart: payment detected
                             let _ = sink.add(MintQuote {
                                 id: quote.id.clone(),
                                 request: quote.request.clone(),
@@ -237,6 +226,8 @@ impl Wallet {
                                 token: None,
                                 error: None,
                             });
+
+                            // Mint the ecash tokens
                             match _self
                                 .inner
                                 .mint(&quote.id, SplitTarget::None, None)
@@ -261,7 +252,6 @@ impl Wallet {
                                         error: None,
                                     });
                                     _self.update_balance_streams().await;
-                                    break;
                                 }
                                 Err(e) => {
                                     let _ = sink.add(MintQuote {
@@ -273,24 +263,33 @@ impl Wallet {
                                         token: None,
                                         error: Some(e.to_string()),
                                     });
-                                    break;
                                 }
                             }
+                            return;
                         }
-                    },
-                    Err(e) => {
-                        let _ = sink.add(MintQuote {
-                            id: quote.id,
-                            request: quote.request,
-                            amount: quote.amount.map(|a| a.into()),
-                            expiry: Some(quote.expiry),
-                            state: MintQuoteState::Error,
-                            token: None,
-                            error: Some(e.to_string()),
-                        });
-                        break;
+                        NotificationPayload::MintQuoteBolt11Response(info)
+                            if info.state == CdkMintQuoteState::Issued =>
+                        {
+                            // Already issued (recovered from previous session)
+                            return;
+                        }
+                        _ => continue,
                     }
                 }
+            })
+            .await;
+
+            if result.is_err() {
+                // Timeout: quote expired
+                let _ = sink.add(MintQuote {
+                    id: expired_id,
+                    request: expired_request,
+                    amount: expired_amount.map(|a| a.into()),
+                    expiry: Some(expired_expiry),
+                    state: MintQuoteState::Error,
+                    token: None,
+                    error: Some("Quote expired".to_string()),
+                });
             }
         });
         Ok(())
