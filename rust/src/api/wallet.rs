@@ -196,10 +196,10 @@ impl Wallet {
         flutter_rust_bridge::spawn(async move {
             // Timeout: time until quote expires + 30s buffer, or 1 hour if no expiry
             let remaining = quote.expiry.saturating_sub(unix_time());
-            let timeout_dur = if remaining > 0 {
-                Duration::from_secs(remaining + 30)
-            } else {
+            let timeout_dur = if quote.expiry == 0 {
                 Duration::from_secs(3600)
+            } else {
+                Duration::from_secs(remaining + 30)
             };
 
             // Clone for the timeout error path (originals are moved into the async block)
@@ -270,7 +270,18 @@ impl Wallet {
                         NotificationPayload::MintQuoteBolt11Response(info)
                             if info.state == CdkMintQuoteState::Issued =>
                         {
-                            // Already issued (recovered from previous session)
+                            // Already issued (recovered from previous session) — notify Dart
+                            // so it can clean up pending metadata and show success UI
+                            let _ = sink.add(MintQuote {
+                                id: quote.id.clone(),
+                                request: quote.request.clone(),
+                                amount: quote.amount.map(|a| a.into()),
+                                expiry: Some(quote.expiry),
+                                state: CdkMintQuoteState::Issued.into(),
+                                token: None,
+                                error: None,
+                            });
+                            _self.update_balance_streams().await;
                             return;
                         }
                         _ => continue,
