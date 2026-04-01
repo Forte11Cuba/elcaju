@@ -11,7 +11,8 @@ import 'package:elcaju/l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
-import '../../core/utils/bip321_builder.dart';
+// TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+// import '../../core/utils/bip321_builder.dart';
 import '../../core/services/nfc_service.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
@@ -45,7 +46,9 @@ class _RequestScreenState extends State<RequestScreen> {
   // Payment data
   String? _creqB;
   String? _bolt11;
-  QrMode _activeMode = QrMode.cashu;
+  // TODO: re-enable QrMode.cashu / universal once CDK fixes NIP-17 sender pubkey bug
+  // See: https://github.com/cashubtc/cdk/issues/1807
+  QrMode _activeMode = QrMode.lightning;
   bool _paymentHandled = false;
 
   // Listeners
@@ -443,18 +446,19 @@ class _RequestScreenState extends State<RequestScreen> {
         color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
+      // TODO: re-enable Universal/Cashu tabs once CDK fixes NIP-17 (cashubtc/cdk#1807)
       child: Row(
         children: [
-          _buildToggleButton(
-            label: L10n.of(context)!.universal,
-            mode: QrMode.universal,
-            enabled: _bolt11 != null,
-          ),
-          _buildToggleButton(
-            label: 'Cashu',
-            mode: QrMode.cashu,
-            enabled: true,
-          ),
+          // _buildToggleButton(
+          //   label: L10n.of(context)!.universal,
+          //   mode: QrMode.universal,
+          //   enabled: _bolt11 != null,
+          // ),
+          // _buildToggleButton(
+          //   label: 'Cashu',
+          //   mode: QrMode.cashu,
+          //   enabled: true,
+          // ),
           _buildToggleButton(
             label: 'Lightning',
             mode: QrMode.lightning,
@@ -712,11 +716,12 @@ class _RequestScreenState extends State<RequestScreen> {
 
   // ─── Logic ───
 
-  static const List<String> _defaultNostrRelays = [
-    'wss://relay.damus.io',
-    'wss://relay.primal.net',
-    'wss://nos.lol',
-  ];
+  // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+  // static const List<String> _defaultNostrRelays = [
+  //   'wss://relay.damus.io',
+  //   'wss://relay.primal.net',
+  //   'wss://nos.lol',
+  // ];
 
   Future<void> _generateRequest() async {
     final walletProvider = context.read<WalletProvider>();
@@ -734,7 +739,9 @@ class _RequestScreenState extends State<RequestScreen> {
     _paymentHandled = false;
     _creqB = null;
     _bolt11 = null;
-    _activeMode = QrMode.cashu;
+    // TODO: re-enable Cashu/Nostr payment request once CDK fixes NIP-17 sender pubkey bug
+    // See: https://github.com/cashubtc/cdk/issues/1807
+    _activeMode = QrMode.lightning;
 
     setState(() => _status = RequestStatus.generating);
 
@@ -751,29 +758,30 @@ class _RequestScreenState extends State<RequestScreen> {
           ? _descriptionController.text
           : null;
 
-      // 1. Create payment request (creqB + Nostr keys)
-      final request = await wallet.createPaymentRequest(
-        params: CreateRequestParams(
-          amount: _amount,
-          unit: _activeUnit,
-          description: description,
-          nostrRelays: _defaultNostrRelays,
-        ),
-      );
+      // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+      // // 1. Create payment request (creqB + Nostr keys)
+      // final request = await wallet.createPaymentRequest(
+      //   params: CreateRequestParams(
+      //     amount: _amount,
+      //     unit: _activeUnit,
+      //     description: description,
+      //     nostrRelays: _defaultNostrRelays,
+      //   ),
+      // );
+      //
+      // _creqB = request.creqB;
+      //
+      // // Persist handle for recovery if app is killed
+      // await walletProvider.savePendingNostrRequest(
+      //   request.listenerHandle.toPersisted(),
+      // );
+      //
+      // // 2. Start Nostr listener
+      // _nostrSubscription = wallet
+      //     .waitForNostrPayment(handle: request.listenerHandle)
+      //     .listen(_onNostrEvent);
 
-      _creqB = request.creqB;
-
-      // Persist handle for recovery if app is killed
-      await walletProvider.savePendingNostrRequest(
-        request.listenerHandle.toPersisted(),
-      );
-
-      // 2. Start Nostr listener
-      _nostrSubscription = wallet
-          .waitForNostrPayment(handle: request.listenerHandle)
-          .listen(_onNostrEvent);
-
-      // 3. Start Lightning invoice generation directly via CDK
+      // Lightning invoice generation via CDK
       _mintSubscription = wallet
           .mint(amount: _amount, description: description)
           .listen(_onMintEvent);
@@ -787,14 +795,15 @@ class _RequestScreenState extends State<RequestScreen> {
     }
   }
 
-  void _onNostrEvent(NostrPaymentEvent event) {
-    if (!mounted || _paymentHandled) return;
-    if (event.state == NostrPaymentState.received) {
-      _paymentHandled = true;
-      _mintSubscription?.cancel();
-      _onPaymentSuccess(event.amount ?? _amount);
-    }
-  }
+  // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+  // void _onNostrEvent(NostrPaymentEvent event) {
+  //   if (!mounted || _paymentHandled) return;
+  //   if (event.state == NostrPaymentState.received) {
+  //     _paymentHandled = true;
+  //     _mintSubscription?.cancel();
+  //     _onPaymentSuccess(event.amount ?? _amount);
+  //   }
+  // }
 
   void _onMintEvent(MintQuote quote) {
     if (!mounted) return;
@@ -803,7 +812,8 @@ class _RequestScreenState extends State<RequestScreen> {
         if (_bolt11 == null) {
           setState(() {
             _bolt11 = quote.request;
-            _activeMode = QrMode.universal;
+            // TODO: switch to QrMode.universal once CDK fixes NIP-17 (cashubtc/cdk#1807)
+            _activeMode = QrMode.lightning;
           });
           _updateNfcPayload();
         }
@@ -838,11 +848,14 @@ class _RequestScreenState extends State<RequestScreen> {
 
   String _getActiveQrContent() {
     switch (_activeMode) {
-      case QrMode.universal:
-        return buildUnifiedUri(creqB: _creqB!, bolt11: _bolt11);
-      case QrMode.cashu:
-        return _creqB!.toUpperCase();
+      // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+      // case QrMode.universal:
+      //   return buildUnifiedUri(creqB: _creqB!, bolt11: _bolt11);
+      // case QrMode.cashu:
+      //   return _creqB!.toUpperCase();
       case QrMode.lightning:
+        return _bolt11?.toUpperCase() ?? '';
+      default:
         return _bolt11?.toUpperCase() ?? '';
     }
   }

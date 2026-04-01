@@ -461,18 +461,17 @@ async fn wait_for_nostr_payment_inner(
         .await
         .map_err(|_| Error::Network("Relay connection timed out".to_string()))?;
 
+    // Create the broadcast receiver BEFORE subscribing so we capture historical
+    // events the relay sends back in response to our subscription filter.
+    // (broadcast::Receiver only sees messages sent after its creation)
+    let mut notifications = client.notifications();
+
     // Subscribe to NIP-17 gift-wrap events (kind 1059) addressed to our ephemeral pubkey
     let filter = Filter::new().pubkey(pubkey).kind(Kind::GiftWrap);
     client
         .subscribe(filter, None)
         .await
         .map_err(|e| Error::Cdk(format!("Subscription failed: {e}")))?;
-
-    // Listen for notifications with periodic cancellation check.
-    // Every 1s we check if the Dart stream is still alive by attempting
-    // a sink.add(). If it fails, the Dart side disposed the stream and
-    // we disconnect cleanly. Short interval minimizes "Fail to post" spam.
-    let mut notifications = client.notifications();
     loop {
         match tokio::time::timeout(Duration::from_secs(1), notifications.recv()).await {
             Ok(Ok(notification)) => {
