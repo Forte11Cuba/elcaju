@@ -11,7 +11,8 @@ import 'package:elcaju/l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
-import '../../core/utils/bip321_builder.dart';
+// TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+// import '../../core/utils/bip321_builder.dart';
 import '../../core/services/nfc_service.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
@@ -45,7 +46,9 @@ class _RequestScreenState extends State<RequestScreen> {
   // Payment data
   String? _creqB;
   String? _bolt11;
-  QrMode _activeMode = QrMode.cashu;
+  // TODO: re-enable QrMode.cashu / universal once CDK fixes NIP-17 sender pubkey bug
+  // See: https://github.com/cashubtc/cdk/issues/1807
+  // QrMode _activeMode = QrMode.lightning;
   bool _paymentHandled = false;
 
   // Listeners
@@ -72,10 +75,11 @@ class _RequestScreenState extends State<RequestScreen> {
   @override
   void dispose() {
     _descriptionController.dispose();
+    // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+    // No-op while Nostr is disabled (_nostrSubscription is always null, _creqB is always null)
     _nostrSubscription?.cancel();
     _mintSubscription?.cancel();
     if (_nfcEmulating) NfcService.stopEmulating();
-    // Clear persisted request if user abandoned without receiving payment
     if (!_paymentHandled && _creqB != null) {
       _walletProvider.removePendingNostrRequest();
     }
@@ -349,42 +353,37 @@ class _RequestScreenState extends State<RequestScreen> {
                           version: QrVersions.auto,
                           size: 260,
                           backgroundColor: Colors.white,
-                          errorCorrectionLevel: _activeMode == QrMode.universal
-                              ? QrErrorCorrectLevel.M
-                              : QrErrorCorrectLevel.H,
+                          // TODO: use QrErrorCorrectLevel.M for universal mode once CDK fixes NIP-17 (cashubtc/cdk#1807)
+                          errorCorrectionLevel: QrErrorCorrectLevel.H,
                         ),
-                        if (_activeMode == QrMode.cashu)
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.white, width: 4),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: Image.asset(
-                                'assets/img/cashu.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+                        // TODO: re-enable Cashu logo overlay once CDK fixes NIP-17 (cashubtc/cdk#1807)
+                        // if (_activeMode == QrMode.cashu)
+                        //   Container(
+                        //     width: 48, height: 48,
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.white,
+                        //       borderRadius: BorderRadius.circular(10),
+                        //       border: Border.all(color: Colors.white, width: 4),
+                        //     ),
+                        //     child: ClipRRect(
+                        //       borderRadius: BorderRadius.circular(6),
+                        //       child: Image.asset('assets/img/cashu.png', fit: BoxFit.contain),
+                        //     ),
+                        //   ),
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppColors.bitcoinOrange,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white, width: 4),
                           ),
-                        if (_activeMode == QrMode.lightning)
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: AppColors.bitcoinOrange,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.white, width: 4),
-                            ),
-                            child: const Icon(
-                              LucideIcons.zap,
-                              color: Colors.white,
-                              size: 28,
-                            ),
+                          child: const Icon(
+                            LucideIcons.zap,
+                            color: Colors.white,
+                            size: 28,
                           ),
+                        ),
                       ],
                     ),
                   ),
@@ -437,73 +436,66 @@ class _RequestScreenState extends State<RequestScreen> {
   }
 
   Widget _buildModeToggle() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          _buildToggleButton(
-            label: L10n.of(context)!.universal,
-            mode: QrMode.universal,
-            enabled: _bolt11 != null,
-          ),
-          _buildToggleButton(
-            label: 'Cashu',
-            mode: QrMode.cashu,
-            enabled: true,
-          ),
-          _buildToggleButton(
-            label: 'Lightning',
-            mode: QrMode.lightning,
-            enabled: _bolt11 != null,
-          ),
-        ],
-      ),
+    // TODO: re-enable Universal/Cashu tabs once CDK fixes NIP-17 (cashubtc/cdk#1807)
+    // Hidden while only Lightning is available (single button toggle is a no-op)
+    return const SizedBox.shrink(
+      // child: Container(
+      //   padding: const EdgeInsets.all(4),
+      //   decoration: BoxDecoration(
+      //     color: Colors.white.withValues(alpha: 0.1),
+      //     borderRadius: BorderRadius.circular(12),
+      //   ),
+      //   child: Row(
+      //     children: [
+      //       _buildToggleButton(label: L10n.of(context)!.universal, mode: QrMode.universal, enabled: _bolt11 != null),
+      //       _buildToggleButton(label: 'Cashu', mode: QrMode.cashu, enabled: true),
+      //       _buildToggleButton(label: 'Lightning', mode: QrMode.lightning, enabled: _bolt11 != null),
+      //     ],
+      //   ),
+      // ),
     );
   }
 
-  Widget _buildToggleButton({
-    required String label,
-    required QrMode mode,
-    required bool enabled,
-  }) {
-    final isActive = _activeMode == mode;
-    return Expanded(
-      child: GestureDetector(
-        onTap: enabled
-            ? () {
-                setState(() => _activeMode = mode);
-                _updateNfcPayload();
-              }
-            : null,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            gradient: isActive
-                ? const LinearGradient(colors: AppColors.buttonGradient)
-                : null,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 13,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: enabled
-                    ? (isActive ? Colors.white : AppColors.textSecondary)
-                    : Colors.white.withValues(alpha: 0.3),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+  // Widget _buildToggleButton({
+  //   required String label,
+  //   required QrMode mode,
+  //   required bool enabled,
+  // }) {
+  //   final isActive = _activeMode == mode;
+  //   return Expanded(
+  //     child: GestureDetector(
+  //       onTap: enabled
+  //           ? () {
+  //               setState(() => _activeMode = mode);
+  //               _updateNfcPayload();
+  //             }
+  //           : null,
+  //       child: Container(
+  //         padding: const EdgeInsets.symmetric(vertical: 10),
+  //         decoration: BoxDecoration(
+  //           gradient: isActive
+  //               ? const LinearGradient(colors: AppColors.buttonGradient)
+  //               : null,
+  //           borderRadius: BorderRadius.circular(10),
+  //         ),
+  //         child: Center(
+  //           child: Text(
+  //             label,
+  //             style: TextStyle(
+  //               fontFamily: 'Inter',
+  //               fontSize: 13,
+  //               fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+  //               color: enabled
+  //                   ? (isActive ? Colors.white : AppColors.textSecondary)
+  //                   : Colors.white.withValues(alpha: 0.3),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildActionButtons() {
     return Row(
@@ -712,11 +704,12 @@ class _RequestScreenState extends State<RequestScreen> {
 
   // ─── Logic ───
 
-  static const List<String> _defaultNostrRelays = [
-    'wss://relay.damus.io',
-    'wss://relay.primal.net',
-    'wss://nos.lol',
-  ];
+  // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+  // static const List<String> _defaultNostrRelays = [
+  //   'wss://relay.damus.io',
+  //   'wss://relay.primal.net',
+  //   'wss://nos.lol',
+  // ];
 
   Future<void> _generateRequest() async {
     final walletProvider = context.read<WalletProvider>();
@@ -734,7 +727,9 @@ class _RequestScreenState extends State<RequestScreen> {
     _paymentHandled = false;
     _creqB = null;
     _bolt11 = null;
-    _activeMode = QrMode.cashu;
+    // TODO: re-enable Cashu/Nostr payment request once CDK fixes NIP-17 sender pubkey bug
+    // See: https://github.com/cashubtc/cdk/issues/1807
+    // _activeMode = QrMode.lightning;
 
     setState(() => _status = RequestStatus.generating);
 
@@ -751,34 +746,33 @@ class _RequestScreenState extends State<RequestScreen> {
           ? _descriptionController.text
           : null;
 
-      // 1. Create payment request (creqB + Nostr keys)
-      final request = await wallet.createPaymentRequest(
-        params: CreateRequestParams(
-          amount: _amount,
-          unit: _activeUnit,
-          description: description,
-          nostrRelays: _defaultNostrRelays,
-        ),
-      );
+      // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+      // // 1. Create payment request (creqB + Nostr keys)
+      // final request = await wallet.createPaymentRequest(
+      //   params: CreateRequestParams(
+      //     amount: _amount,
+      //     unit: _activeUnit,
+      //     description: description,
+      //     nostrRelays: _defaultNostrRelays,
+      //   ),
+      // );
+      //
+      // _creqB = request.creqB;
+      //
+      // // Persist handle for recovery if app is killed
+      // await walletProvider.savePendingNostrRequest(
+      //   request.listenerHandle.toPersisted(),
+      // );
+      //
+      // // 2. Start Nostr listener
+      // _nostrSubscription = wallet
+      //     .waitForNostrPayment(handle: request.listenerHandle)
+      //     .listen(_onNostrEvent);
 
-      _creqB = request.creqB;
-
-      // Persist handle for recovery if app is killed
-      await walletProvider.savePendingNostrRequest(
-        request.listenerHandle.toPersisted(),
-      );
-
-      // 2. Start Nostr listener
-      _nostrSubscription = wallet
-          .waitForNostrPayment(handle: request.listenerHandle)
-          .listen(_onNostrEvent);
-
-      // 3. Start Lightning invoice generation directly via CDK
+      // Lightning invoice generation via CDK
       _mintSubscription = wallet
           .mint(amount: _amount, description: description)
           .listen(_onMintEvent);
-
-      setState(() => _status = RequestStatus.waiting);
     } catch (e) {
       setState(() {
         _status = RequestStatus.error;
@@ -787,14 +781,15 @@ class _RequestScreenState extends State<RequestScreen> {
     }
   }
 
-  void _onNostrEvent(NostrPaymentEvent event) {
-    if (!mounted || _paymentHandled) return;
-    if (event.state == NostrPaymentState.received) {
-      _paymentHandled = true;
-      _mintSubscription?.cancel();
-      _onPaymentSuccess(event.amount ?? _amount);
-    }
-  }
+  // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+  // void _onNostrEvent(NostrPaymentEvent event) {
+  //   if (!mounted || _paymentHandled) return;
+  //   if (event.state == NostrPaymentState.received) {
+  //     _paymentHandled = true;
+  //     _mintSubscription?.cancel();
+  //     _onPaymentSuccess(event.amount ?? _amount);
+  //   }
+  // }
 
   void _onMintEvent(MintQuote quote) {
     if (!mounted) return;
@@ -803,7 +798,9 @@ class _RequestScreenState extends State<RequestScreen> {
         if (_bolt11 == null) {
           setState(() {
             _bolt11 = quote.request;
-            _activeMode = QrMode.universal;
+            // TODO: switch to QrMode.universal once CDK fixes NIP-17 (cashubtc/cdk#1807)
+            // _activeMode = QrMode.lightning;
+            _status = RequestStatus.waiting;
           });
           _updateNfcPayload();
         }
@@ -816,7 +813,17 @@ class _RequestScreenState extends State<RequestScreen> {
         }
         break;
       case MintQuoteState.error:
-        // Lightning failed, but Nostr listener continues
+        // No Nostr fallback while CDK NIP-17 bug is open (cashubtc/cdk#1807)
+        if (!_paymentHandled) {
+          if (_nfcEmulating) {
+            NfcService.stopEmulating();
+            _nfcEmulating = false;
+          }
+          setState(() {
+            _status = RequestStatus.error;
+            _errorMessage = quote.error ?? L10n.of(context)!.unknownError;
+          });
+        }
         break;
       default:
         break;
@@ -831,20 +838,22 @@ class _RequestScreenState extends State<RequestScreen> {
     });
     final walletProvider = context.read<WalletProvider>();
     walletProvider.confettiController.fire();
-    await walletProvider.removePendingNostrRequest();
+    // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+    // Only remove pending Nostr request if this screen created one.
+    // Disabled while Nostr payment requests are disabled to avoid
+    // deleting a recovery record from a previous session.
+    // await walletProvider.removePendingNostrRequest();
   }
 
   // ─── QR Content ───
 
   String _getActiveQrContent() {
-    switch (_activeMode) {
-      case QrMode.universal:
-        return buildUnifiedUri(creqB: _creqB!, bolt11: _bolt11);
-      case QrMode.cashu:
-        return _creqB!.toUpperCase();
-      case QrMode.lightning:
-        return _bolt11?.toUpperCase() ?? '';
-    }
+    // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+    // case QrMode.universal:
+    //   return buildUnifiedUri(creqB: _creqB!, bolt11: _bolt11);
+    // case QrMode.cashu:
+    //   return _creqB!.toUpperCase();
+    return _bolt11?.toUpperCase() ?? '';
   }
 
   // ─── Actions ───
