@@ -48,7 +48,7 @@ class _RequestScreenState extends State<RequestScreen> {
   String? _bolt11;
   // TODO: re-enable QrMode.cashu / universal once CDK fixes NIP-17 sender pubkey bug
   // See: https://github.com/cashubtc/cdk/issues/1807
-  QrMode _activeMode = QrMode.lightning;
+  // QrMode _activeMode = QrMode.lightning;
   bool _paymentHandled = false;
 
   // Listeners
@@ -75,10 +75,11 @@ class _RequestScreenState extends State<RequestScreen> {
   @override
   void dispose() {
     _descriptionController.dispose();
+    // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+    // No-op while Nostr is disabled (_nostrSubscription is always null, _creqB is always null)
     _nostrSubscription?.cancel();
     _mintSubscription?.cancel();
     if (_nfcEmulating) NfcService.stopEmulating();
-    // Clear persisted request if user abandoned without receiving payment
     if (!_paymentHandled && _creqB != null) {
       _walletProvider.removePendingNostrRequest();
     }
@@ -352,42 +353,37 @@ class _RequestScreenState extends State<RequestScreen> {
                           version: QrVersions.auto,
                           size: 260,
                           backgroundColor: Colors.white,
-                          errorCorrectionLevel: _activeMode == QrMode.universal
-                              ? QrErrorCorrectLevel.M
-                              : QrErrorCorrectLevel.H,
+                          // TODO: use QrErrorCorrectLevel.M for universal mode once CDK fixes NIP-17 (cashubtc/cdk#1807)
+                          errorCorrectionLevel: QrErrorCorrectLevel.H,
                         ),
-                        if (_activeMode == QrMode.cashu)
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.white, width: 4),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: Image.asset(
-                                'assets/img/cashu.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
+                        // TODO: re-enable Cashu logo overlay once CDK fixes NIP-17 (cashubtc/cdk#1807)
+                        // if (_activeMode == QrMode.cashu)
+                        //   Container(
+                        //     width: 48, height: 48,
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.white,
+                        //       borderRadius: BorderRadius.circular(10),
+                        //       border: Border.all(color: Colors.white, width: 4),
+                        //     ),
+                        //     child: ClipRRect(
+                        //       borderRadius: BorderRadius.circular(6),
+                        //       child: Image.asset('assets/img/cashu.png', fit: BoxFit.contain),
+                        //     ),
+                        //   ),
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppColors.bitcoinOrange,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white, width: 4),
                           ),
-                        if (_activeMode == QrMode.lightning)
-                          Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: AppColors.bitcoinOrange,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.white, width: 4),
-                            ),
-                            child: const Icon(
-                              LucideIcons.zap,
-                              color: Colors.white,
-                              size: 28,
-                            ),
+                          child: const Icon(
+                            LucideIcons.zap,
+                            color: Colors.white,
+                            size: 28,
                           ),
+                        ),
                       ],
                     ),
                   ),
@@ -733,7 +729,7 @@ class _RequestScreenState extends State<RequestScreen> {
     _bolt11 = null;
     // TODO: re-enable Cashu/Nostr payment request once CDK fixes NIP-17 sender pubkey bug
     // See: https://github.com/cashubtc/cdk/issues/1807
-    _activeMode = QrMode.lightning;
+    // _activeMode = QrMode.lightning;
 
     setState(() => _status = RequestStatus.generating);
 
@@ -803,7 +799,7 @@ class _RequestScreenState extends State<RequestScreen> {
           setState(() {
             _bolt11 = quote.request;
             // TODO: switch to QrMode.universal once CDK fixes NIP-17 (cashubtc/cdk#1807)
-            _activeMode = QrMode.lightning;
+            // _activeMode = QrMode.lightning;
             _status = RequestStatus.waiting;
           });
           _updateNfcPayload();
