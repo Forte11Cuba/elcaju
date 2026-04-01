@@ -440,74 +440,66 @@ class _RequestScreenState extends State<RequestScreen> {
   }
 
   Widget _buildModeToggle() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      // TODO: re-enable Universal/Cashu tabs once CDK fixes NIP-17 (cashubtc/cdk#1807)
-      child: Row(
-        children: [
-          // _buildToggleButton(
-          //   label: L10n.of(context)!.universal,
-          //   mode: QrMode.universal,
-          //   enabled: _bolt11 != null,
-          // ),
-          // _buildToggleButton(
-          //   label: 'Cashu',
-          //   mode: QrMode.cashu,
-          //   enabled: true,
-          // ),
-          _buildToggleButton(
-            label: 'Lightning',
-            mode: QrMode.lightning,
-            enabled: _bolt11 != null,
-          ),
-        ],
-      ),
+    // TODO: re-enable Universal/Cashu tabs once CDK fixes NIP-17 (cashubtc/cdk#1807)
+    // Hidden while only Lightning is available (single button toggle is a no-op)
+    return const SizedBox.shrink(
+      // child: Container(
+      //   padding: const EdgeInsets.all(4),
+      //   decoration: BoxDecoration(
+      //     color: Colors.white.withValues(alpha: 0.1),
+      //     borderRadius: BorderRadius.circular(12),
+      //   ),
+      //   child: Row(
+      //     children: [
+      //       _buildToggleButton(label: L10n.of(context)!.universal, mode: QrMode.universal, enabled: _bolt11 != null),
+      //       _buildToggleButton(label: 'Cashu', mode: QrMode.cashu, enabled: true),
+      //       _buildToggleButton(label: 'Lightning', mode: QrMode.lightning, enabled: _bolt11 != null),
+      //     ],
+      //   ),
+      // ),
     );
   }
 
-  Widget _buildToggleButton({
-    required String label,
-    required QrMode mode,
-    required bool enabled,
-  }) {
-    final isActive = _activeMode == mode;
-    return Expanded(
-      child: GestureDetector(
-        onTap: enabled
-            ? () {
-                setState(() => _activeMode = mode);
-                _updateNfcPayload();
-              }
-            : null,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            gradient: isActive
-                ? const LinearGradient(colors: AppColors.buttonGradient)
-                : null,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 13,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: enabled
-                    ? (isActive ? Colors.white : AppColors.textSecondary)
-                    : Colors.white.withValues(alpha: 0.3),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+  // Widget _buildToggleButton({
+  //   required String label,
+  //   required QrMode mode,
+  //   required bool enabled,
+  // }) {
+  //   final isActive = _activeMode == mode;
+  //   return Expanded(
+  //     child: GestureDetector(
+  //       onTap: enabled
+  //           ? () {
+  //               setState(() => _activeMode = mode);
+  //               _updateNfcPayload();
+  //             }
+  //           : null,
+  //       child: Container(
+  //         padding: const EdgeInsets.symmetric(vertical: 10),
+  //         decoration: BoxDecoration(
+  //           gradient: isActive
+  //               ? const LinearGradient(colors: AppColors.buttonGradient)
+  //               : null,
+  //           borderRadius: BorderRadius.circular(10),
+  //         ),
+  //         child: Center(
+  //           child: Text(
+  //             label,
+  //             style: TextStyle(
+  //               fontFamily: 'Inter',
+  //               fontSize: 13,
+  //               fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+  //               color: enabled
+  //                   ? (isActive ? Colors.white : AppColors.textSecondary)
+  //                   : Colors.white.withValues(alpha: 0.3),
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildActionButtons() {
     return Row(
@@ -846,17 +838,12 @@ class _RequestScreenState extends State<RequestScreen> {
   // ─── QR Content ───
 
   String _getActiveQrContent() {
-    switch (_activeMode) {
-      // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
-      // case QrMode.universal:
-      //   return buildUnifiedUri(creqB: _creqB!, bolt11: _bolt11);
-      // case QrMode.cashu:
-      //   return _creqB!.toUpperCase();
-      case QrMode.lightning:
-        return _bolt11?.toUpperCase() ?? '';
-      default:
-        return _bolt11?.toUpperCase() ?? '';
-    }
+    // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
+    // case QrMode.universal:
+    //   return buildUnifiedUri(creqB: _creqB!, bolt11: _bolt11);
+    // case QrMode.cashu:
+    //   return _creqB!.toUpperCase();
+    return _bolt11?.toUpperCase() ?? '';
   }
 
   // ─── Actions ───
