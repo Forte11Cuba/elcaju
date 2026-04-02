@@ -979,45 +979,27 @@ class WalletProvider extends ChangeNotifier {
   Future<String> confirmSend(PreparedSend prepared, String? memo) async {
     final wallet = await getActiveWallet();
 
-    final token = await wallet.send(
+    final result = await wallet.send(
       send: prepared,
       memo: memo,
       includeMemo: memo != null && memo.isNotEmpty,
     );
 
-    // Guardar token en storage local para mostrar en detalles del historial.
-    // Usamos hash del token como key temporal; después buscaremos la transacción.
-    await _saveTokenForRecentTransaction(token.encoded);
+    // Save token metadata using the deterministic transaction ID returned by CDK
+    // (SHA-256 of sorted proof Y values — no racy listTransactions needed)
+    if (result.transactionId.isNotEmpty) {
+      await _txMetaStorage.save(
+        result.transactionId,
+        TransactionMeta(
+          type: TransactionType.cashu,
+          token: result.token.encoded,
+        ),
+      );
+      debugPrint('Token guardado para tx ${result.transactionId}');
+    }
 
     notifyListeners();
-    return token.encoded;
-  }
-
-  /// Guarda el token para la transacción más reciente de tipo send.
-  Future<void> _saveTokenForRecentTransaction(String tokenEncoded) async {
-    try {
-      // Obtener transacciones outgoing más recientes
-      final wallet = await getActiveWallet();
-      final txs = await wallet.listTransactions(
-        direction: TransactionDirection.outgoing,
-      );
-
-      if (txs.isNotEmpty) {
-        // La más reciente debería ser la que acabamos de crear
-        final recentTx = txs.first;
-
-        await _txMetaStorage.save(
-          recentTx.id,
-          TransactionMeta(
-            type: TransactionType.cashu,
-            token: tokenEncoded,
-          ),
-        );
-        debugPrint('Token guardado para tx ${recentTx.id}');
-      }
-    } catch (e) {
-      debugPrint('Error guardando token metadata: $e');
-    }
+    return result.token.encoded;
   }
 
   /// Cancela un envío preparado (libera proofs reservados).
@@ -1151,7 +1133,7 @@ class WalletProvider extends ChangeNotifier {
 
         // Cuando se completa, guardar metadata, confetti, limpiar pending
         if (quote.state == MintQuoteState.issued && invoiceBolt11 != null) {
-          _saveMintMetadata(wallet, invoiceBolt11!);
+          _saveMintMetadata(wallet, invoiceBolt11!, quote.transactionId);
           _removePendingMintInvoice(quote.id);
         }
 
@@ -1386,26 +1368,23 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Guarda metadata para una transacción de mint (Lightning deposit).
-  Future<void> _saveMintMetadata(Wallet wallet, String invoice) async {
+  /// Uses the deterministic transaction ID from CDK when available.
+  Future<void> _saveMintMetadata(Wallet wallet, String invoice, String? transactionId) async {
     try {
-      final txs = await wallet.listTransactions(
-        direction: TransactionDirection.incoming,
-      );
-
-      if (txs.isNotEmpty) {
-        final recentTx = txs.first;
-
+      if (transactionId != null && transactionId.isNotEmpty) {
         await _txMetaStorage.save(
-          recentTx.id,
+          transactionId,
           TransactionMeta(
             type: TransactionType.lightning,
             invoice: invoice,
           ),
         );
-        debugPrint('Mint metadata guardada para tx ${recentTx.id}');
-        confettiController.fire();
-        notifyListeners();
+        debugPrint('Mint metadata guardada para tx $transactionId');
+      } else {
+        debugPrint('Mint metadata: no transaction ID available');
       }
+      confettiController.fire();
+      notifyListeners();
     } catch (e) {
       debugPrint('Error guardando mint metadata: $e');
     }
@@ -1735,7 +1714,7 @@ class WalletProvider extends ChangeNotifier {
               // Enviar todo el balance
               final prepared =
                   await tempWallet.prepareSend(amount: tempBalance);
-              final token = await tempWallet.send(
+              final result = await tempWallet.send(
                 send: prepared,
                 memo: 'Recuperación El Caju',
                 includeMemo: true,
@@ -1743,7 +1722,7 @@ class WalletProvider extends ChangeNotifier {
 
               // Reclamar en nuestro wallet
               final ourWallet = await getWallet(mintUrl, unit);
-              final received = await ourWallet.receive(token: token);
+              final received = await ourWallet.receive(token: result.token);
               totalRecovered += received;
             }
           } catch (e) {

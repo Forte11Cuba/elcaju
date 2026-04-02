@@ -379,6 +379,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SendOptions dco_decode_send_options(dynamic raw);
 
   @protected
+  SendResult dco_decode_send_result(dynamic raw);
+
+  @protected
   SupportedSettings dco_decode_supported_settings(dynamic raw);
 
   @protected
@@ -780,6 +783,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SendOptions sse_decode_send_options(SseDeserializer deserializer);
+
+  @protected
+  SendResult sse_decode_send_result(SseDeserializer deserializer);
 
   @protected
   SupportedSettings sse_decode_supported_settings(SseDeserializer deserializer);
@@ -1272,6 +1278,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_send_options(SendOptions self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_send_result(SendResult self, SseSerializer serializer);
 
   @protected
   void sse_encode_supported_settings(

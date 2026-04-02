@@ -109,7 +109,7 @@ abstract class Wallet implements RustOpaqueInterface {
 
   Future<void> restore();
 
-  Future<Token> send({
+  Future<SendResult> send({
     required PreparedSend send,
     String? memo,
     bool? includeMemo,
@@ -182,6 +182,9 @@ class MintQuote {
   final Token? token;
   final String? error;
 
+  /// Deterministic transaction ID (set when state == Issued)
+  final String? transactionId;
+
   const MintQuote({
     required this.id,
     required this.request,
@@ -190,6 +193,7 @@ class MintQuote {
     required this.state,
     this.token,
     this.error,
+    this.transactionId,
   });
 
   @override
@@ -200,7 +204,8 @@ class MintQuote {
       expiry.hashCode ^
       state.hashCode ^
       token.hashCode ^
-      error.hashCode;
+      error.hashCode ^
+      transactionId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -213,7 +218,8 @@ class MintQuote {
           expiry == other.expiry &&
           state == other.state &&
           token == other.token &&
-          error == other.error;
+          error == other.error &&
+          transactionId == other.transactionId;
 }
 
 enum MintQuoteState { unpaid, paid, issued, error }
@@ -258,6 +264,27 @@ class SendOptions {
           runtimeType == other.runtimeType &&
           pubkey == other.pubkey &&
           includeFee == other.includeFee;
+}
+
+/// Result of a confirmed send, carrying both the ecash token and the
+/// deterministic transaction ID so Dart can save metadata without a racy
+/// listTransactions lookup.
+class SendResult {
+  final Token token;
+  final String transactionId;
+
+  const SendResult({required this.token, required this.transactionId});
+
+  @override
+  int get hashCode => token.hashCode ^ transactionId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SendResult &&
+          runtimeType == other.runtimeType &&
+          token == other.token &&
+          transactionId == other.transactionId;
 }
 
 class Transaction {

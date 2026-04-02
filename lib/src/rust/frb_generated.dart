@@ -280,7 +280,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiWalletWalletRestore({required Wallet that});
 
-  Future<Token> crateApiWalletWalletSend({
+  Future<SendResult> crateApiWalletWalletSend({
     required Wallet that,
     required PreparedSend send,
     String? memo,
@@ -2005,7 +2005,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "Wallet_restore", argNames: ["that"]);
 
   @override
-  Future<Token> crateApiWalletWalletSend({
+  Future<SendResult> crateApiWalletWalletSend({
     required Wallet that,
     required PreparedSend send,
     String? memo,
@@ -2033,7 +2033,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_token,
+          decodeSuccessData: sse_decode_send_result,
           decodeErrorData: sse_decode_error,
         ),
         constMeta: kCrateApiWalletWalletSendConstMeta,
@@ -3044,8 +3044,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   MintQuote dco_decode_mint_quote(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return MintQuote(
       id: dco_decode_String(arr[0]),
       request: dco_decode_String(arr[1]),
@@ -3054,6 +3054,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       state: dco_decode_mint_quote_state(arr[4]),
       token: dco_decode_opt_box_autoadd_token(arr[5]),
       error: dco_decode_opt_String(arr[6]),
+      transactionId: dco_decode_opt_String(arr[7]),
     );
   }
 
@@ -3286,6 +3287,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return SendOptions(
       pubkey: dco_decode_opt_String(arr[0]),
       includeFee: dco_decode_opt_box_autoadd_bool(arr[1]),
+    );
+  }
+
+  @protected
+  SendResult dco_decode_send_result(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return SendResult(
+      token: dco_decode_token(arr[0]),
+      transactionId: dco_decode_String(arr[1]),
     );
   }
 
@@ -4056,6 +4069,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_state = sse_decode_mint_quote_state(deserializer);
     var var_token = sse_decode_opt_box_autoadd_token(deserializer);
     var var_error = sse_decode_opt_String(deserializer);
+    var var_transactionId = sse_decode_opt_String(deserializer);
     return MintQuote(
       id: var_id,
       request: var_request,
@@ -4064,6 +4078,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       state: var_state,
       token: var_token,
       error: var_error,
+      transactionId: var_transactionId,
     );
   }
 
@@ -4377,6 +4392,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_pubkey = sse_decode_opt_String(deserializer);
     var var_includeFee = sse_decode_opt_box_autoadd_bool(deserializer);
     return SendOptions(pubkey: var_pubkey, includeFee: var_includeFee);
+  }
+
+  @protected
+  SendResult sse_decode_send_result(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_token = sse_decode_token(deserializer);
+    var var_transactionId = sse_decode_String(deserializer);
+    return SendResult(token: var_token, transactionId: var_transactionId);
   }
 
   @protected
@@ -5177,6 +5200,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_mint_quote_state(self.state, serializer);
     sse_encode_opt_box_autoadd_token(self.token, serializer);
     sse_encode_opt_String(self.error, serializer);
+    sse_encode_opt_String(self.transactionId, serializer);
   }
 
   @protected
@@ -5463,6 +5487,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_opt_String(self.pubkey, serializer);
     sse_encode_opt_box_autoadd_bool(self.includeFee, serializer);
+  }
+
+  @protected
+  void sse_encode_send_result(SendResult self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_token(self.token, serializer);
+    sse_encode_String(self.transactionId, serializer);
   }
 
   @protected
@@ -5881,7 +5912,7 @@ class WalletImpl extends RustOpaque implements Wallet {
   Future<void> restore() =>
       RustLib.instance.api.crateApiWalletWalletRestore(that: this);
 
-  Future<Token> send({
+  Future<SendResult> send({
     required PreparedSend send,
     String? memo,
     bool? includeMemo,

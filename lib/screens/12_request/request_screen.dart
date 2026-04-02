@@ -769,10 +769,13 @@ class _RequestScreenState extends State<RequestScreen> {
       //     .waitForNostrPayment(handle: request.listenerHandle)
       //     .listen(_onNostrEvent);
 
-      // Lightning invoice generation via CDK
-      _mintSubscription = wallet
-          .mint(amount: _amount, description: description)
-          .listen(_onMintEvent);
+      // Lightning invoice generation via wallet provider
+      // (walletProvider.mintTokens handles pending invoice persistence and metadata)
+      final mintStream = await walletProvider.mintTokens(
+        _amount,
+        description,
+      );
+      _mintSubscription = mintStream.listen(_onMintEvent);
     } catch (e) {
       setState(() {
         _status = RequestStatus.error;
