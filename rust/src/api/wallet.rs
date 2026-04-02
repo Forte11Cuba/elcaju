@@ -156,12 +156,20 @@ impl Wallet {
         // (SHA-256 of sorted Y values — same as CDK uses internally)
         // Best-effort: send is already committed, don't fail on ID computation
         let tx_id = match self.inner.get_mint_keysets().await {
-            Ok(keysets) => cdk_token
-                .proofs(&keysets)
-                .ok()
-                .and_then(|proofs| TransactionId::try_from(proofs).ok())
-                .map(|id| id.to_string()),
-            Err(_) => None,
+            Ok(keysets) => match cdk_token.proofs(&keysets) {
+                Ok(proofs) => TransactionId::try_from(proofs)
+                    .map(|id| id.to_string())
+                    .map_err(|e| info!("Failed to compute tx ID from proofs: {e}"))
+                    .ok(),
+                Err(e) => {
+                    info!("Failed to extract proofs from token: {e}");
+                    None
+                }
+            },
+            Err(e) => {
+                info!("Failed to fetch keysets for tx ID: {e}");
+                None
+            }
         };
 
         let token_str = cdk_token.to_string();
@@ -516,7 +524,7 @@ pub struct MintQuote {
     pub state: MintQuoteState,
     pub token: Option<Token>,
     pub error: Option<String>,
-    /// Deterministic transaction ID (set when state == Issued)
+    /// Deterministic transaction ID (set when proofs are available, typically on Issued)
     pub transaction_id: Option<String>,
 }
 
