@@ -261,11 +261,15 @@ impl Wallet {
                                 .await
                             {
                                 Ok(mint_proofs) => {
-                                    let tx_id = TransactionId::try_from(
+                                    let tx_id = match TransactionId::try_from(
                                         mint_proofs.clone(),
-                                    )
-                                    .map(|id| id.to_string())
-                                    .ok();
+                                    ) {
+                                        Ok(id) => Some(id.to_string()),
+                                        Err(e) => {
+                                            info!("Failed to compute mint tx ID: {e}");
+                                            None
+                                        }
+                                    };
 
                                     let mint_amount =
                                         mint_proofs.total_amount().unwrap_or_default();
