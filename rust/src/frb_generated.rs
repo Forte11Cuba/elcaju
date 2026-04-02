@@ -3597,6 +3597,7 @@ impl SseDecode for crate::api::wallet::MintQuote {
         let mut var_state = <crate::api::wallet::MintQuoteState>::sse_decode(deserializer);
         let mut var_token = <Option<crate::api::token::Token>>::sse_decode(deserializer);
         let mut var_error = <Option<String>>::sse_decode(deserializer);
+        let mut var_transactionId = <Option<String>>::sse_decode(deserializer);
         return crate::api::wallet::MintQuote {
             id: var_id,
             request: var_request,
@@ -3605,6 +3606,7 @@ impl SseDecode for crate::api::wallet::MintQuote {
             state: var_state,
             token: var_token,
             error: var_error,
+            transaction_id: var_transactionId,
         };
     }
 }
@@ -3944,6 +3946,18 @@ impl SseDecode for crate::api::wallet::SendOptions {
         return crate::api::wallet::SendOptions {
             pubkey: var_pubkey,
             include_fee: var_includeFee,
+        };
+    }
+}
+
+impl SseDecode for crate::api::wallet::SendResult {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_token = <crate::api::token::Token>::sse_decode(deserializer);
+        let mut var_transactionId = <Option<String>>::sse_decode(deserializer);
+        return crate::api::wallet::SendResult {
+            token: var_token,
+            transaction_id: var_transactionId,
         };
     }
 }
@@ -4526,6 +4540,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::MintQuote {
             self.state.into_into_dart().into_dart(),
             self.token.into_into_dart().into_dart(),
             self.error.into_into_dart().into_dart(),
+            self.transaction_id.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4786,6 +4801,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::wallet::SendOptions>
     for crate::api::wallet::SendOptions
 {
     fn into_into_dart(self) -> crate::api::wallet::SendOptions {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::wallet::SendResult {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.token.into_into_dart().into_dart(),
+            self.transaction_id.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::wallet::SendResult
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::wallet::SendResult>
+    for crate::api::wallet::SendResult
+{
+    fn into_into_dart(self) -> crate::api::wallet::SendResult {
         self
     }
 }
@@ -5300,6 +5336,7 @@ impl SseEncode for crate::api::wallet::MintQuote {
         <crate::api::wallet::MintQuoteState>::sse_encode(self.state, serializer);
         <Option<crate::api::token::Token>>::sse_encode(self.token, serializer);
         <Option<String>>::sse_encode(self.error, serializer);
+        <Option<String>>::sse_encode(self.transaction_id, serializer);
     }
 }
 
@@ -5565,6 +5602,14 @@ impl SseEncode for crate::api::wallet::SendOptions {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Option<String>>::sse_encode(self.pubkey, serializer);
         <Option<bool>>::sse_encode(self.include_fee, serializer);
+    }
+}
+
+impl SseEncode for crate::api::wallet::SendResult {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::api::token::Token>::sse_encode(self.token, serializer);
+        <Option<String>>::sse_encode(self.transaction_id, serializer);
     }
 }
 

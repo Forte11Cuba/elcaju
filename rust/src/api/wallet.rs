@@ -19,6 +19,7 @@ use cdk_common::{
     util::unix_time,
     wallet::{
         Transaction as CdkTransaction, TransactionDirection as CdkTransactionDirection,
+        TransactionId,
     },
     NotificationPayload,
 };
@@ -132,12 +133,12 @@ impl Wallet {
         send: PreparedSend,
         memo: Option<String>,
         include_memo: Option<bool>,
-    ) -> Result<Token, Error> {
+    ) -> Result<SendResult, Error> {
         let send_memo = memo.map(|m| SendMemo {
             memo: m,
             include_memo: include_memo.unwrap_or_default(),
         });
-        let token = self
+        let cdk_token = self
             .inner
             .confirm_send(
                 send.operation_id,
@@ -149,10 +150,35 @@ impl Wallet {
                 send.cdk_send_fee,
                 send_memo,
             )
-            .await?
-            .to_string();
+            .await?;
+
+        // Compute the deterministic transaction ID from the token's proofs
+        // (SHA-256 of sorted Y values — same as CDK uses internally)
+        // Best-effort: send is already committed, don't fail on ID computation
+        let tx_id = match self.inner.get_mint_keysets().await {
+            Ok(keysets) => match cdk_token.proofs(&keysets) {
+                Ok(proofs) => TransactionId::try_from(proofs)
+                    .map(|id| id.to_string())
+                    .map_err(|e| info!("Failed to compute tx ID from proofs: {e}"))
+                    .ok(),
+                Err(e) => {
+                    info!("Failed to extract proofs from token: {e}");
+                    None
+                }
+            },
+            Err(e) => {
+                info!("Failed to fetch keysets for tx ID: {e}");
+                None
+            }
+        };
+
+        let token_str = cdk_token.to_string();
         self.update_balance_streams().await;
-        Ok(Token::from_str(&token)?)
+
+        Ok(SendResult {
+            token: Token::from_str(&token_str)?,
+            transaction_id: tx_id,
+        })
     }
 
     pub async fn cancel_send(&self, send: PreparedSend) -> Result<(), Error> {
@@ -225,6 +251,7 @@ impl Wallet {
                                 state: CdkMintQuoteState::Paid.into(),
                                 token: None,
                                 error: None,
+                                transaction_id: None,
                             });
 
                             // Mint the ecash tokens
@@ -234,6 +261,16 @@ impl Wallet {
                                 .await
                             {
                                 Ok(mint_proofs) => {
+                                    let tx_id = match TransactionId::try_from(
+                                        mint_proofs.clone(),
+                                    ) {
+                                        Ok(id) => Some(id.to_string()),
+                                        Err(e) => {
+                                            info!("Failed to compute mint tx ID: {e}");
+                                            None
+                                        }
+                                    };
+
                                     let mint_amount =
                                         mint_proofs.total_amount().unwrap_or_default();
                                     let _ = sink.add(MintQuote {
@@ -250,6 +287,7 @@ impl Wallet {
                                         ))
                                         .ok(),
                                         error: None,
+                                        transaction_id: tx_id,
                                     });
                                     _self.update_balance_streams().await;
                                 }
@@ -262,6 +300,7 @@ impl Wallet {
                                         state: MintQuoteState::Error,
                                         token: None,
                                         error: Some(e.to_string()),
+                                        transaction_id: None,
                                     });
                                 }
                             }
@@ -280,6 +319,7 @@ impl Wallet {
                                 state: CdkMintQuoteState::Issued.into(),
                                 token: None,
                                 error: None,
+                                transaction_id: None,
                             });
                             _self.update_balance_streams().await;
                             return;
@@ -300,6 +340,7 @@ impl Wallet {
                     state: MintQuoteState::Error,
                     token: None,
                     error: Some("Quote expired".to_string()),
+                    transaction_id: None,
                 });
             }
         });
@@ -470,6 +511,15 @@ impl Wallet {
 // Types
 // ========================================================================
 
+/// Result of a confirmed send, carrying both the ecash token and the
+/// deterministic transaction ID so Dart can save metadata without a racy
+/// listTransactions lookup.
+pub struct SendResult {
+    pub token: Token,
+    /// Deterministic transaction ID (None if computation failed)
+    pub transaction_id: Option<String>,
+}
+
 pub struct MintQuote {
     pub id: String,
     pub request: String,
@@ -478,6 +528,8 @@ pub struct MintQuote {
     pub state: MintQuoteState,
     pub token: Option<Token>,
     pub error: Option<String>,
+    /// Deterministic transaction ID (set when proofs are available, typically on Issued)
+    pub transaction_id: Option<String>,
 }
 
 impl From<CdkMintQuote> for MintQuote {
@@ -490,6 +542,7 @@ impl From<CdkMintQuote> for MintQuote {
             state: quote.state.into(),
             token: None,
             error: None,
+            transaction_id: None,
         }
     }
 }
