@@ -3298,7 +3298,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return SendResult(
       token: dco_decode_token(arr[0]),
-      transactionId: dco_decode_String(arr[1]),
+      transactionId: dco_decode_opt_String(arr[1]),
     );
   }
 
@@ -4398,7 +4398,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SendResult sse_decode_send_result(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_token = sse_decode_token(deserializer);
-    var var_transactionId = sse_decode_String(deserializer);
+    var var_transactionId = sse_decode_opt_String(deserializer);
     return SendResult(token: var_token, transactionId: var_transactionId);
   }
 
@@ -5493,7 +5493,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_send_result(SendResult self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_token(self.token, serializer);
-    sse_encode_String(self.transactionId, serializer);
+    sse_encode_opt_String(self.transactionId, serializer);
   }
 
   @protected

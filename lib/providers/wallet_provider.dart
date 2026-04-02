@@ -987,15 +987,21 @@ class WalletProvider extends ChangeNotifier {
 
     // Save token metadata using the deterministic transaction ID returned by CDK
     // (SHA-256 of sorted proof Y values — no racy listTransactions needed)
-    if (result.transactionId.isNotEmpty) {
-      await _txMetaStorage.save(
-        result.transactionId,
-        TransactionMeta(
-          type: TransactionType.cashu,
-          token: result.token.encoded,
-        ),
-      );
-      debugPrint('Token guardado para tx ${result.transactionId}');
+    // Best-effort: don't fail the send if metadata persistence fails
+    final txId = result.transactionId;
+    if (txId != null && txId.isNotEmpty) {
+      try {
+        await _txMetaStorage.save(
+          txId,
+          TransactionMeta(
+            type: TransactionType.cashu,
+            token: result.token.encoded,
+          ),
+        );
+        debugPrint('Token guardado para tx $txId');
+      } catch (e) {
+        debugPrint('Error guardando send metadata: $e');
+      }
     }
 
     notifyListeners();
@@ -1124,7 +1130,7 @@ class WalletProvider extends ChangeNotifier {
       amount: amount,
       description: description,
     ).listen(
-      (quote) {
+      (quote) async {
         // Guardar invoice temprano en SharedPreferences
         if (quote.state == MintQuoteState.unpaid) {
           invoiceBolt11 = quote.request;
@@ -1133,8 +1139,10 @@ class WalletProvider extends ChangeNotifier {
 
         // Cuando se completa, guardar metadata, confetti, limpiar pending
         if (quote.state == MintQuoteState.issued && invoiceBolt11 != null) {
-          _saveMintMetadata(wallet, invoiceBolt11!, quote.transactionId);
-          _removePendingMintInvoice(quote.id);
+          final saved = await _saveMintMetadata(wallet, invoiceBolt11!, quote.transactionId);
+          // Only remove pending invoice if metadata was saved;
+          // otherwise _matchPendingMintInvoices can recover it on next startup
+          if (saved) _removePendingMintInvoice(quote.id);
         }
 
         // Reenviar a la UI (si sigue escuchando)
@@ -1368,8 +1376,8 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Guarda metadata para una transacción de mint (Lightning deposit).
-  /// Uses the deterministic transaction ID from CDK when available.
-  Future<void> _saveMintMetadata(Wallet wallet, String invoice, String? transactionId) async {
+  /// Returns true if metadata was actually saved.
+  Future<bool> _saveMintMetadata(Wallet wallet, String invoice, String? transactionId) async {
     try {
       if (transactionId != null && transactionId.isNotEmpty) {
         await _txMetaStorage.save(
@@ -1380,13 +1388,18 @@ class WalletProvider extends ChangeNotifier {
           ),
         );
         debugPrint('Mint metadata guardada para tx $transactionId');
+        confettiController.fire();
+        notifyListeners();
+        return true;
       } else {
         debugPrint('Mint metadata: no transaction ID available');
+        confettiController.fire();
+        notifyListeners();
+        return false;
       }
-      confettiController.fire();
-      notifyListeners();
     } catch (e) {
       debugPrint('Error guardando mint metadata: $e');
+      return false;
     }
   }
 

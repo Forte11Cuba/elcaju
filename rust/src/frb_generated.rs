@@ -3954,7 +3954,7 @@ impl SseDecode for crate::api::wallet::SendResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_token = <crate::api::token::Token>::sse_decode(deserializer);
-        let mut var_transactionId = <String>::sse_decode(deserializer);
+        let mut var_transactionId = <Option<String>>::sse_decode(deserializer);
         return crate::api::wallet::SendResult {
             token: var_token,
             transaction_id: var_transactionId,
@@ -5609,7 +5609,7 @@ impl SseEncode for crate::api::wallet::SendResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <crate::api::token::Token>::sse_encode(self.token, serializer);
-        <String>::sse_encode(self.transaction_id, serializer);
+        <Option<String>>::sse_encode(self.transaction_id, serializer);
     }
 }
 

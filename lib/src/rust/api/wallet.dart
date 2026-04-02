@@ -271,9 +271,11 @@ class SendOptions {
 /// listTransactions lookup.
 class SendResult {
   final Token token;
-  final String transactionId;
 
-  const SendResult({required this.token, required this.transactionId});
+  /// Deterministic transaction ID (None if computation failed)
+  final String? transactionId;
+
+  const SendResult({required this.token, this.transactionId});
 
   @override
   int get hashCode => token.hashCode ^ transactionId.hashCode;

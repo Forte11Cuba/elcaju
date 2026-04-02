@@ -158,7 +158,7 @@ impl Wallet {
         let proofs = cdk_token.proofs(&keysets)?;
         let tx_id = TransactionId::try_from(proofs)
             .map(|id| id.to_string())
-            .unwrap_or_default();
+            .ok();
 
         let token_str = cdk_token.to_string();
         self.update_balance_streams().await;
@@ -500,7 +500,8 @@ impl Wallet {
 /// listTransactions lookup.
 pub struct SendResult {
     pub token: Token,
-    pub transaction_id: String,
+    /// Deterministic transaction ID (None if computation failed)
+    pub transaction_id: Option<String>,
 }
 
 pub struct MintQuote {
