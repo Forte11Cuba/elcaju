@@ -775,8 +775,10 @@ class _RequestScreenState extends State<RequestScreen> {
         _amount,
         description,
       );
+      if (!mounted) return;
       _mintSubscription = mintStream.listen(_onMintEvent);
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _status = RequestStatus.error;
         _errorMessage = e.toString();
