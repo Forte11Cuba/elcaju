@@ -154,11 +154,15 @@ impl Wallet {
 
         // Compute the deterministic transaction ID from the token's proofs
         // (SHA-256 of sorted Y values — same as CDK uses internally)
-        let keysets = self.inner.get_mint_keysets().await?;
-        let proofs = cdk_token.proofs(&keysets)?;
-        let tx_id = TransactionId::try_from(proofs)
-            .map(|id| id.to_string())
-            .ok();
+        // Best-effort: send is already committed, don't fail on ID computation
+        let tx_id = match self.inner.get_mint_keysets().await {
+            Ok(keysets) => cdk_token
+                .proofs(&keysets)
+                .ok()
+                .and_then(|proofs| TransactionId::try_from(proofs).ok())
+                .map(|id| id.to_string()),
+            Err(_) => None,
+        };
 
         let token_str = cdk_token.to_string();
         self.update_balance_streams().await;
