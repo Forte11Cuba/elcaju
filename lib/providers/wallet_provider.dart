@@ -1793,6 +1793,8 @@ class WalletProvider extends ChangeNotifier {
       _activeUnit = 'sat';
       _mnemonic = null;
       _db = null;
+      _cachedBalanceStream = null;
+      _cachedBalanceKey = null;
 
       // Limpiar metadata de transacciones
       await _txMetaStorage.clear();
@@ -1821,6 +1823,8 @@ class WalletProvider extends ChangeNotifier {
     _activeUnit = 'sat';
     _mnemonic = null;
     _db = null;
+    _cachedBalanceStream = null;
+    _cachedBalanceKey = null;
     notifyListeners();
   }
 
