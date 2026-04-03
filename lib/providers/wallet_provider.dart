@@ -448,7 +448,11 @@ class WalletProvider extends ChangeNotifier {
     }
 
     if (changed) {
-      await _saveMints();
+      try {
+        await _saveMints();
+      } catch (e) {
+        debugPrint('Error guardando mints actualizados: $e');
+      }
       notifyListeners();
     }
   }
