@@ -435,6 +435,12 @@ class WalletProvider extends ChangeNotifier {
           _mintUnits[mintUrl] = unitList;
           changed = true;
           debugPrint('Unidades actualizadas para $mintUrl: $unitList');
+
+          // Validar _activeUnit si este es el mint activo
+          if (mintUrl == _activeMintUrl && !unitList.contains(_activeUnit)) {
+            _activeUnit = unitList.first;
+            debugPrint('Active unit reset to ${unitList.first} for $mintUrl');
+          }
         }
       } catch (e) {
         debugPrint('Error refrescando unidades de $mintUrl: $e');
