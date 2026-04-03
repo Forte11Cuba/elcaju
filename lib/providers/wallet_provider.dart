@@ -356,6 +356,10 @@ class WalletProvider extends ChangeNotifier {
         }
       }
       debugPrint('Mints restaurados: ${_mintUnits.keys.length}');
+
+      // Re-detectar unidades en background (sin bloquear arranque).
+      // Si el mint ahora soporta más unidades (ej: usd), se actualizan.
+      _refreshAllMintUnits();
     } else {
       // Primera vez - agregar mint por defecto
       await addMint('https://mint.cubabitcoin.org');
@@ -405,6 +409,62 @@ class WalletProvider extends ChangeNotifier {
       throw Exception('No hay mint activo');
     }
     return await getWallet(_activeMintUrl!, _activeUnit);
+  }
+
+  /// Re-detecta unidades de todos los mints conocidos via NUT-04.
+  /// Corre en background sin bloquear el arranque. Solo notifica si hay cambios.
+  void _refreshAllMintUnits() async {
+    bool changed = false;
+
+    for (final mintUrl in _mintUnits.keys.toList()) {
+      try {
+        final mintInfo = await getMintInfo(mintUrl: mintUrl);
+        final units = <String>{};
+        for (final method in mintInfo.nuts.nut04.methods) {
+          units.add(method.unit);
+        }
+        final unitList = units.isEmpty ? ['sat'] : units.toList();
+        unitList.sort((a, b) {
+          if (a == 'sat') return -1;
+          if (b == 'sat') return 1;
+          return a.compareTo(b);
+        });
+
+        final previous = _mintUnits[mintUrl];
+        if (!_listEquals(previous, unitList)) {
+          _mintUnits[mintUrl] = unitList;
+          changed = true;
+          debugPrint('Unidades actualizadas para $mintUrl: $unitList');
+
+          // Validar _activeUnit si este es el mint activo
+          if (mintUrl == _activeMintUrl && !unitList.contains(_activeUnit)) {
+            _activeUnit = unitList.first;
+            debugPrint('Active unit reset to ${unitList.first} for $mintUrl');
+          }
+        }
+      } catch (e) {
+        debugPrint('Error refrescando unidades de $mintUrl: $e');
+      }
+    }
+
+    if (changed) {
+      try {
+        await _saveMints();
+      } catch (e) {
+        debugPrint('Error guardando mints actualizados: $e');
+      }
+      notifyListeners();
+    }
+  }
+
+  /// Compara dos listas de strings por valor.
+  bool _listEquals(List<String>? a, List<String>? b) {
+    if (a == null || b == null) return a == b;
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 
   // ============================================================
