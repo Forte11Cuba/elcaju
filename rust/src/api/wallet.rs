@@ -211,12 +211,21 @@ impl Wallet {
             return Ok(());
         }
 
-        // Subscribe to quote state changes via WebSocket (NUT-17) with HTTP polling fallback
-        let mut subscription = self
+        // Try WebSocket (NUT-17) subscription — if unavailable, HTTP polling still works
+        let subscription = match self
             .inner
             .subscribe(WalletSubscription::Bolt11MintQuoteState(vec![quote.id.clone()]))
             .await
-            .map_err(|e| Error::Cdk(e.to_string()))?;
+        {
+            Ok(sub) => Some(sub),
+            Err(e) => {
+                info!(
+                    "Mint quote {}: WebSocket unavailable, using HTTP polling only: {e}",
+                    quote.id
+                );
+                None
+            }
+        };
 
         let _self = self.clone();
         flutter_rust_bridge::spawn(async move {
@@ -242,17 +251,22 @@ impl Wallet {
             let quote_id_for_poll = quote.id.clone();
             let poll_wallet = _self.clone();
 
-            let result = tokio::time::timeout(timeout_dur, async {
-                // Enum to unify both detection paths
-                enum Detected {
-                    Paid,
-                    Issued,
-                }
+            // Timeout only covers detection, not minting.
+            // If payment is detected near expiry, mint() must still complete.
+            enum Detected {
+                Paid,
+                Issued,
+            }
 
-                let detected = tokio::select! {
-                    // Path A: WebSocket subscription
+            let mut subscription = subscription;
+            let detected = tokio::time::timeout(timeout_dur, async {
+                tokio::select! {
+                    // Path A: WebSocket subscription (skipped if unavailable)
                     result = async {
-                        while let Some(event) = subscription.recv().await {
+                        let Some(ref mut sub) = subscription else {
+                            return std::future::pending::<Detected>().await;
+                        };
+                        while let Some(event) = sub.recv().await {
                             match event.into_inner() {
                                 NotificationPayload::MintQuoteBolt11Response(info)
                                     if info.state == CdkMintQuoteState::Paid =>
@@ -268,7 +282,6 @@ impl Wallet {
                                 _ => continue,
                             }
                         }
-                        // Subscription closed without detecting payment — wait for poll path
                         std::future::pending::<Detected>().await
                     } => result,
 
@@ -288,103 +301,103 @@ impl Wallet {
                             }
                         }
                     } => result,
-                };
-
-                match detected {
-                    Detected::Paid => {
-                        // Notify Dart: payment detected
-                        let _ = sink.add(MintQuote {
-                            id: quote.id.clone(),
-                            request: quote.request.clone(),
-                            amount: quote.amount.map(|a| a.into()),
-                            expiry: Some(quote.expiry),
-                            state: CdkMintQuoteState::Paid.into(),
-                            token: None,
-                            error: None,
-                            transaction_id: None,
-                        });
-
-                        // Mint the ecash tokens
-                        match _self
-                            .inner
-                            .mint(&quote.id, SplitTarget::None, None)
-                            .await
-                        {
-                            Ok(mint_proofs) => {
-                                let tx_id = match TransactionId::try_from(
-                                    mint_proofs.clone(),
-                                ) {
-                                    Ok(id) => Some(id.to_string()),
-                                    Err(e) => {
-                                        info!("Failed to compute mint tx ID: {e}");
-                                        None
-                                    }
-                                };
-
-                                let mint_amount =
-                                    mint_proofs.total_amount().unwrap_or_default();
-                                let _ = sink.add(MintQuote {
-                                    id: quote.id,
-                                    request: quote.request,
-                                    amount: Some(mint_amount.into()),
-                                    expiry: Some(quote.expiry),
-                                    state: CdkMintQuoteState::Issued.into(),
-                                    token: Token::try_from(CdkToken::new(
-                                        mint_url,
-                                        mint_proofs,
-                                        None,
-                                        unit,
-                                    ))
-                                    .ok(),
-                                    error: None,
-                                    transaction_id: tx_id,
-                                });
-                                _self.update_balance_streams().await;
-                            }
-                            Err(e) => {
-                                let _ = sink.add(MintQuote {
-                                    id: quote.id,
-                                    request: quote.request,
-                                    amount: quote.amount.map(|a| a.into()),
-                                    expiry: Some(quote.expiry),
-                                    state: MintQuoteState::Error,
-                                    token: None,
-                                    error: Some(e.to_string()),
-                                    transaction_id: None,
-                                });
-                            }
-                        }
-                    }
-                    Detected::Issued => {
-                        // Already issued (recovered from previous session)
-                        let _ = sink.add(MintQuote {
-                            id: quote.id.clone(),
-                            request: quote.request.clone(),
-                            amount: quote.amount.map(|a| a.into()),
-                            expiry: Some(quote.expiry),
-                            state: CdkMintQuoteState::Issued.into(),
-                            token: None,
-                            error: None,
-                            transaction_id: None,
-                        });
-                        _self.update_balance_streams().await;
-                    }
                 }
             })
             .await;
 
-            if result.is_err() {
-                // Timeout: quote expired
-                let _ = sink.add(MintQuote {
-                    id: expired_id,
-                    request: expired_request,
-                    amount: expired_amount.map(|a| a.into()),
-                    expiry: Some(expired_expiry),
-                    state: MintQuoteState::Error,
-                    token: None,
-                    error: Some("Quote expired".to_string()),
-                    transaction_id: None,
-                });
+            // Handle detection result — mint logic runs outside the timeout
+            match detected {
+                Err(_) => {
+                    // Timeout: quote expired
+                    let _ = sink.add(MintQuote {
+                        id: expired_id,
+                        request: expired_request,
+                        amount: expired_amount.map(|a| a.into()),
+                        expiry: Some(expired_expiry),
+                        state: MintQuoteState::Error,
+                        token: None,
+                        error: Some("Quote expired".to_string()),
+                        transaction_id: None,
+                    });
+                }
+                Ok(Detected::Paid) => {
+                    // Notify Dart: payment detected
+                    let _ = sink.add(MintQuote {
+                        id: quote.id.clone(),
+                        request: quote.request.clone(),
+                        amount: quote.amount.map(|a| a.into()),
+                        expiry: Some(quote.expiry),
+                        state: CdkMintQuoteState::Paid.into(),
+                        token: None,
+                        error: None,
+                        transaction_id: None,
+                    });
+
+                    // Mint the ecash tokens (outside timeout)
+                    match _self
+                        .inner
+                        .mint(&quote.id, SplitTarget::None, None)
+                        .await
+                    {
+                        Ok(mint_proofs) => {
+                            let tx_id = match TransactionId::try_from(
+                                mint_proofs.clone(),
+                            ) {
+                                Ok(id) => Some(id.to_string()),
+                                Err(e) => {
+                                    info!("Failed to compute mint tx ID: {e}");
+                                    None
+                                }
+                            };
+
+                            let mint_amount =
+                                mint_proofs.total_amount().unwrap_or_default();
+                            let _ = sink.add(MintQuote {
+                                id: quote.id,
+                                request: quote.request,
+                                amount: Some(mint_amount.into()),
+                                expiry: Some(quote.expiry),
+                                state: CdkMintQuoteState::Issued.into(),
+                                token: Token::try_from(CdkToken::new(
+                                    mint_url,
+                                    mint_proofs,
+                                    None,
+                                    unit,
+                                ))
+                                .ok(),
+                                error: None,
+                                transaction_id: tx_id,
+                            });
+                            _self.update_balance_streams().await;
+                        }
+                        Err(e) => {
+                            let _ = sink.add(MintQuote {
+                                id: quote.id,
+                                request: quote.request,
+                                amount: quote.amount.map(|a| a.into()),
+                                expiry: Some(quote.expiry),
+                                state: MintQuoteState::Error,
+                                token: None,
+                                error: Some(e.to_string()),
+                                transaction_id: None,
+                            });
+                        }
+                    }
+                }
+                Ok(Detected::Issued) => {
+                    // Already issued (recovered from previous session)
+                    let _ = sink.add(MintQuote {
+                        id: quote.id.clone(),
+                        request: quote.request.clone(),
+                        amount: quote.amount.map(|a| a.into()),
+                        expiry: Some(quote.expiry),
+                        state: CdkMintQuoteState::Issued.into(),
+                        token: None,
+                        error: None,
+                        transaction_id: None,
+                    });
+                    _self.update_balance_streams().await;
+                }
             }
         });
         Ok(())
