@@ -68,6 +68,10 @@ class WalletProvider extends ChangeNotifier {
   /// Caché de MintInfo por URL (nombre, logo, contactos, etc.)
   final Map<String, MintInfo> _mintInfoCache = {};
 
+  /// Caché del balance stream para evitar recrear StreamSink en cada build().
+  Stream<BigInt>? _cachedBalanceStream;
+  String? _cachedBalanceKey;
+
   /// Mint activo actualmente
   String? _activeMintUrl;
 
@@ -602,8 +606,21 @@ class WalletProvider extends ChangeNotifier {
   // ============================================================
 
   /// Stream de balance del wallet activo (reactivo).
+  /// Cacheado para que StreamBuilder reciba el mismo objeto entre rebuilds
+  /// y no mate el StreamSink de Rust.
   Stream<BigInt>? streamBalance() {
-    return activeWallet?.streamBalance();
+    final wallet = activeWallet;
+    if (wallet == null) {
+      _cachedBalanceStream = null;
+      _cachedBalanceKey = null;
+      return null;
+    }
+    final key = '$_activeMintUrl:$_activeUnit';
+    if (_cachedBalanceKey != key) {
+      _cachedBalanceStream = wallet.streamBalance().asBroadcastStream();
+      _cachedBalanceKey = key;
+    }
+    return _cachedBalanceStream;
   }
 
   /// Obtiene el balance del wallet activo.
@@ -1117,12 +1134,14 @@ class WalletProvider extends ChangeNotifier {
       _activeMintController!.close();
     }
 
-    // StreamController que la UI puede escuchar y cancelar libremente
-    final controller = StreamController<MintQuote>();
+    // StreamController que la UI puede escuchar y cancelar libremente.
+    // sync: true para no perder eventos rápidos (paid → issued en µs).
+    final controller = StreamController<MintQuote>(sync: true);
     _activeMintController = controller;
 
-    // Cancelar suscripción anterior si existe (await evita race de callbacks)
-    await _activeMintSubscription?.cancel();
+    // Cancelar suscripción anterior sin await: el task de Rust (polling + WS)
+    // puede tardar en cerrar y bloquearía la creación de una nueva factura.
+    _activeMintSubscription?.cancel();
     _activeMintSubscription = null;
 
     // Suscribirse al stream del CDK desde el provider (persiste sin UI)
@@ -1977,6 +1996,8 @@ class WalletProvider extends ChangeNotifier {
     if (_activeMintController != null && !_activeMintController!.isClosed) {
       _activeMintController!.close();
     }
+    _cachedBalanceStream = null;
+    _cachedBalanceKey = null;
     confettiController.dispose();
     super.dispose();
   }
