@@ -69,13 +69,7 @@ fn parse_payment_request_inner(encoded: String) -> Result<PaymentRequestInfo, Er
     let pr = CdkPaymentRequest::from_str(&creq_str)
         .map_err(|e| Error::Cdk(format!("Invalid payment request: {e}")))?;
 
-    let mints: Vec<String> = {
-        let mut v = Vec::new();
-        for m in &pr.mints {
-            v.push(format!("{}", m));
-        }
-        v
-    };
+    let mints: Vec<String> = pr.mints.iter().map(|m| m.to_string()).collect();
     let mut transports = Vec::new();
     for t in &pr.transports {
         transports.push(TransportInfo {

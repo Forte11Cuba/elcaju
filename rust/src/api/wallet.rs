@@ -528,7 +528,7 @@ impl Wallet {
 
     pub async fn is_token_spent(&self, token: Token) -> Result<bool, Error> {
         let token: CdkToken = token.try_into()?;
-        let mint_keysets = self.inner.get_mint_keysets(cdk::wallet::KeysetFilter::Active).await?;
+        let mint_keysets = self.inner.get_mint_keysets(cdk::wallet::KeysetFilter::All).await?;
         let proof_states = self
             .inner
             .check_proofs_spent(token.proofs(&mint_keysets)?)
