@@ -8,9 +8,9 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 # Cashu — acceso directo, sin intermediarios
-cdk = { version = "0.15.1", default-features = false, features = ["wallet", "nostr"] }
-cdk-common = { version = "0.15.1", default-features = false, features = ["nostr"] }
-cdk-sqlite = { version = "0.15.1", default-features = false, features = ["wallet"] }
+cdk = { version = "0.16.0", default-features = false, features = ["wallet", "nostr"] }
+cdk-common = { version = "0.16.0", default-features = false, features = ["nostr"] }
+cdk-sqlite = { version = "0.16.0", default-features = false, features = ["wallet"] }
 
 # Bridge Flutter <-> Rust
 flutter_rust_bridge = { version = "=2.11.1", default-features = false, features = [
@@ -31,7 +31,7 @@ bip39 = { version = "2.1", default-features = false, features = ["std"] }
 # Entropy
 getrandom = { version = "0.3", default-features = false, features = ["std"] }
 
-# Nostr keys (same version as CDK 0.15.1 — CDK does not re-export Keys)
+# Nostr keys (same version as CDK 0.16.0 — CDK does not re-export Keys)
 nostr-sdk = { version = "0.44.1", default-features = false, features = ["nip04", "nip44", "nip59"] }
 
 # Async runtime

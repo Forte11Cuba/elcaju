@@ -69,16 +69,7 @@ fn parse_payment_request_inner(encoded: String) -> Result<PaymentRequestInfo, Er
     let pr = CdkPaymentRequest::from_str(&creq_str)
         .map_err(|e| Error::Cdk(format!("Invalid payment request: {e}")))?;
 
-    let mints: Vec<String> = match &pr.mints {
-        Some(list) => {
-            let mut v = Vec::new();
-            for m in list {
-                v.push(format!("{}", m));
-            }
-            v
-        }
-        None => Vec::new(),
-    };
+    let mints: Vec<String> = pr.mints.iter().map(|m| m.to_string()).collect();
     let mut transports = Vec::new();
     for t in &pr.transports {
         transports.push(TransportInfo {
@@ -320,7 +311,7 @@ impl Wallet {
         let nostr_transport = Transport {
             _type: TransportType::Nostr,
             target: nprofile_bech32,
-            tags: Some(vec![vec!["n".to_string(), "17".to_string()]]),
+            tags: vec![vec!["n".to_string(), "17".to_string()]],
         };
 
         // Build the PaymentRequest with this wallet's mint and unit
@@ -336,7 +327,7 @@ impl Wallet {
             amount: params.amount.map(Amount::from),
             unit: Some(unit.clone()),
             single_use: Some(true),
-            mints: Some(vec![mint_url.clone()]),
+            mints: vec![mint_url.clone()],
             description: params.description,
             transports: vec![nostr_transport],
             nut10: None,

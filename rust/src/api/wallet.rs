@@ -155,7 +155,7 @@ impl Wallet {
         // Compute the deterministic transaction ID from the token's proofs
         // (SHA-256 of sorted Y values — same as CDK uses internally)
         // Best-effort: send is already committed, don't fail on ID computation
-        let tx_id = match self.inner.get_mint_keysets().await {
+        let tx_id = match self.inner.get_mint_keysets(cdk::wallet::KeysetFilter::Active).await {
             Ok(keysets) => match cdk_token.proofs(&keysets) {
                 Ok(proofs) => TransactionId::try_from(proofs)
                     .map(|id| id.to_string())
@@ -528,7 +528,7 @@ impl Wallet {
 
     pub async fn is_token_spent(&self, token: Token) -> Result<bool, Error> {
         let token: CdkToken = token.try_into()?;
-        let mint_keysets = self.inner.get_mint_keysets().await?;
+        let mint_keysets = self.inner.get_mint_keysets(cdk::wallet::KeysetFilter::All).await?;
         let proof_states = self
             .inner
             .check_proofs_spent(token.proofs(&mint_keysets)?)

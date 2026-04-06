@@ -368,6 +368,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dee39a0ee5b4095224a0cfc6bf4cc1baf0f9624b96b367e53b66d974e51d953"
 
 [[package]]
+name = "bitcoin-payment-instructions"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c300c948b2ff78c965ea3a613372352125448a22f1acf49e95e3878149824091"
+dependencies = [
+ "bitcoin",
+ "lightning",
+ "lightning-invoice",
+]
+
+[[package]]
 name = "bitcoin-private"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -489,9 +500,9 @@ checksum = "1e748733b7cbc798e1434b6ac524f0c1ff2ab456fe201501e6497c8417a4fc33"
 
 [[package]]
 name = "cashu"
-version = "0.15.1"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d612261d61069314bb0e39adbd63d0fd3bd22084f332e85c98e615c15f24e5a"
+checksum = "26b4ad04070fb67914feb2641e7b54001000f1f7f67a7c39a08f32edf01fd3ae"
 dependencies = [
  "bitcoin",
  "cbor-diag",
@@ -507,6 +518,7 @@ dependencies = [
  "strum_macros",
  "thiserror 2.0.18",
  "tracing",
+ "unicode-normalization",
  "url",
  "uuid",
  "web-time",
@@ -555,14 +567,15 @@ dependencies = [
 
 [[package]]
 name = "cdk"
-version = "0.15.1"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8955437beea95ee6849c6eab59012760a7589e6eeff4d6e36ebf324c641388d"
+checksum = "c6536eb1df7a497cb334edf6bb9eea1fa8e4a9b08c79fe45c40d43413ecb88c8"
 dependencies = [
  "anyhow",
  "arc-swap",
  "async-trait",
  "bitcoin",
+ "bitcoin-payment-instructions",
  "cbor-diag",
  "cdk-common",
  "cdk-signatory",
@@ -582,7 +595,6 @@ dependencies = [
  "serde_with",
  "thiserror 2.0.18",
  "tokio",
- "tokio-tungstenite",
  "tokio-util",
  "tracing",
  "url",
@@ -593,9 +605,9 @@ dependencies = [
 
 [[package]]
 name = "cdk-common"
-version = "0.15.1"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f5bf771d3780d2321211eb575e1f8341cec50f8a16c4f50b2787807b5090a38"
+checksum = "a371d218ffe83dcabd202278251af53744b8fa3e846124ddcd34247c4e38bdc3"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -606,6 +618,7 @@ dependencies = [
  "ciborium",
  "futures",
  "getrandom 0.2.17",
+ "jsonwebtoken",
  "lightning",
  "lightning-invoice",
  "parking_lot",
@@ -626,23 +639,31 @@ dependencies = [
 
 [[package]]
 name = "cdk-http-client"
-version = "0.15.1"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b58f47c4af4a4c862d145863211f5454c3ccfbacaaef9e4913276519a1ac498e"
+checksum = "bf194792d45975b360911417d3713e4d3f0142e18b082e2a8c2c88a91630b43d"
 dependencies = [
+ "futures",
+ "futures-channel",
+ "js-sys",
  "regex",
  "reqwest",
  "serde",
  "serde_json",
  "thiserror 2.0.18",
+ "tokio-tungstenite",
+ "tracing",
  "url",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]
 name = "cdk-signatory"
-version = "0.15.1"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dc1dca3b84999ac0e6fd15330d566aff6df6082a349134fd884deef8c9eeb570"
+checksum = "4f40745c9402049bbba47ae52e1fc7552d4af8e99572fd73697448f51bbb3a02"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -662,9 +683,9 @@ dependencies = [
 
 [[package]]
 name = "cdk-sql-common"
-version = "0.15.1"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6625a8248a43fbebb92cc57f1b09c453d5de94d62a512b62e9a62b25d0dd5506"
+checksum = "36e920cffaa36f396d16727649b05d6dc8d42aecc4108fa955876515149bdb0e"
 dependencies = [
  "async-trait",
  "bitcoin",
@@ -681,9 +702,9 @@ dependencies = [
 
 [[package]]
 name = "cdk-sqlite"
-version = "0.15.1"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9334877fe3f9fb25f6819c0876af1b0690f47aa2b1e548a20ac904740cbd574c"
+checksum = "c706b86b76d89bbbfad7e106328c14f1d99440ee5829840510e50922f48fdc51"
 dependencies = [
  "async-trait",
  "bitcoin",
@@ -1054,6 +1075,9 @@ name = "dnssec-prover"
 version = "0.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec4f825369fc7134da70ca4040fddc8e03b80a46d249ae38d9c1c39b7b4476bf"
+dependencies = [
+ "bitcoin_hashes 0.14.1",
+]
 
 [[package]]
 name = "dyn-clone"
