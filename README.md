@@ -214,7 +214,7 @@ flutter build apk --release --target-platform android-arm64
 │    flutter_rust_bridge v2.11.1 (FFI)    │
 ├─────────────────────────────────────────┤
 │        elcaju_core (Rust interno)       │
-│   CDK 0.15.1 + SQLite + BIP39 + Tokio  │
+│   CDK 0.16.0 + SQLite + BIP39 + Tokio  │
 └─────────────────────────────────────────┘
 ```
 
@@ -256,7 +256,7 @@ elcaju/
 │   │   └── scanner/               # QR scanner widget
 │   └── l10n/                      # 11 languages (354 translation keys)
 ├── rust/
-│   ├── Cargo.toml                 # elcaju_core: CDK 0.15.1, flutter_rust_bridge 2.11.1
+│   ├── Cargo.toml                 # elcaju_core: CDK 0.16.0, flutter_rust_bridge 2.11.1
 │   └── src/api/                   # wallet, token, keys, mint_info, error
 ├── rust_builder/                  # Cargokit integration (auto Rust compilation)
 ├── android/                       # Android config (NDK 27.0, NFC HCE service)
