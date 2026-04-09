@@ -559,5 +559,13 @@
   "requestPaymentReceived": "支払いを受け取りました",
   "requestDescriptionHint": "説明（任意）",
   "universal": "ユニバーサル",
-  "copiedToClipboard": "クリップボードにコピーしました"
+  "copiedToClipboard": "クリップボードにコピーしました",
+
+  "swap": "交換",
+  "swapDescription": "SatsとUSDを変換",
+  "swapFrom": "送信元",
+  "swapTo": "送信先",
+  "swapAction": "交換",
+  "swapEstimatedFee": "推定手数料",
+  "swapUseAll": "全額使用"
 }

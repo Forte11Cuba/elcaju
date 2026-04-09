@@ -559,5 +559,13 @@
   "requestPaymentReceived": "Pagamento ricevuto",
   "requestDescriptionHint": "Descrizione (opzionale)",
   "universal": "Universale",
-  "copiedToClipboard": "Copiato negli appunti"
+  "copiedToClipboard": "Copiato negli appunti",
+
+  "swap": "Scambia",
+  "swapDescription": "Converti tra sats e USD",
+  "swapFrom": "Da",
+  "swapTo": "A",
+  "swapAction": "Scambia",
+  "swapEstimatedFee": "Commissione stimata",
+  "swapUseAll": "Usa tutto"
 }

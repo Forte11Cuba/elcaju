@@ -1209,4 +1209,25 @@ class L10nKo extends L10n {
 
   @override
   String get copiedToClipboard => '클립보드에 복사되었습니다';
+
+  @override
+  String get swap => '교환';
+
+  @override
+  String get swapDescription => 'Sats와 USD 간 변환';
+
+  @override
+  String get swapFrom => '보내기';
+
+  @override
+  String get swapTo => '받기';
+
+  @override
+  String get swapAction => '교환';
+
+  @override
+  String get swapEstimatedFee => '예상 수수료';
+
+  @override
+  String get swapUseAll => '전액 사용';
 }

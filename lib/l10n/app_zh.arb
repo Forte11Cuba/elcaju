@@ -559,5 +559,13 @@
   "requestPaymentReceived": "已收到付款",
   "requestDescriptionHint": "描述（可选）",
   "universal": "通用",
-  "copiedToClipboard": "已复制到剪贴板"
+  "copiedToClipboard": "已复制到剪贴板",
+
+  "swap": "兑换",
+  "swapDescription": "在 Sats 和 USD 之间转换",
+  "swapFrom": "从",
+  "swapTo": "到",
+  "swapAction": "兑换",
+  "swapEstimatedFee": "预估手续费",
+  "swapUseAll": "全部使用"
 }

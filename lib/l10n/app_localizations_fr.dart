@@ -1246,4 +1246,25 @@ class L10nFr extends L10n {
 
   @override
   String get copiedToClipboard => 'Copié dans le presse-papiers';
+
+  @override
+  String get swap => 'Échanger';
+
+  @override
+  String get swapDescription => 'Convertir entre sats et USD';
+
+  @override
+  String get swapFrom => 'De';
+
+  @override
+  String get swapTo => 'Vers';
+
+  @override
+  String get swapAction => 'Échanger';
+
+  @override
+  String get swapEstimatedFee => 'Frais estimés';
+
+  @override
+  String get swapUseAll => 'Tout utiliser';
 }

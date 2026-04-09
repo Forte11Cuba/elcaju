@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 
 /// Servicio para obtener precios de Bitcoin usando Yadio API
@@ -86,4 +87,56 @@ class PriceService {
     // Retornar en centavos
     return BigInt.from((fiatAmount * 100).round());
   }
+
+  // --- Blink API (precios históricos) ---
+
+  static const _blinkUrl = 'https://api.blink.sv/graphql';
+
+  /// Obtiene precios históricos de BTC desde Blink API.
+  /// range: ONE_DAY, ONE_WEEK, ONE_MONTH, ONE_YEAR, FIVE_YEARS
+  static Future<List<PricePoint>> getHistoricalPrices({
+    String range = 'ONE_DAY',
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(_blinkUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'query':
+              'query { btcPriceList(range: $range) { price { base offset } timestamp } }',
+        }),
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode != 200) {
+        throw Exception('Error HTTP: ${response.statusCode}');
+      }
+
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final data = json['data'] as Map<String, dynamic>?;
+      if (data == null) throw Exception('No data in response');
+
+      final list = data['btcPriceList'] as List? ?? [];
+
+      return list.map((point) {
+        final price = point['price'] as Map<String, dynamic>;
+        final base = (price['base'] as num).toDouble();
+        final offset = (price['offset'] as num).toInt();
+        // base / 10^offset = USD cents → /100 = USD
+        final priceUsd = base / pow(10, offset) / 100;
+        final timestamp = (point['timestamp'] as num).toInt();
+
+        return PricePoint(timestamp: timestamp, priceUsd: priceUsd);
+      }).toList();
+    } catch (e) {
+      throw Exception('Error obteniendo precios históricos: $e');
+    }
+  }
+}
+
+/// Punto de precio histórico de BTC
+class PricePoint {
+  final int timestamp;
+  final double priceUsd;
+
+  PricePoint({required this.timestamp, required this.priceUsd});
 }

@@ -1241,4 +1241,25 @@ class L10nDe extends L10n {
 
   @override
   String get copiedToClipboard => 'In die Zwischenablage kopiert';
+
+  @override
+  String get swap => 'Tauschen';
+
+  @override
+  String get swapDescription => 'Zwischen Sats und USD wechseln';
+
+  @override
+  String get swapFrom => 'Von';
+
+  @override
+  String get swapTo => 'Nach';
+
+  @override
+  String get swapAction => 'Tauschen';
+
+  @override
+  String get swapEstimatedFee => 'Geschätzte Gebühr';
+
+  @override
+  String get swapUseAll => 'Alles verwenden';
 }

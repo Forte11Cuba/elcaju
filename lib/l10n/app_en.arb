@@ -452,5 +452,13 @@
   "requestPaymentReceived": "Payment received",
   "requestDescriptionHint": "Description (optional)",
   "universal": "Universal",
-  "copiedToClipboard": "Copied to clipboard"
+  "copiedToClipboard": "Copied to clipboard",
+
+  "swap": "Swap",
+  "swapDescription": "Convert between sats and USD",
+  "swapFrom": "From",
+  "swapTo": "To",
+  "swapAction": "Swap",
+  "swapEstimatedFee": "Estimated fee",
+  "swapUseAll": "Use all"
 }

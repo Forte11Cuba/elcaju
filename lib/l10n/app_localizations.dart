@@ -2352,6 +2352,48 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'Copiado al portapapeles'**
   String get copiedToClipboard;
+
+  /// No description provided for @swap.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar'**
+  String get swap;
+
+  /// No description provided for @swapDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Convertir entre sats y USD'**
+  String get swapDescription;
+
+  /// No description provided for @swapFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'De'**
+  String get swapFrom;
+
+  /// No description provided for @swapTo.
+  ///
+  /// In es, this message translates to:
+  /// **'A'**
+  String get swapTo;
+
+  /// No description provided for @swapAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar'**
+  String get swapAction;
+
+  /// No description provided for @swapEstimatedFee.
+  ///
+  /// In es, this message translates to:
+  /// **'Fee estimado'**
+  String get swapEstimatedFee;
+
+  /// No description provided for @swapUseAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar todo'**
+  String get swapUseAll;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

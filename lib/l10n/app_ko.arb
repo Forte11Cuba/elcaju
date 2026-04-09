@@ -559,5 +559,13 @@
   "requestPaymentReceived": "결제가 수신되었습니다",
   "requestDescriptionHint": "설명 (선택사항)",
   "universal": "유니버설",
-  "copiedToClipboard": "클립보드에 복사되었습니다"
+  "copiedToClipboard": "클립보드에 복사되었습니다",
+
+  "swap": "교환",
+  "swapDescription": "Sats와 USD 간 변환",
+  "swapFrom": "보내기",
+  "swapTo": "받기",
+  "swapAction": "교환",
+  "swapEstimatedFee": "예상 수수료",
+  "swapUseAll": "전액 사용"
 }

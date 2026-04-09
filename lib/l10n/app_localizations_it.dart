@@ -1234,4 +1234,25 @@ class L10nIt extends L10n {
 
   @override
   String get copiedToClipboard => 'Copiato negli appunti';
+
+  @override
+  String get swap => 'Scambia';
+
+  @override
+  String get swapDescription => 'Converti tra sats e USD';
+
+  @override
+  String get swapFrom => 'Da';
+
+  @override
+  String get swapTo => 'A';
+
+  @override
+  String get swapAction => 'Scambia';
+
+  @override
+  String get swapEstimatedFee => 'Commissione stimata';
+
+  @override
+  String get swapUseAll => 'Usa tutto';
 }

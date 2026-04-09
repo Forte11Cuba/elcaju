@@ -1207,4 +1207,25 @@ class L10nJa extends L10n {
 
   @override
   String get copiedToClipboard => 'クリップボードにコピーしました';
+
+  @override
+  String get swap => '交換';
+
+  @override
+  String get swapDescription => 'SatsとUSDを変換';
+
+  @override
+  String get swapFrom => '送信元';
+
+  @override
+  String get swapTo => '送信先';
+
+  @override
+  String get swapAction => '交換';
+
+  @override
+  String get swapEstimatedFee => '推定手数料';
+
+  @override
+  String get swapUseAll => '全額使用';
 }

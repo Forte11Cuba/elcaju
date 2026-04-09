@@ -1230,4 +1230,25 @@ class L10nEs extends L10n {
 
   @override
   String get copiedToClipboard => 'Copiado al portapapeles';
+
+  @override
+  String get swap => 'Cambiar';
+
+  @override
+  String get swapDescription => 'Convertir entre sats y USD';
+
+  @override
+  String get swapFrom => 'De';
+
+  @override
+  String get swapTo => 'A';
+
+  @override
+  String get swapAction => 'Cambiar';
+
+  @override
+  String get swapEstimatedFee => 'Fee estimado';
+
+  @override
+  String get swapUseAll => 'Usar todo';
 }

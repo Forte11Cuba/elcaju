@@ -559,5 +559,13 @@
   "requestPaymentReceived": "Zahlung erhalten",
   "requestDescriptionHint": "Beschreibung (optional)",
   "universal": "Universal",
-  "copiedToClipboard": "In die Zwischenablage kopiert"
+  "copiedToClipboard": "In die Zwischenablage kopiert",
+
+  "swap": "Tauschen",
+  "swapDescription": "Zwischen Sats und USD wechseln",
+  "swapFrom": "Von",
+  "swapTo": "Nach",
+  "swapAction": "Tauschen",
+  "swapEstimatedFee": "Geschätzte Gebühr",
+  "swapUseAll": "Alles verwenden"
 }
