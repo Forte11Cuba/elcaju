@@ -1241,4 +1241,47 @@ class L10nDe extends L10n {
 
   @override
   String get copiedToClipboard => 'In die Zwischenablage kopiert';
+
+  @override
+  String get swap => 'Tauschen';
+
+  @override
+  String get swapDescription => 'Zwischen Sats und USD wechseln';
+
+  @override
+  String get swapFrom => 'Von';
+
+  @override
+  String get swapTo => 'Nach';
+
+  @override
+  String get swapAction => 'Tauschen';
+
+  @override
+  String get swapEstimatedFee => 'Geschätzte Gebühr';
+
+  @override
+  String get swapUseAll => 'Alles verwenden';
+
+  @override
+  String swapMinimum(String amount) {
+    return 'Minimum: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'Swap wird verarbeitet...';
+
+  @override
+  String get swapSuccess => 'Swap abgeschlossen';
+
+  @override
+  String get swapErrorInsufficient => 'Unzureichendes Guthaben';
+
+  @override
+  String get swapErrorExpired => 'Angebot abgelaufen';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'Swap-Fehler: $error';
+  }
 }

@@ -559,5 +559,19 @@
   "requestPaymentReceived": "已收到付款",
   "requestDescriptionHint": "描述（可选）",
   "universal": "通用",
-  "copiedToClipboard": "已复制到剪贴板"
+  "copiedToClipboard": "已复制到剪贴板",
+
+  "swap": "兑换",
+  "swapDescription": "在 Sats 和 USD 之间转换",
+  "swapFrom": "从",
+  "swapTo": "到",
+  "swapAction": "兑换",
+  "swapEstimatedFee": "预估手续费",
+  "swapUseAll": "全部使用",
+  "swapMinimum": "最低: {amount}",
+  "swapProcessing": "兑换处理中...",
+  "swapSuccess": "兑换完成",
+  "swapErrorInsufficient": "余额不足",
+  "swapErrorExpired": "报价已过期",
+  "swapErrorGeneric": "兑换错误: {error}"
 }

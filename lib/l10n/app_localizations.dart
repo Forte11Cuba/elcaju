@@ -2352,6 +2352,84 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'Copiado al portapapeles'**
   String get copiedToClipboard;
+
+  /// No description provided for @swap.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar'**
+  String get swap;
+
+  /// No description provided for @swapDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Convertir entre sats y USD'**
+  String get swapDescription;
+
+  /// No description provided for @swapFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'De'**
+  String get swapFrom;
+
+  /// No description provided for @swapTo.
+  ///
+  /// In es, this message translates to:
+  /// **'A'**
+  String get swapTo;
+
+  /// No description provided for @swapAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar'**
+  String get swapAction;
+
+  /// No description provided for @swapEstimatedFee.
+  ///
+  /// In es, this message translates to:
+  /// **'Fee estimado'**
+  String get swapEstimatedFee;
+
+  /// No description provided for @swapUseAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar todo'**
+  String get swapUseAll;
+
+  /// No description provided for @swapMinimum.
+  ///
+  /// In es, this message translates to:
+  /// **'Mínimo: {amount}'**
+  String swapMinimum(String amount);
+
+  /// No description provided for @swapProcessing.
+  ///
+  /// In es, this message translates to:
+  /// **'Procesando swap...'**
+  String get swapProcessing;
+
+  /// No description provided for @swapSuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Swap completado'**
+  String get swapSuccess;
+
+  /// No description provided for @swapErrorInsufficient.
+  ///
+  /// In es, this message translates to:
+  /// **'Saldo insuficiente'**
+  String get swapErrorInsufficient;
+
+  /// No description provided for @swapErrorExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'La cotización ha expirado'**
+  String get swapErrorExpired;
+
+  /// No description provided for @swapErrorGeneric.
+  ///
+  /// In es, this message translates to:
+  /// **'Error en el swap: {error}'**
+  String swapErrorGeneric(String error);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

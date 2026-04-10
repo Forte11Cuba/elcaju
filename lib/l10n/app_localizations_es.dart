@@ -1230,4 +1230,47 @@ class L10nEs extends L10n {
 
   @override
   String get copiedToClipboard => 'Copiado al portapapeles';
+
+  @override
+  String get swap => 'Cambiar';
+
+  @override
+  String get swapDescription => 'Convertir entre sats y USD';
+
+  @override
+  String get swapFrom => 'De';
+
+  @override
+  String get swapTo => 'A';
+
+  @override
+  String get swapAction => 'Cambiar';
+
+  @override
+  String get swapEstimatedFee => 'Fee estimado';
+
+  @override
+  String get swapUseAll => 'Usar todo';
+
+  @override
+  String swapMinimum(String amount) {
+    return 'Mínimo: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'Procesando swap...';
+
+  @override
+  String get swapSuccess => 'Swap completado';
+
+  @override
+  String get swapErrorInsufficient => 'Saldo insuficiente';
+
+  @override
+  String get swapErrorExpired => 'La cotización ha expirado';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'Error en el swap: $error';
+  }
 }

@@ -15,6 +15,7 @@ import '../2_onboarding/backup_seed_screen.dart';
 import 'mints_screen.dart';
 import 'language_screen.dart';
 import 'p2pk_keys_screen.dart';
+import '../13_swap/swap_screen.dart';
 
 /// Pantalla de configuración
 class SettingsScreen extends StatefulWidget {
@@ -78,6 +79,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildSectionHeader(l10n.walletSection),
                     const SizedBox(height: AppDimensions.paddingSmall),
                     _buildSettingTile(
+                      icon: LucideIcons.arrowLeftRight,
+                      title: l10n.swap,
+                      subtitle: l10n.swapDescription,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SwapScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildSettingTile(
                       icon: LucideIcons.key,
                       title: l10n.backupSeedPhrase,
                       subtitle: l10n.viewRecoveryWords,
@@ -110,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     _buildSettingTile(
-                      icon: LucideIcons.refreshCw,
+                      icon: LucideIcons.searchCode,
                       title: l10n.recoverTokens,
                       subtitle: l10n.scanMintsWithSeed,
                       onTap: () => _showRecoverTokensDialog(context, settingsProvider),

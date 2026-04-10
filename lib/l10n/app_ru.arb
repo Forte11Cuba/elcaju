@@ -559,5 +559,19 @@
   "requestPaymentReceived": "Платёж получен",
   "requestDescriptionHint": "Описание (необязательно)",
   "universal": "Универсальный",
-  "copiedToClipboard": "Скопировано в буфер обмена"
+  "copiedToClipboard": "Скопировано в буфер обмена",
+
+  "swap": "Обменять",
+  "swapDescription": "Конвертировать между sats и USD",
+  "swapFrom": "Из",
+  "swapTo": "В",
+  "swapAction": "Обменять",
+  "swapEstimatedFee": "Ориентировочная комиссия",
+  "swapUseAll": "Использовать всё",
+  "swapMinimum": "Минимум: {amount}",
+  "swapProcessing": "Обработка обмена...",
+  "swapSuccess": "Обмен завершён",
+  "swapErrorInsufficient": "Недостаточный баланс",
+  "swapErrorExpired": "Котировка истекла",
+  "swapErrorGeneric": "Ошибка обмена: {error}"
 }

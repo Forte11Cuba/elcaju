@@ -1537,6 +1537,58 @@ class WalletProvider extends ChangeNotifier {
     }
   }
 
+  /// Guarda metadata para el lado melt (enviado) de un swap.
+  /// Busca la tx outgoing más reciente que coincida con el monto.
+  Future<void> saveSwapMeltMetadata(Wallet wallet, String invoice, BigInt amount) async {
+    try {
+      final txs = await wallet.listTransactions(
+        direction: TransactionDirection.outgoing,
+      );
+      final tx = txs.cast<Transaction?>().firstWhere(
+        (t) => t!.amount == amount && !_txMetaStorage.has(t.id),
+        orElse: () => null,
+      );
+      if (tx != null) {
+        await _txMetaStorage.save(
+          tx.id,
+          TransactionMeta(type: TransactionType.lightning, invoice: invoice),
+        );
+        debugPrint('Swap melt metadata guardada para tx ${tx.id}');
+      } else {
+        debugPrint('No matching untagged outgoing tx found for amount $amount');
+      }
+    } catch (e) {
+      debugPrint('Error guardando swap melt metadata: $e');
+    }
+    notifyListeners();
+  }
+
+  /// Guarda metadata para el lado mint (recibido) de un swap.
+  /// Busca la tx incoming más reciente que coincida con el monto.
+  Future<void> saveSwapMintMetadata(Wallet wallet, String invoice, BigInt amount) async {
+    try {
+      final txs = await wallet.listTransactions(
+        direction: TransactionDirection.incoming,
+      );
+      final tx = txs.cast<Transaction?>().firstWhere(
+        (t) => t!.amount == amount && !_txMetaStorage.has(t.id),
+        orElse: () => null,
+      );
+      if (tx != null) {
+        await _txMetaStorage.save(
+          tx.id,
+          TransactionMeta(type: TransactionType.lightning, invoice: invoice),
+        );
+        debugPrint('Swap mint metadata guardada para tx ${tx.id}');
+      } else {
+        debugPrint('No matching untagged incoming tx found for amount $amount');
+      }
+    } catch (e) {
+      debugPrint('Error guardando swap mint metadata: $e');
+    }
+    notifyListeners();
+  }
+
   // ============================================================
   // HISTORIAL
   // ============================================================

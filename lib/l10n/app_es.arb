@@ -572,5 +572,29 @@
   "requestPaymentReceived": "Pago recibido",
   "requestDescriptionHint": "Descripción (opcional)",
   "universal": "Universal",
-  "copiedToClipboard": "Copiado al portapapeles"
+  "copiedToClipboard": "Copiado al portapapeles",
+
+  "swap": "Cambiar",
+  "swapDescription": "Convertir entre sats y USD",
+  "swapFrom": "De",
+  "swapTo": "A",
+  "swapAction": "Cambiar",
+  "swapEstimatedFee": "Fee estimado",
+  "swapUseAll": "Usar todo",
+  "swapMinimum": "Mínimo: {amount}",
+  "@swapMinimum": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "swapProcessing": "Procesando swap...",
+  "swapSuccess": "Swap completado",
+  "swapErrorInsufficient": "Saldo insuficiente",
+  "swapErrorExpired": "La cotización ha expirado",
+  "swapErrorGeneric": "Error en el swap: {error}",
+  "@swapErrorGeneric": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  }
 }

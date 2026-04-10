@@ -1207,4 +1207,47 @@ class L10nJa extends L10n {
 
   @override
   String get copiedToClipboard => 'クリップボードにコピーしました';
+
+  @override
+  String get swap => '交換';
+
+  @override
+  String get swapDescription => 'SatsとUSDを変換';
+
+  @override
+  String get swapFrom => '送信元';
+
+  @override
+  String get swapTo => '送信先';
+
+  @override
+  String get swapAction => '交換';
+
+  @override
+  String get swapEstimatedFee => '推定手数料';
+
+  @override
+  String get swapUseAll => '全額使用';
+
+  @override
+  String swapMinimum(String amount) {
+    return '最小: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'スワップ処理中...';
+
+  @override
+  String get swapSuccess => 'スワップ完了';
+
+  @override
+  String get swapErrorInsufficient => '残高不足';
+
+  @override
+  String get swapErrorExpired => '見積もりの有効期限切れ';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'スワップエラー: $error';
+  }
 }

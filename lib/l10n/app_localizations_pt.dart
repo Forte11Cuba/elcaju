@@ -1234,4 +1234,47 @@ class L10nPt extends L10n {
 
   @override
   String get copiedToClipboard => 'Copiado para a área de transferência';
+
+  @override
+  String get swap => 'Trocar';
+
+  @override
+  String get swapDescription => 'Converter entre sats e USD';
+
+  @override
+  String get swapFrom => 'De';
+
+  @override
+  String get swapTo => 'Para';
+
+  @override
+  String get swapAction => 'Trocar';
+
+  @override
+  String get swapEstimatedFee => 'Taxa estimada';
+
+  @override
+  String get swapUseAll => 'Usar tudo';
+
+  @override
+  String swapMinimum(String amount) {
+    return 'Mínimo: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'Processando swap...';
+
+  @override
+  String get swapSuccess => 'Swap concluído';
+
+  @override
+  String get swapErrorInsufficient => 'Saldo insuficiente';
+
+  @override
+  String get swapErrorExpired => 'A cotação expirou';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'Erro no swap: $error';
+  }
 }

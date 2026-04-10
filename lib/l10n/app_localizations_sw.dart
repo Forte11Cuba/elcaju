@@ -1231,4 +1231,47 @@ class L10nSw extends L10n {
 
   @override
   String get copiedToClipboard => 'Imenakiliwa kwenye ubao wa kunakili';
+
+  @override
+  String get swap => 'Badilisha';
+
+  @override
+  String get swapDescription => 'Badilisha kati ya sats na USD';
+
+  @override
+  String get swapFrom => 'Kutoka';
+
+  @override
+  String get swapTo => 'Kwenda';
+
+  @override
+  String get swapAction => 'Badilisha';
+
+  @override
+  String get swapEstimatedFee => 'Ada inayokadiriwa';
+
+  @override
+  String get swapUseAll => 'Tumia yote';
+
+  @override
+  String swapMinimum(String amount) {
+    return 'Kiwango cha chini: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'Inashughulikia ubadilishaji...';
+
+  @override
+  String get swapSuccess => 'Ubadilishaji umekamilika';
+
+  @override
+  String get swapErrorInsufficient => 'Salio haitoshi';
+
+  @override
+  String get swapErrorExpired => 'Bei imeisha muda';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'Kosa la ubadilishaji: $error';
+  }
 }

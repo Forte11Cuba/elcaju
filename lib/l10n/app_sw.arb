@@ -559,5 +559,19 @@
   "requestPaymentReceived": "Malipo limepokelewa",
   "requestDescriptionHint": "Maelezo (si lazima)",
   "universal": "Universal",
-  "copiedToClipboard": "Imenakiliwa kwenye ubao wa kunakili"
+  "copiedToClipboard": "Imenakiliwa kwenye ubao wa kunakili",
+
+  "swap": "Badilisha",
+  "swapDescription": "Badilisha kati ya sats na USD",
+  "swapFrom": "Kutoka",
+  "swapTo": "Kwenda",
+  "swapAction": "Badilisha",
+  "swapEstimatedFee": "Ada inayokadiriwa",
+  "swapUseAll": "Tumia yote",
+  "swapMinimum": "Kiwango cha chini: {amount}",
+  "swapProcessing": "Inashughulikia ubadilishaji...",
+  "swapSuccess": "Ubadilishaji umekamilika",
+  "swapErrorInsufficient": "Salio haitoshi",
+  "swapErrorExpired": "Bei imeisha muda",
+  "swapErrorGeneric": "Kosa la ubadilishaji: {error}"
 }

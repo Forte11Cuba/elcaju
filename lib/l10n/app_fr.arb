@@ -559,5 +559,19 @@
   "requestPaymentReceived": "Paiement reçu",
   "requestDescriptionHint": "Description (facultatif)",
   "universal": "Universel",
-  "copiedToClipboard": "Copié dans le presse-papiers"
+  "copiedToClipboard": "Copié dans le presse-papiers",
+
+  "swap": "Échanger",
+  "swapDescription": "Convertir entre sats et USD",
+  "swapFrom": "De",
+  "swapTo": "Vers",
+  "swapAction": "Échanger",
+  "swapEstimatedFee": "Frais estimés",
+  "swapUseAll": "Tout utiliser",
+  "swapMinimum": "Minimum : {amount}",
+  "swapProcessing": "Swap en cours...",
+  "swapSuccess": "Swap terminé",
+  "swapErrorInsufficient": "Solde insuffisant",
+  "swapErrorExpired": "Le devis a expiré",
+  "swapErrorGeneric": "Erreur de swap : {error}"
 }

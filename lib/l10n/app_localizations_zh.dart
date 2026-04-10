@@ -1202,4 +1202,47 @@ class L10nZh extends L10n {
 
   @override
   String get copiedToClipboard => '已复制到剪贴板';
+
+  @override
+  String get swap => '兑换';
+
+  @override
+  String get swapDescription => '在 Sats 和 USD 之间转换';
+
+  @override
+  String get swapFrom => '从';
+
+  @override
+  String get swapTo => '到';
+
+  @override
+  String get swapAction => '兑换';
+
+  @override
+  String get swapEstimatedFee => '预估手续费';
+
+  @override
+  String get swapUseAll => '全部使用';
+
+  @override
+  String swapMinimum(String amount) {
+    return '最低: $amount';
+  }
+
+  @override
+  String get swapProcessing => '兑换处理中...';
+
+  @override
+  String get swapSuccess => '兑换完成';
+
+  @override
+  String get swapErrorInsufficient => '余额不足';
+
+  @override
+  String get swapErrorExpired => '报价已过期';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return '兑换错误: $error';
+  }
 }

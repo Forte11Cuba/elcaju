@@ -1230,4 +1230,47 @@ class L10nRu extends L10n {
 
   @override
   String get copiedToClipboard => 'Скопировано в буфер обмена';
+
+  @override
+  String get swap => 'Обменять';
+
+  @override
+  String get swapDescription => 'Конвертировать между sats и USD';
+
+  @override
+  String get swapFrom => 'Из';
+
+  @override
+  String get swapTo => 'В';
+
+  @override
+  String get swapAction => 'Обменять';
+
+  @override
+  String get swapEstimatedFee => 'Ориентировочная комиссия';
+
+  @override
+  String get swapUseAll => 'Использовать всё';
+
+  @override
+  String swapMinimum(String amount) {
+    return 'Минимум: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'Обработка обмена...';
+
+  @override
+  String get swapSuccess => 'Обмен завершён';
+
+  @override
+  String get swapErrorInsufficient => 'Недостаточный баланс';
+
+  @override
+  String get swapErrorExpired => 'Котировка истекла';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'Ошибка обмена: $error';
+  }
 }
