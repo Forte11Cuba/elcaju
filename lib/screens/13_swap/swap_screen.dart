@@ -283,9 +283,18 @@ class _SwapScreenState extends State<SwapScreen>
       _mintSubscription = destWallet.mint(
         amount: destAmount,
       ).listen(
-        (quote) {
+        (quote) async {
           if (quote.state == MintQuoteState.unpaid && !completer.isCompleted) {
             completer.complete(quote.request);
+          }
+          if (quote.state == MintQuoteState.issued) {
+            final wp = context.read<WalletProvider>();
+            await wp.saveSwapMintMetadata(
+              destWallet, quote.request, destAmount,
+            );
+            if (mounted) _loadBalances();
+            _mintSubscription?.cancel();
+            _mintSubscription = null;
           }
           if (quote.state == MintQuoteState.error && !completer.isCompleted) {
             completer.completeError(
@@ -296,9 +305,20 @@ class _SwapScreenState extends State<SwapScreen>
         onError: (e) {
           if (!completer.isCompleted) completer.completeError(e);
         },
+        onDone: () {
+          if (!completer.isCompleted) {
+            completer.completeError(Exception('Mint quote stream closed unexpectedly'));
+          }
+        },
       );
 
-      invoice = await completer.future;
+      invoice = await completer.future.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () {
+          _mintSubscription?.cancel();
+          throw Exception('Mint quote creation timed out');
+        },
+      );
 
       // 3. Obtener melt quote en wallet origen → fee
       final meltQuote = await srcWallet.meltQuote(request: invoice);
@@ -525,7 +545,8 @@ class _SwapScreenState extends State<SwapScreen>
         srcWallet, invoice, meltQuote.amount,
       );
 
-      _mintSubscription?.cancel();
+      // No cancelar _mintSubscription: el listener espera el estado
+      // `issued` para guardar metadata del mint y recargar balances.
 
       if (!mounted) return;
 
@@ -534,15 +555,6 @@ class _SwapScreenState extends State<SwapScreen>
       if (!mounted) return;
 
       walletProvider.confettiController.fire();
-
-      // En background: esperar a que CDK procese el mint,
-      // guardar metadata del lado recibido y recargar balances
-      Future.delayed(const Duration(seconds: 3), () async {
-        await walletProvider.saveSwapMintMetadata(
-          destWallet, invoice, destAmount,
-        );
-        if (mounted) _loadBalances();
-      });
 
       // Limpiar campos
       _isUpdating = true;
@@ -564,6 +576,8 @@ class _SwapScreenState extends State<SwapScreen>
         ),
       );
     } catch (e) {
+      _mintSubscription?.cancel();
+      _mintSubscription = null;
       if (!mounted) return;
       final errorStr = e.toString().toLowerCase();
       setState(() {
@@ -576,9 +590,6 @@ class _SwapScreenState extends State<SwapScreen>
           _swapError = l10n.swapErrorGeneric(e.toString());
         }
       });
-    } finally {
-      _mintSubscription?.cancel();
-      _mintSubscription = null;
     }
   }
 

@@ -1546,7 +1546,7 @@ class WalletProvider extends ChangeNotifier {
       );
       final tx = txs.cast<Transaction?>().firstWhere(
         (t) => t!.amount == amount && !_txMetaStorage.has(t.id),
-        orElse: () => txs.isNotEmpty ? txs.first : null,
+        orElse: () => null,
       );
       if (tx != null) {
         await _txMetaStorage.save(
@@ -1554,6 +1554,8 @@ class WalletProvider extends ChangeNotifier {
           TransactionMeta(type: TransactionType.lightning, invoice: invoice),
         );
         debugPrint('Swap melt metadata guardada para tx ${tx.id}');
+      } else {
+        debugPrint('No matching untagged outgoing tx found for amount $amount');
       }
     } catch (e) {
       debugPrint('Error guardando swap melt metadata: $e');
@@ -1570,7 +1572,7 @@ class WalletProvider extends ChangeNotifier {
       );
       final tx = txs.cast<Transaction?>().firstWhere(
         (t) => t!.amount == amount && !_txMetaStorage.has(t.id),
-        orElse: () => txs.isNotEmpty ? txs.first : null,
+        orElse: () => null,
       );
       if (tx != null) {
         await _txMetaStorage.save(
@@ -1578,10 +1580,13 @@ class WalletProvider extends ChangeNotifier {
           TransactionMeta(type: TransactionType.lightning, invoice: invoice),
         );
         debugPrint('Swap mint metadata guardada para tx ${tx.id}');
+      } else {
+        debugPrint('No matching untagged incoming tx found for amount $amount');
       }
     } catch (e) {
       debugPrint('Error guardando swap mint metadata: $e');
     }
+    notifyListeners();
   }
 
   // ============================================================
