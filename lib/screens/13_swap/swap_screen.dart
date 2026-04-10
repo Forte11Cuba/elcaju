@@ -161,11 +161,11 @@ class _SwapScreenState extends State<SwapScreen>
       String result;
       if (sourceIsSats) {
         final sats = int.tryParse(text) ?? 0;
-        final usd = sats / 100000000 * btcPrice;
-        result = usd == 0 ? '' : usd.toStringAsFixed(2);
+        final cents = ((sats / 100000000) * btcPrice * 100).floor();
+        result = cents == 0 ? '' : (cents / 100).toStringAsFixed(2);
       } else {
         final usd = double.tryParse(text) ?? 0;
-        final sats = (usd / btcPrice * 100000000).round();
+        final sats = (usd / btcPrice * 100000000).floor();
         result = sats == 0 ? '' : sats.toString();
       }
 
