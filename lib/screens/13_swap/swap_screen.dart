@@ -80,7 +80,7 @@ class _SwapScreenState extends State<SwapScreen>
 
   Future<void> _loadBalances() async {
     final walletProvider = context.read<WalletProvider>();
-    final mintUrl = walletProvider.activeMintUrl;
+    final mintUrl = WalletProvider.cubaBitcoinMint;
     if (mintUrl == null) return;
 
     try {
@@ -262,7 +262,7 @@ class _SwapScreenState extends State<SwapScreen>
   /// muestra fee en modal de confirmación.
   Future<void> _startSwap() async {
     final walletProvider = context.read<WalletProvider>();
-    final mintUrl = walletProvider.activeMintUrl;
+    final mintUrl = WalletProvider.cubaBitcoinMint;
     if (mintUrl == null) return;
 
     final destAmount = _getDestAmount();
@@ -372,6 +372,8 @@ class _SwapScreenState extends State<SwapScreen>
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isDismissible: false,
+      enableDrag: false,
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(AppDimensions.paddingMedium),
         decoration: BoxDecoration(
@@ -614,13 +616,27 @@ class _SwapScreenState extends State<SwapScreen>
             icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
-          title: Text(
-            l10n.swap,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.swap,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                WalletProvider.cubaBitcoinMint.replaceFirst('https://', ''),
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textSecondary.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
           ),
         ),
         body: SafeArea(
