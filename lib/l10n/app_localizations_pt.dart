@@ -1255,4 +1255,26 @@ class L10nPt extends L10n {
 
   @override
   String get swapUseAll => 'Usar tudo';
+
+  @override
+  String swapMinimum(String amount) {
+    return 'Mínimo: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'Processando swap...';
+
+  @override
+  String get swapSuccess => 'Swap concluído';
+
+  @override
+  String get swapErrorInsufficient => 'Saldo insuficiente';
+
+  @override
+  String get swapErrorExpired => 'A cotação expirou';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'Erro no swap: $error';
+  }
 }

@@ -567,5 +567,11 @@
   "swapTo": "Kwenda",
   "swapAction": "Badilisha",
   "swapEstimatedFee": "Ada inayokadiriwa",
-  "swapUseAll": "Tumia yote"
+  "swapUseAll": "Tumia yote",
+  "swapMinimum": "Kiwango cha chini: {amount}",
+  "swapProcessing": "Inashughulikia ubadilishaji...",
+  "swapSuccess": "Ubadilishaji umekamilika",
+  "swapErrorInsufficient": "Salio haitoshi",
+  "swapErrorExpired": "Bei imeisha muda",
+  "swapErrorGeneric": "Kosa la ubadilishaji: {error}"
 }

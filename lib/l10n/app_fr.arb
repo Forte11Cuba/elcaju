@@ -567,5 +567,11 @@
   "swapTo": "Vers",
   "swapAction": "Échanger",
   "swapEstimatedFee": "Frais estimés",
-  "swapUseAll": "Tout utiliser"
+  "swapUseAll": "Tout utiliser",
+  "swapMinimum": "Minimum : {amount}",
+  "swapProcessing": "Swap en cours...",
+  "swapSuccess": "Swap terminé",
+  "swapErrorInsufficient": "Solde insuffisant",
+  "swapErrorExpired": "Le devis a expiré",
+  "swapErrorGeneric": "Erreur de swap : {error}"
 }

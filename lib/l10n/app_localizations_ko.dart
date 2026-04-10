@@ -1217,10 +1217,10 @@ class L10nKo extends L10n {
   String get swapDescription => 'Sats와 USD 간 변환';
 
   @override
-  String get swapFrom => '보내기';
+  String get swapFrom => '에서';
 
   @override
-  String get swapTo => '받기';
+  String get swapTo => '으로';
 
   @override
   String get swapAction => '교환';
@@ -1230,4 +1230,26 @@ class L10nKo extends L10n {
 
   @override
   String get swapUseAll => '전액 사용';
+
+  @override
+  String swapMinimum(String amount) {
+    return '최소: $amount';
+  }
+
+  @override
+  String get swapProcessing => '교환 처리 중...';
+
+  @override
+  String get swapSuccess => '교환 완료';
+
+  @override
+  String get swapErrorInsufficient => '잔액 부족';
+
+  @override
+  String get swapErrorExpired => '견적이 만료되었습니다';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return '교환 오류: $error';
+  }
 }

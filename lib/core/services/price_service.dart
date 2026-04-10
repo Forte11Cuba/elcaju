@@ -115,7 +115,10 @@ class PriceService {
       final data = json['data'] as Map<String, dynamic>?;
       if (data == null) throw Exception('No data in response');
 
-      final list = data['btcPriceList'] as List? ?? [];
+      final list = data['btcPriceList'] as List?;
+      if (list == null || list.isEmpty) {
+        throw Exception('No historical prices in response');
+      }
 
       return list.map((point) {
         final price = point['price'] as Map<String, dynamic>;

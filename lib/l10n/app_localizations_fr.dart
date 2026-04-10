@@ -1267,4 +1267,26 @@ class L10nFr extends L10n {
 
   @override
   String get swapUseAll => 'Tout utiliser';
+
+  @override
+  String swapMinimum(String amount) {
+    return 'Minimum : $amount';
+  }
+
+  @override
+  String get swapProcessing => 'Swap en cours...';
+
+  @override
+  String get swapSuccess => 'Swap terminé';
+
+  @override
+  String get swapErrorInsufficient => 'Solde insuffisant';
+
+  @override
+  String get swapErrorExpired => 'Le devis a expiré';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'Erreur de swap : $error';
+  }
 }

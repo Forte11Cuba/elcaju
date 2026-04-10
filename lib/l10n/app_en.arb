@@ -460,5 +460,11 @@
   "swapTo": "To",
   "swapAction": "Swap",
   "swapEstimatedFee": "Estimated fee",
-  "swapUseAll": "Use all"
+  "swapUseAll": "Use all",
+  "swapMinimum": "Minimum: {amount}",
+  "swapProcessing": "Processing swap...",
+  "swapSuccess": "Swap completed",
+  "swapErrorInsufficient": "Insufficient balance",
+  "swapErrorExpired": "Quote has expired",
+  "swapErrorGeneric": "Swap error: {error}"
 }

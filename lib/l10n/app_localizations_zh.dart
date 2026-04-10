@@ -1223,4 +1223,26 @@ class L10nZh extends L10n {
 
   @override
   String get swapUseAll => '全部使用';
+
+  @override
+  String swapMinimum(String amount) {
+    return '最低: $amount';
+  }
+
+  @override
+  String get swapProcessing => '兑换处理中...';
+
+  @override
+  String get swapSuccess => '兑换完成';
+
+  @override
+  String get swapErrorInsufficient => '余额不足';
+
+  @override
+  String get swapErrorExpired => '报价已过期';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return '兑换错误: $error';
+  }
 }

@@ -567,5 +567,11 @@
   "swapTo": "A",
   "swapAction": "Scambia",
   "swapEstimatedFee": "Commissione stimata",
-  "swapUseAll": "Usa tutto"
+  "swapUseAll": "Usa tutto",
+  "swapMinimum": "Minimo: {amount}",
+  "swapProcessing": "Swap in corso...",
+  "swapSuccess": "Swap completato",
+  "swapErrorInsufficient": "Saldo insufficiente",
+  "swapErrorExpired": "Il preventivo è scaduto",
+  "swapErrorGeneric": "Errore swap: {error}"
 }

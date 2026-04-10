@@ -567,5 +567,11 @@
   "swapTo": "Nach",
   "swapAction": "Tauschen",
   "swapEstimatedFee": "Geschätzte Gebühr",
-  "swapUseAll": "Alles verwenden"
+  "swapUseAll": "Alles verwenden",
+  "swapMinimum": "Minimum: {amount}",
+  "swapProcessing": "Swap wird verarbeitet...",
+  "swapSuccess": "Swap abgeschlossen",
+  "swapErrorInsufficient": "Unzureichendes Guthaben",
+  "swapErrorExpired": "Angebot abgelaufen",
+  "swapErrorGeneric": "Swap-Fehler: {error}"
 }

@@ -1251,4 +1251,26 @@ class L10nRu extends L10n {
 
   @override
   String get swapUseAll => 'Использовать всё';
+
+  @override
+  String swapMinimum(String amount) {
+    return 'Минимум: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'Обработка обмена...';
+
+  @override
+  String get swapSuccess => 'Обмен завершён';
+
+  @override
+  String get swapErrorInsufficient => 'Недостаточный баланс';
+
+  @override
+  String get swapErrorExpired => 'Котировка истекла';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'Ошибка обмена: $error';
+  }
 }

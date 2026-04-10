@@ -1228,4 +1228,26 @@ class L10nJa extends L10n {
 
   @override
   String get swapUseAll => '全額使用';
+
+  @override
+  String swapMinimum(String amount) {
+    return '最小: $amount';
+  }
+
+  @override
+  String get swapProcessing => 'スワップ処理中...';
+
+  @override
+  String get swapSuccess => 'スワップ完了';
+
+  @override
+  String get swapErrorInsufficient => '残高不足';
+
+  @override
+  String get swapErrorExpired => '見積もりの有効期限切れ';
+
+  @override
+  String swapErrorGeneric(String error) {
+    return 'スワップエラー: $error';
+  }
 }

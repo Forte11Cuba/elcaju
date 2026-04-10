@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../core/services/price_service.dart';
+import '../../src/rust/api/wallet.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -26,8 +28,13 @@ class _SwapScreenState extends State<SwapScreen>
     with SingleTickerProviderStateMixin {
   // true = sats → usd, false = usd → sats
   bool _isSatsToUsd = true;
-  final _amountController = TextEditingController();
-  String _convertedAmount = '';
+  final _fromController = TextEditingController();
+  final _toController = TextEditingController();
+
+  // Cuál campo se editó último: true = from, false = to
+  bool _lastEditedFrom = true;
+  // Evita loops infinitos entre listeners
+  bool _isUpdating = false;
 
   late AnimationController _flipController;
   late Animation<double> _flipAnimation;
@@ -37,6 +44,12 @@ class _SwapScreenState extends State<SwapScreen>
 
   List<double> _chartData = [];
   bool _isLoadingChart = true;
+
+  // --- Swap state ---
+  bool _isSwapping = false;
+  String? _swapError;
+  // Suscripciones locales (NO usa los globales del provider)
+  StreamSubscription<MintQuote>? _mintSubscription;
 
   @override
   void initState() {
@@ -48,7 +61,8 @@ class _SwapScreenState extends State<SwapScreen>
     _flipAnimation = Tween<double>(begin: 0.0, end: 0.5).animate(
       CurvedAnimation(parent: _flipController, curve: Curves.easeInOut),
     );
-    _amountController.addListener(_calculateConversion);
+    _fromController.addListener(_onFromChanged);
+    _toController.addListener(_onToChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadBalances();
       _loadChartData();
@@ -57,7 +71,9 @@ class _SwapScreenState extends State<SwapScreen>
 
   @override
   void dispose() {
-    _amountController.dispose();
+    _mintSubscription?.cancel();
+    _fromController.dispose();
+    _toController.dispose();
     _flipController.dispose();
     super.dispose();
   }
@@ -104,38 +120,58 @@ class _SwapScreenState extends State<SwapScreen>
     });
   }
 
-  void _calculateConversion() {
-    final text = _amountController.text;
+  void _onFromChanged() {
+    if (_isUpdating) return;
+    _lastEditedFrom = true;
+    _syncConversion(fromSource: true);
+  }
+
+  void _onToChanged() {
+    if (_isUpdating) return;
+    _lastEditedFrom = false;
+    _syncConversion(fromSource: false);
+  }
+
+  /// Calcula el campo opuesto basado en el campo editado
+  void _syncConversion({required bool fromSource}) {
+    final source = fromSource ? _fromController : _toController;
+    final target = fromSource ? _toController : _fromController;
+    final text = source.text;
+
     if (text.isEmpty) {
-      setState(() => _convertedAmount = '');
+      _isUpdating = true;
+      target.text = '';
+      _isUpdating = false;
+      setState(() {});
       return;
     }
 
     final priceProvider = context.read<PriceProvider>();
     final btcPrice = priceProvider.btcPriceUsd;
-    if (btcPrice == null || btcPrice == 0) {
-      setState(() => _convertedAmount = '...');
-      return;
-    }
+    if (btcPrice == null || btcPrice == 0) return;
 
     try {
-      if (_isSatsToUsd) {
+      // Determinar si el source es sats o usd
+      final sourceIsSats =
+          (fromSource && _isSatsToUsd) || (!fromSource && !_isSatsToUsd);
+
+      String result;
+      if (sourceIsSats) {
         final sats = int.tryParse(text) ?? 0;
-        final usdAmount = sats / 100000000 * btcPrice;
-        setState(() {
-          _convertedAmount = usdAmount < 0.01 && usdAmount > 0
-              ? '< \$0.01'
-              : '\$${usdAmount.toStringAsFixed(2)}';
-        });
+        final usd = sats / 100000000 * btcPrice;
+        result = usd == 0 ? '' : usd.toStringAsFixed(2);
       } else {
         final usd = double.tryParse(text) ?? 0;
         final sats = (usd / btcPrice * 100000000).round();
-        setState(() {
-          _convertedAmount = '${NumberFormat('#,###').format(sats)} sat';
-        });
+        result = sats == 0 ? '' : sats.toString();
       }
+
+      _isUpdating = true;
+      target.text = result;
+      _isUpdating = false;
+      setState(() {});
     } catch (_) {
-      setState(() => _convertedAmount = '...');
+      // ignorar errores de parseo parcial
     }
   }
 
@@ -146,26 +182,403 @@ class _SwapScreenState extends State<SwapScreen>
     } else {
       _flipController.reverse();
     }
+
+    // Intercambiar valores entre campos
+    final fromText = _fromController.text;
+    final toText = _toController.text;
+
+    _isUpdating = true;
     setState(() {
       _isSatsToUsd = !_isSatsToUsd;
-      _amountController.clear();
-      _convertedAmount = '';
+      _fromController.text = toText;
+      _toController.text = fromText;
+      _lastEditedFrom = !_lastEditedFrom;
     });
-  }
-
-  void _setQuickAmount(String amount) {
-    _amountController.text = amount;
-    _amountController.selection = TextSelection.fromPosition(
-      TextPosition(offset: amount.length),
-    );
+    _isUpdating = false;
   }
 
   void _setMaxAmount() {
     if (_isSatsToUsd) {
-      _setQuickAmount(_satsBalance.toString());
+      _fromController.text = _satsBalance.toString();
     } else {
       final usd = _usdBalance.toDouble() / 100;
-      _setQuickAmount(usd.toStringAsFixed(2));
+      _fromController.text = usd.toStringAsFixed(2);
+    }
+    _lastEditedFrom = true;
+  }
+
+  // --- Validación de mínimos del mint ---
+  static const double _minUsd = 0.01;
+  static const int _minSats = 1;
+
+  /// Valida que ambos lados cumplan los mínimos del mint.
+  /// Retorna null si es válido, o el mensaje de error si no.
+  String? _validateMinimums(L10n l10n) {
+    if (_fromController.text.isEmpty || _toController.text.isEmpty) return null;
+
+    final priceProvider = context.read<PriceProvider>();
+    final btcPrice = priceProvider.btcPriceUsd;
+    if (btcPrice == null || btcPrice == 0) return null;
+
+    if (_isSatsToUsd) {
+      // from=sats, to=usd → verificar que USD >= 0.01
+      final usd = double.tryParse(_toController.text) ?? 0;
+      if (usd < _minUsd) {
+        // Calcular mínimo de sats necesario
+        final minSatsNeeded = ((_minUsd / btcPrice) * 100000000).ceil();
+        return l10n.swapMinimum('$minSatsNeeded sats');
+      }
+    } else {
+      // from=usd, to=sats → verificar que sats >= 1 y USD >= 0.01
+      final usd = double.tryParse(_fromController.text) ?? 0;
+      final sats = int.tryParse(_toController.text) ?? 0;
+      if (usd < _minUsd) {
+        return l10n.swapMinimum('\$${_minUsd.toStringAsFixed(2)}');
+      }
+      if (sats < _minSats) {
+        return l10n.swapMinimum('$_minSats sat');
+      }
+    }
+    return null;
+  }
+
+  // --- Swap logic ---
+
+  /// Determina el monto destino en BigInt (centavos para USD, sats para sat).
+  BigInt _getDestAmount() {
+    final destText = _isSatsToUsd ? _toController.text : _toController.text;
+    final destUnit = _isSatsToUsd ? 'usd' : 'sat';
+    return UnitFormatter.parseUserInput(destText, destUnit);
+  }
+
+  /// Determina unidades de origen y destino.
+  String get _srcUnit => _isSatsToUsd ? 'sat' : 'usd';
+  String get _destUnit => _isSatsToUsd ? 'usd' : 'sat';
+
+  /// Inicia el swap: crea mint quote en destino, obtiene melt quote en origen,
+  /// muestra fee en modal de confirmación.
+  Future<void> _startSwap() async {
+    final walletProvider = context.read<WalletProvider>();
+    final mintUrl = walletProvider.activeMintUrl;
+    if (mintUrl == null) return;
+
+    final destAmount = _getDestAmount();
+    if (destAmount <= BigInt.zero) return;
+
+    setState(() {
+      _isSwapping = true;
+      _swapError = null;
+    });
+
+    try {
+      // 1. Obtener wallets directamente (sin cambiar activeUnit)
+      final destWallet = await walletProvider.getWallet(mintUrl, _destUnit);
+      final srcWallet = await walletProvider.getWallet(mintUrl, _srcUnit);
+
+      // 2. Crear mint quote en wallet destino → obtener invoice BOLT11
+      String? invoice;
+      final completer = Completer<String>();
+
+      _mintSubscription?.cancel();
+      _mintSubscription = destWallet.mint(
+        amount: destAmount,
+      ).listen(
+        (quote) {
+          if (quote.state == MintQuoteState.unpaid && !completer.isCompleted) {
+            completer.complete(quote.request);
+          }
+          if (quote.state == MintQuoteState.error && !completer.isCompleted) {
+            completer.completeError(
+              Exception(quote.error ?? 'Error creating mint quote'),
+            );
+          }
+        },
+        onError: (e) {
+          if (!completer.isCompleted) completer.completeError(e);
+        },
+      );
+
+      invoice = await completer.future;
+
+      // 3. Obtener melt quote en wallet origen → fee
+      final meltQuote = await srcWallet.meltQuote(request: invoice);
+
+      if (!mounted) return;
+      setState(() => _isSwapping = false);
+
+      // 4. Mostrar confirmación con fee
+      _showSwapConfirmation(
+        meltQuote: meltQuote,
+        srcWallet: srcWallet,
+        destWallet: destWallet,
+        destAmount: destAmount,
+      );
+    } catch (e) {
+      _mintSubscription?.cancel();
+      if (!mounted) return;
+      final l10n = L10n.of(context)!;
+      final errorStr = e.toString().toLowerCase();
+      setState(() {
+        _isSwapping = false;
+        if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
+          _swapError = l10n.swapErrorInsufficient;
+        } else if (errorStr.contains('expired')) {
+          _swapError = l10n.swapErrorExpired;
+        } else {
+          _swapError = l10n.swapErrorGeneric(e.toString());
+        }
+      });
+    }
+  }
+
+  /// Muestra modal de confirmación con desglose de fee.
+  void _showSwapConfirmation({
+    required MeltQuote meltQuote,
+    required Wallet srcWallet,
+    required Wallet destWallet,
+    required BigInt destAmount,
+  }) {
+    final l10n = L10n.of(context)!;
+    final srcUnitLabel = UnitFormatter.getUnitLabel(_srcUnit);
+    final destUnitLabel = UnitFormatter.getUnitLabel(_destUnit);
+    final total = meltQuote.amount + meltQuote.feeReserve;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+        decoration: BoxDecoration(
+          color: AppColors.deepVoidPurple,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle
+            Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            // Icono swap
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.primaryAction.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                LucideIcons.arrowLeftRight,
+                color: AppColors.primaryAction,
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.paddingMedium),
+
+            // Título
+            Text(
+              l10n.confirmPayment,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.paddingSmall),
+
+            // Destino: lo que recibes
+            Text(
+              '+ ${UnitFormatter.formatBalance(destAmount, _destUnit)} $destUnitLabel',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: AppColors.success,
+              ),
+            ),
+            const SizedBox(height: 4),
+
+            // Origen: lo que pagas
+            Text(
+              '- ${UnitFormatter.formatBalance(meltQuote.amount, _srcUnit)} $srcUnitLabel',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+
+            // Fee
+            Text(
+              '+ ~${UnitFormatter.formatBalance(meltQuote.feeReserve, _srcUnit)} $srcUnitLabel fee',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                color: AppColors.textSecondary.withValues(alpha: 0.7),
+              ),
+            ),
+            const SizedBox(height: AppDimensions.paddingSmall),
+
+            // Total
+            Text(
+              'Total: ${UnitFormatter.formatBalance(total, _srcUnit)} $srcUnitLabel',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primaryAction,
+              ),
+            ),
+
+            const SizedBox(height: AppDimensions.paddingLarge),
+
+            // Botones
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _mintSubscription?.cancel();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: Text(
+                          l10n.cancel,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.paddingMedium),
+                Expanded(
+                  child: PrimaryButton(
+                    text: l10n.swapAction,
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _executeSwap(
+                        meltQuote: meltQuote,
+                        srcWallet: srcWallet,
+                        destWallet: destWallet,
+                        destAmount: destAmount,
+                      );
+                    },
+                    height: 52,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppDimensions.paddingSmall),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Ejecuta el swap: melt en origen, guarda metadata de ambos lados.
+  Future<void> _executeSwap({
+    required MeltQuote meltQuote,
+    required Wallet srcWallet,
+    required Wallet destWallet,
+    required BigInt destAmount,
+  }) async {
+    final l10n = L10n.of(context)!;
+    final walletProvider = context.read<WalletProvider>();
+    final invoice = meltQuote.request;
+
+    setState(() {
+      _isSwapping = true;
+      _swapError = null;
+    });
+
+    try {
+      // Ejecutar melt (paga el invoice Lightning)
+      await srcWallet.melt(quote: meltQuote);
+
+      // Guardar metadata del melt (lado enviado)
+      await walletProvider.saveSwapMeltMetadata(
+        srcWallet, invoice, meltQuote.amount,
+      );
+
+      _mintSubscription?.cancel();
+
+      if (!mounted) return;
+
+      // Éxito: recargar balances, confetti, snackbar
+      await _loadBalances();
+      if (!mounted) return;
+
+      walletProvider.confettiController.fire();
+
+      // En background: esperar a que CDK procese el mint,
+      // guardar metadata del lado recibido y recargar balances
+      Future.delayed(const Duration(seconds: 3), () async {
+        await walletProvider.saveSwapMintMetadata(
+          destWallet, invoice, destAmount,
+        );
+        if (mounted) _loadBalances();
+      });
+
+      // Limpiar campos
+      _isUpdating = true;
+      _fromController.clear();
+      _toController.clear();
+      _isUpdating = false;
+
+      setState(() {
+        _isSwapping = false;
+        _swapError = null;
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.swapSuccess),
+          backgroundColor: AppColors.success,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      final errorStr = e.toString().toLowerCase();
+      setState(() {
+        _isSwapping = false;
+        if (errorStr.contains('insufficient') || errorStr.contains('not enough')) {
+          _swapError = l10n.swapErrorInsufficient;
+        } else if (errorStr.contains('expired')) {
+          _swapError = l10n.swapErrorExpired;
+        } else {
+          _swapError = l10n.swapErrorGeneric(e.toString());
+        }
+      });
+    } finally {
+      _mintSubscription?.cancel();
+      _mintSubscription = null;
     }
   }
 
@@ -188,35 +601,69 @@ class _SwapScreenState extends State<SwapScreen>
             l10n.swap,
             style: const TextStyle(
               fontFamily: 'Inter',
-              fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
           ),
-          centerTitle: true,
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
+          child: Padding(
             padding: const EdgeInsets.all(AppDimensions.paddingMedium),
             child: Column(
               children: [
+                // Precio + chart (arriba)
                 _buildPriceChart(priceProvider),
-                const SizedBox(height: AppDimensions.paddingMedium),
-                const SizedBox(height: AppDimensions.paddingLarge),
-                _buildFromCard(l10n),
-                _buildFlipButton(),
-                _buildToCard(l10n),
-                const SizedBox(height: AppDimensions.paddingMedium),
-                const SizedBox(height: AppDimensions.paddingLarge),
-                PrimaryButton(
-                  text: l10n.swapAction,
-                  onPressed: _amountController.text.isNotEmpty
-                      ? () {
-                          // TODO: implement swap logic
-                          HapticFeedback.heavyImpact();
-                        }
-                      : null,
+
+                // Cards De/A centradas verticalmente
+                Expanded(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildFromCard(l10n),
+                          _buildFlipButton(),
+                          _buildToCard(l10n),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
+
+                // Validación + errores + botón fijo abajo
+                Builder(builder: (_) {
+                  final minError = _validateMinimums(l10n);
+                  final errorMsg = _swapError ?? minError;
+                  final canSwap = _fromController.text.isNotEmpty &&
+                      _toController.text.isNotEmpty &&
+                      minError == null &&
+                      !_isSwapping;
+
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (errorMsg != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            errorMsg,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 12,
+                              color: AppColors.error,
+                            ),
+                          ),
+                        ),
+                      PrimaryButton(
+                        text: _isSwapping
+                            ? l10n.swapProcessing
+                            : l10n.swapAction,
+                        isLoading: _isSwapping,
+                        onPressed: canSwap ? _startSwap : null,
+                      ),
+                    ],
+                  );
+                }),
               ],
             ),
           ),
@@ -306,24 +753,26 @@ class _SwapScreenState extends State<SwapScreen>
     );
   }
 
-  Widget _buildFromCard(L10n l10n) {
-    final fromSymbol = _isSatsToUsd ? '₿' : '\$';
-    final fromLabel = _isSatsToUsd ? 'sats' : 'USD';
-    final fromBalance = _isSatsToUsd
-        ? UnitFormatter.formatBalance(_satsBalance, 'sat')
-        : UnitFormatter.formatBalance(_usdBalance, 'usd');
-    final fromUnit = _isSatsToUsd ? 'sat' : 'USD';
-
+  Widget _buildSwapCard({
+    required L10n l10n,
+    required String label,
+    required String symbol,
+    required String unitLabel,
+    required String balance,
+    required String unit,
+    required TextEditingController controller,
+    required bool isSats,
+    bool showUseAll = false,
+  }) {
     return GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Label + Balance en la misma línea
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                l10n.swapFrom,
+                label,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 12,
@@ -335,26 +784,28 @@ class _SwapScreenState extends State<SwapScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '${l10n.balance}: $fromBalance $fromUnit',
+                    '${l10n.balance}: $balance $unit',
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 12,
                       color: AppColors.textSecondary.withValues(alpha: 0.6),
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  GestureDetector(
-                    onTap: _setMaxAmount,
-                    child: Text(
-                      l10n.swapUseAll,
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryAction,
+                  if (showUseAll) ...[
+                    const SizedBox(width: 6),
+                    GestureDetector(
+                      onTap: _setMaxAmount,
+                      child: Text(
+                        l10n.swapUseAll,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryAction,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ],
@@ -362,7 +813,6 @@ class _SwapScreenState extends State<SwapScreen>
           const SizedBox(height: 8),
           Row(
             children: [
-              // Unit pill
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -371,7 +821,7 @@ class _SwapScreenState extends State<SwapScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '$fromSymbol $fromLabel',
+                  '$symbol $unitLabel',
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
@@ -381,13 +831,11 @@ class _SwapScreenState extends State<SwapScreen>
                 ),
               ),
               const SizedBox(width: 12),
-              // Amount input
               Expanded(
                 child: TextField(
-                  key: ValueKey('from_$_isSatsToUsd'),
-                  controller: _amountController,
+                  controller: controller,
                   keyboardType: TextInputType.numberWithOptions(
-                    decimal: !_isSatsToUsd,
+                    decimal: !isSats,
                   ),
                   style: const TextStyle(
                     fontFamily: 'Inter',
@@ -409,7 +857,7 @@ class _SwapScreenState extends State<SwapScreen>
                     isDense: true,
                   ),
                   inputFormatters: [
-                    if (_isSatsToUsd)
+                    if (isSats)
                       FilteringTextInputFormatter.digitsOnly
                     else
                       FilteringTextInputFormatter.allow(
@@ -462,6 +910,27 @@ class _SwapScreenState extends State<SwapScreen>
     );
   }
 
+  Widget _buildFromCard(L10n l10n) {
+    final fromSymbol = _isSatsToUsd ? '₿' : '\$';
+    final fromLabel = _isSatsToUsd ? 'sats' : 'USD';
+    final fromBalance = _isSatsToUsd
+        ? UnitFormatter.formatBalance(_satsBalance, 'sat')
+        : UnitFormatter.formatBalance(_usdBalance, 'usd');
+    final fromUnit = _isSatsToUsd ? 'sat' : 'USD';
+
+    return _buildSwapCard(
+      l10n: l10n,
+      label: l10n.swapFrom,
+      symbol: fromSymbol,
+      unitLabel: fromLabel,
+      balance: fromBalance,
+      unit: fromUnit,
+      controller: _fromController,
+      isSats: _isSatsToUsd,
+      showUseAll: true,
+    );
+  }
+
   Widget _buildToCard(L10n l10n) {
     final toSymbol = _isSatsToUsd ? '\$' : '₿';
     final toLabel = _isSatsToUsd ? 'USD' : 'sats';
@@ -470,70 +939,15 @@ class _SwapScreenState extends State<SwapScreen>
         : UnitFormatter.formatBalance(_satsBalance, 'sat');
     final toUnit = _isSatsToUsd ? 'USD' : 'sat';
 
-    return GlassCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Label + Balance en la misma línea
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.swapTo,
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary.withValues(alpha: 0.6),
-                ),
-              ),
-              Text(
-                '${l10n.balance}: $toBalance $toUnit',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 12,
-                  color: AppColors.textSecondary.withValues(alpha: 0.6),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '$toSymbol $toLabel',
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  _convertedAmount.isEmpty ? '≈ 0' : '≈ $_convertedAmount',
-                  textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white.withValues(alpha: 0.7),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return _buildSwapCard(
+      l10n: l10n,
+      label: l10n.swapTo,
+      symbol: toSymbol,
+      unitLabel: toLabel,
+      balance: toBalance,
+      unit: toUnit,
+      controller: _toController,
+      isSats: !_isSatsToUsd,
     );
   }
 

@@ -563,9 +563,15 @@
 
   "swap": "교환",
   "swapDescription": "Sats와 USD 간 변환",
-  "swapFrom": "보내기",
-  "swapTo": "받기",
+  "swapFrom": "에서",
+  "swapTo": "으로",
   "swapAction": "교환",
   "swapEstimatedFee": "예상 수수료",
-  "swapUseAll": "전액 사용"
+  "swapUseAll": "전액 사용",
+  "swapMinimum": "최소: {amount}",
+  "swapProcessing": "교환 처리 중...",
+  "swapSuccess": "교환 완료",
+  "swapErrorInsufficient": "잔액 부족",
+  "swapErrorExpired": "견적이 만료되었습니다",
+  "swapErrorGeneric": "교환 오류: {error}"
 }

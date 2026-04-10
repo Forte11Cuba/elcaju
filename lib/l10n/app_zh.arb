@@ -567,5 +567,11 @@
   "swapTo": "到",
   "swapAction": "兑换",
   "swapEstimatedFee": "预估手续费",
-  "swapUseAll": "全部使用"
+  "swapUseAll": "全部使用",
+  "swapMinimum": "最低: {amount}",
+  "swapProcessing": "兑换处理中...",
+  "swapSuccess": "兑换完成",
+  "swapErrorInsufficient": "余额不足",
+  "swapErrorExpired": "报价已过期",
+  "swapErrorGeneric": "兑换错误: {error}"
 }

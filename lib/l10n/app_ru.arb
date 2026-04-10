@@ -567,5 +567,11 @@
   "swapTo": "В",
   "swapAction": "Обменять",
   "swapEstimatedFee": "Ориентировочная комиссия",
-  "swapUseAll": "Использовать всё"
+  "swapUseAll": "Использовать всё",
+  "swapMinimum": "Минимум: {amount}",
+  "swapProcessing": "Обработка обмена...",
+  "swapSuccess": "Обмен завершён",
+  "swapErrorInsufficient": "Недостаточный баланс",
+  "swapErrorExpired": "Котировка истекла",
+  "swapErrorGeneric": "Ошибка обмена: {error}"
 }

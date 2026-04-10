@@ -567,5 +567,11 @@
   "swapTo": "Para",
   "swapAction": "Trocar",
   "swapEstimatedFee": "Taxa estimada",
-  "swapUseAll": "Usar tudo"
+  "swapUseAll": "Usar tudo",
+  "swapMinimum": "Mínimo: {amount}",
+  "swapProcessing": "Processando swap...",
+  "swapSuccess": "Swap concluído",
+  "swapErrorInsufficient": "Saldo insuficiente",
+  "swapErrorExpired": "A cotação expirou",
+  "swapErrorGeneric": "Erro no swap: {error}"
 }

@@ -580,5 +580,21 @@
   "swapTo": "A",
   "swapAction": "Cambiar",
   "swapEstimatedFee": "Fee estimado",
-  "swapUseAll": "Usar todo"
+  "swapUseAll": "Usar todo",
+  "swapMinimum": "Mínimo: {amount}",
+  "@swapMinimum": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "swapProcessing": "Procesando swap...",
+  "swapSuccess": "Swap completado",
+  "swapErrorInsufficient": "Saldo insuficiente",
+  "swapErrorExpired": "La cotización ha expirado",
+  "swapErrorGeneric": "Error en el swap: {error}",
+  "@swapErrorGeneric": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  }
 }
