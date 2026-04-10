@@ -246,7 +246,7 @@ class _SwapScreenState extends State<SwapScreen>
 
   /// Determina el monto destino en BigInt (centavos para USD, sats para sat).
   BigInt _getDestAmount() {
-    final destText = _isSatsToUsd ? _toController.text : _toController.text;
+    final destText = _toController.text;
     final destUnit = _isSatsToUsd ? 'usd' : 'sat';
     return UnitFormatter.parseUserInput(destText, destUnit);
   }
@@ -288,11 +288,14 @@ class _SwapScreenState extends State<SwapScreen>
             completer.complete(quote.request);
           }
           if (quote.state == MintQuoteState.issued) {
-            final wp = context.read<WalletProvider>();
-            await wp.saveSwapMintMetadata(
-              destWallet, quote.request, destAmount,
-            );
-            if (mounted) _loadBalances();
+            try {
+              await walletProvider.saveSwapMintMetadata(
+                destWallet, quote.request, destAmount,
+              );
+              if (mounted) _loadBalances();
+            } catch (e) {
+              debugPrint('Error saving swap mint metadata: $e');
+            }
             _mintSubscription?.cancel();
             _mintSubscription = null;
           }
