@@ -83,12 +83,15 @@ class _SwapScreenState extends State<SwapScreen>
     final mintUrl = walletProvider.activeMintUrl;
     if (mintUrl == null) return;
 
-    final balances = await walletProvider.getBalancesForMint(mintUrl);
-    if (mounted) {
+    try {
+      final balances = await walletProvider.getBalancesForMint(mintUrl);
+      if (!mounted) return;
       setState(() {
         _satsBalance = balances['sat'] ?? BigInt.zero;
         _usdBalance = balances['usd'] ?? BigInt.zero;
       });
+    } catch (e) {
+      debugPrint('Error loading swap balances: $e');
     }
   }
 
@@ -446,7 +449,7 @@ class _SwapScreenState extends State<SwapScreen>
 
             // Fee
             Text(
-              '+ ~${UnitFormatter.formatBalance(meltQuote.feeReserve, _srcUnit)} $srcUnitLabel fee',
+              '+ ~${UnitFormatter.formatBalance(meltQuote.feeReserve, _srcUnit)} $srcUnitLabel ${l10n.fee}',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 14,
@@ -457,7 +460,7 @@ class _SwapScreenState extends State<SwapScreen>
 
             // Total
             Text(
-              'Total: ${UnitFormatter.formatBalance(total, _srcUnit)} $srcUnitLabel',
+              '${l10n.total} ${UnitFormatter.formatBalance(total, _srcUnit)} $srcUnitLabel',
               style: const TextStyle(
                 fontFamily: 'Inter',
                 fontSize: 16,
