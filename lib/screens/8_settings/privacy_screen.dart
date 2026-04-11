@@ -32,80 +32,85 @@ class PrivacyScreen extends StatelessWidget {
           ),
         ),
         body: SafeArea(
-          child: Center(
-            child: Padding(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
               padding: const EdgeInsets.all(AppDimensions.paddingLarge),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    l10n.privacyTitle,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n.privacyGoodbye,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryAction,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  Text(
-                    l10n.privacyKeepReading,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
-                      color: AppColors.textSecondary.withValues(alpha: 0.5),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  ...l10n.privacyBody.split('\n').map(
-                    (line) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        line,
-                        style: TextStyle(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        l10n.privacyTitle,
+                        style: const TextStyle(
                           fontFamily: 'Inter',
-                          fontSize: 16,
-                          color: AppColors.textSecondary.withValues(alpha: 0.85),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      Text(
+                        l10n.privacyGoodbye,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primaryAction,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      Text(
+                        l10n.privacyKeepReading,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                          color: AppColors.textSecondary.withValues(alpha: 0.5),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      ...l10n.privacyBody.split('\n').map(
+                        (line) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            line,
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 16,
+                              color: AppColors.textSecondary.withValues(alpha: 0.85),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      Text(
+                        l10n.privacyConclusion.split('\n').first,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textSecondary.withValues(alpha: 0.7),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.privacyConclusion.split('\n').last,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 28),
-                  Text(
-                    l10n.privacyConclusion.split('\n').first,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary.withValues(alpha: 0.7),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.privacyConclusion.split('\n').last,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                ),
               ),
             ),
           ),

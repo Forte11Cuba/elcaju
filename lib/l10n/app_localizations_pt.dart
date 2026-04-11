@@ -1297,13 +1297,13 @@ class L10nPt extends L10n {
   String get privacyGoodbye => 'ADEUS';
 
   @override
-  String get privacyKeepReading => '(continua a ler se quiseres…)';
+  String get privacyKeepReading => '(continue lendo se quiser…)';
 
   @override
   String get privacyBody =>
-      'Não sabemos quem és\nNão sabemos quanto tens\nNão sabemos o que fazes';
+      'Não sabemos quem você é\nNão sabemos quanto você tem\nNão sabemos o que você faz';
 
   @override
   String get privacyConclusion =>
-      'A melhor forma de proteger os teus dados\né não os ter';
+      'A melhor forma de proteger seus dados\né não tê-los';
 }

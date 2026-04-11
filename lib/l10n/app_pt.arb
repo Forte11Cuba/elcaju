@@ -579,7 +579,7 @@
   "privacyPolicy": "Política de privacidade",
   "privacyTitle": "NÃO RECOLHEMOS NADA",
   "privacyGoodbye": "ADEUS",
-  "privacyKeepReading": "(continua a ler se quiseres…)",
-  "privacyBody": "Não sabemos quem és\nNão sabemos quanto tens\nNão sabemos o que fazes",
-  "privacyConclusion": "A melhor forma de proteger os teus dados\né não os ter"
+  "privacyKeepReading": "(continue lendo se quiser…)",
+  "privacyBody": "Não sabemos quem você é\nNão sabemos quanto você tem\nNão sabemos o que você faz",
+  "privacyConclusion": "A melhor forma de proteger seus dados\né não tê-los"
 }
