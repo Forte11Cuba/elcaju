@@ -77,7 +77,10 @@ class PrivacyScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      ...l10n.privacyBody.split('\n').map(
+                      ...l10n.privacyBody.split('\n')
+                          .map((s) => s.trim())
+                          .where((s) => s.isNotEmpty)
+                          .map(
                         (line) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Text(
