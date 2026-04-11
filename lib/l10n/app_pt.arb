@@ -575,5 +575,11 @@
   "swapErrorExpired": "A cotação expirou",
   "swapErrorGeneric": "Erro no swap: {error}",
   "swapChartUnavailable": "Preço indisponível · Toque para tentar novamente",
-  "swapChartMinMax": "24h  Mín: {minPrice} — Máx: {maxPrice}"
+  "swapChartMinMax": "24h  Mín: {minPrice} — Máx: {maxPrice}",
+  "privacyPolicy": "Política de privacidade",
+  "privacyTitle": "NÃO RECOLHEMOS NADA",
+  "privacyGoodbye": "ADEUS",
+  "privacyKeepReading": "(continue lendo se quiser…)",
+  "privacyBody": "Não sabemos quem você é\nNão sabemos quanto você tem\nNão sabemos o que você faz",
+  "privacyConclusion": "A melhor forma de proteger seus dados\né não tê-los"
 }

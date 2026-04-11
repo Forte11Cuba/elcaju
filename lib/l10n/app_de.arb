@@ -575,5 +575,11 @@
   "swapErrorExpired": "Angebot abgelaufen",
   "swapErrorGeneric": "Swap-Fehler: {error}",
   "swapChartUnavailable": "Preis nicht verfügbar · Tippen zum Wiederholen",
-  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}"
+  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}",
+  "privacyPolicy": "Datenschutz",
+  "privacyTitle": "WIR SAMMELN NICHTS",
+  "privacyGoodbye": "TSCHÜSS",
+  "privacyKeepReading": "(lies weiter, wenn du willst…)",
+  "privacyBody": "Wir wissen nicht, wer du bist\nWir wissen nicht, wie viel du hast\nWir wissen nicht, was du tust",
+  "privacyConclusion": "Der beste Weg, deine Daten zu schützen,\nist sie nicht zu haben"
 }

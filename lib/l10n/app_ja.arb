@@ -575,5 +575,11 @@
   "swapErrorExpired": "見積もりの有効期限切れ",
   "swapErrorGeneric": "スワップエラー: {error}",
   "swapChartUnavailable": "価格を取得できません・タップで再試行",
-  "swapChartMinMax": "24h  安値: {minPrice} — 高値: {maxPrice}"
+  "swapChartMinMax": "24h  安値: {minPrice} — 高値: {maxPrice}",
+  "privacyPolicy": "プライバシーポリシー",
+  "privacyTitle": "何も収集しません",
+  "privacyGoodbye": "さようなら",
+  "privacyKeepReading": "(読み続けたければどうぞ…)",
+  "privacyBody": "あなたが誰か知りません\nいくら持っているか知りません\n何をしているか知りません",
+  "privacyConclusion": "データを守る最善の方法は\nデータを持たないことです"
 }

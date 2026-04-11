@@ -13,6 +13,7 @@ import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../2_onboarding/backup_seed_screen.dart';
 import 'mints_screen.dart';
+import 'privacy_screen.dart';
 import 'language_screen.dart';
 import 'p2pk_keys_screen.dart';
 import '../13_swap/swap_screen.dart';
@@ -120,7 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         value: settingsProvider.pinEnabled,
                         onChanged: (value) =>
                             _togglePin(context, settingsProvider, value),
-                        activeColor: AppColors.primaryAction,
+                        activeThumbColor: AppColors.primaryAction,
                       ),
                     ),
                     _buildSettingTile(
@@ -164,6 +165,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       icon: LucideIcons.info,
                       title: l10n.about,
                       onTap: () => _showAboutDialog(context),
+                    ),
+                    _buildSettingTile(
+                      icon: LucideIcons.shield,
+                      title: l10n.privacyPolicy,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PrivacyScreen(),
+                        ),
+                      ),
                     ),
                     _buildSettingTile(
                       icon: LucideIcons.github,
@@ -486,7 +497,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Obtener mnemonic
     final mnemonic = await settingsProvider.getMnemonic();
     if (mnemonic == null) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(L10n.of(context)!.mnemonicNotFound),
@@ -498,7 +509,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     // Navegar a BackupSeedScreen
-    if (mounted) {
+    if (context.mounted) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -519,7 +530,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final pin = await _showCreatePinDialog(context);
       if (pin != null && pin.length == 4) {
         await settingsProvider.setPin(pin);
-        if (mounted) {
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(L10n.of(context)!.pinActivated),
@@ -533,7 +544,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final verified = await _verifyPinDialog(context, settingsProvider);
       if (verified) {
         await settingsProvider.removePin();
-        if (mounted) {
+        if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(L10n.of(context)!.pinDeactivated),
@@ -562,6 +573,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (firstPin == null) return null;
 
     // Confirmar PIN
+    if (!context.mounted) return null;
     final confirmPin = await showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -574,7 +586,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (confirmPin == null) return null;
 
     if (firstPin != confirmPin) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.pinMismatch),
@@ -605,7 +617,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (settingsProvider.verifyPin(pin)) {
       return true;
     } else {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.incorrectPin),
@@ -746,7 +758,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } catch (_) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(L10n.of(context)!.couldNotOpenLink),
@@ -813,7 +825,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await walletProvider.deleteDatabase();
       await settingsProvider.deleteWallet();
 
-      if (mounted) {
+      if (context.mounted) {
         // Navegar a welcome screen
         Navigator.pushNamedAndRemoveUntil(
           context,
@@ -822,7 +834,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       }
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(L10n.of(context)!.deleteError(e.toString())),
@@ -1007,7 +1019,9 @@ class _PinDialogState extends State<_PinDialog> {
       if (_pin.length == 4) {
         // PIN completo, cerrar con resultado
         Future.delayed(const Duration(milliseconds: 200), () {
-          Navigator.pop(context, _pin.join());
+          if (mounted) {
+            Navigator.pop(context, _pin.join());
+          }
         });
       }
     }
@@ -1825,7 +1839,6 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
           // Escanear todos los mints (retorna Map<String, Map<String, BigInt>>)
           final results = await walletProvider.restoreAllMints();
 
-          BigInt totalRecovered = BigInt.zero;
           int mintsScanned = 0;
           int mintsWithError = 0;
           final recoveredDetails = <String>[];
@@ -1833,15 +1846,12 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
           for (final mintEntry in results.entries) {
             final unitBalances = mintEntry.value;
             bool hasError = false;
-            BigInt mintTotal = BigInt.zero;
-
             for (final unitEntry in unitBalances.entries) {
               final unit = unitEntry.key;
               final balance = unitEntry.value;
               if (balance < BigInt.zero) {
                 hasError = true;
               } else if (balance > BigInt.zero) {
-                mintTotal += balance;
                 final formatted = UnitFormatter.formatBalance(balance, unit);
                 final label = UnitFormatter.getUnitLabel(unit);
                 recoveredDetails.add('$formatted $label');
@@ -1852,7 +1862,6 @@ class _RecoverTokensModalState extends State<_RecoverTokensModal> {
               mintsWithError++;
             } else {
               mintsScanned++;
-              totalRecovered += mintTotal;
             }
           }
 

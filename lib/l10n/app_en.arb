@@ -468,5 +468,11 @@
   "swapErrorExpired": "Quote has expired",
   "swapErrorGeneric": "Swap error: {error}",
   "swapChartUnavailable": "Price unavailable · Tap to retry",
-  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}"
+  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}",
+  "privacyPolicy": "Privacy policy",
+  "privacyTitle": "WE COLLECT NOTHING",
+  "privacyGoodbye": "BYE",
+  "privacyKeepReading": "(keep reading if you want…)",
+  "privacyBody": "We don't know who you are\nWe don't know how much you have\nWe don't know what you do",
+  "privacyConclusion": "The best way to protect your data\nis not to have it"
 }

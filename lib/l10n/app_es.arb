@@ -604,5 +604,11 @@
       "minPrice": { "type": "String" },
       "maxPrice": { "type": "String" }
     }
-  }
+  },
+  "privacyPolicy": "Política de privacidad",
+  "privacyTitle": "NO RECOPILAMOS NADA",
+  "privacyGoodbye": "ADIÓS",
+  "privacyKeepReading": "(sigue leyendo si quieres…)",
+  "privacyBody": "No sabemos quién eres\nNo sabemos cuánto tienes\nNo sabemos qué haces",
+  "privacyConclusion": "La mejor forma de proteger tus datos\nes no tenerlos"
 }

@@ -575,5 +575,11 @@
   "swapErrorExpired": "Il preventivo è scaduto",
   "swapErrorGeneric": "Errore swap: {error}",
   "swapChartUnavailable": "Prezzo non disponibile · Tocca per riprovare",
-  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}"
+  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}",
+  "privacyPolicy": "Informativa sulla privacy",
+  "privacyTitle": "NON RACCOGLIAMO NULLA",
+  "privacyGoodbye": "CIAO",
+  "privacyKeepReading": "(continua a leggere se vuoi…)",
+  "privacyBody": "Non sappiamo chi sei\nNon sappiamo quanto hai\nNon sappiamo cosa fai",
+  "privacyConclusion": "Il modo migliore per proteggere i tuoi dati\nè non averli"
 }
