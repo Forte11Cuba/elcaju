@@ -11,6 +11,11 @@ class PrivacyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context)!;
+    final conclusionLines = l10n.privacyConclusion
+        .split('\n')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
 
     return GradientBackground(
       child: Scaffold(
@@ -87,27 +92,29 @@ class PrivacyScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      Text(
-                        l10n.privacyConclusion.split('\n').first,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textSecondary.withValues(alpha: 0.7),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.privacyConclusion.split('\n').last,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      ...conclusionLines.asMap().entries.map((entry) {
+                        final isLast = entry.key == conclusionLines.length - 1;
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: isLast ? 0 : 8),
+                          child: Text(
+                            entry.value,
+                            style: isLast
+                                ? const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  )
+                                : TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                                  ),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),
