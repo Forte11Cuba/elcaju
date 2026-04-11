@@ -1257,8 +1257,7 @@ class L10nKo extends L10n {
   String get swapChartUnavailable => '가격 불러오기 실패 · 탭하여 재시도';
 
   @override
-  String get swapChartMin => '최저';
-
-  @override
-  String get swapChartMax => '최고';
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  최저: $minPrice — 최고: $maxPrice';
+  }
 }

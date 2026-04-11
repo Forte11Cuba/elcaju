@@ -575,6 +575,5 @@
   "swapErrorExpired": "Angebot abgelaufen",
   "swapErrorGeneric": "Swap-Fehler: {error}",
   "swapChartUnavailable": "Preis nicht verfügbar · Tippen zum Wiederholen",
-  "swapChartMin": "Min",
-  "swapChartMax": "Max"
+  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}"
 }

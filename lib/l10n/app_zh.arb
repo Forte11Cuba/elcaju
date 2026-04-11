@@ -575,6 +575,5 @@
   "swapErrorExpired": "报价已过期",
   "swapErrorGeneric": "兑换错误: {error}",
   "swapChartUnavailable": "价格不可用 · 点击重试",
-  "swapChartMin": "最低",
-  "swapChartMax": "最高"
+  "swapChartMinMax": "24h  最低: {minPrice} — 最高: {maxPrice}"
 }

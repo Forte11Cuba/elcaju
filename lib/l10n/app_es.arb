@@ -598,6 +598,11 @@
     }
   },
   "swapChartUnavailable": "Precio no disponible · Toca para reintentar",
-  "swapChartMin": "Mín",
-  "swapChartMax": "Máx"
+  "swapChartMinMax": "24h  Mín: {minPrice} — Máx: {maxPrice}",
+  "@swapChartMinMax": {
+    "placeholders": {
+      "minPrice": { "type": "String" },
+      "maxPrice": { "type": "String" }
+    }
+  }
 }

@@ -575,6 +575,5 @@
   "swapErrorExpired": "Il preventivo è scaduto",
   "swapErrorGeneric": "Errore swap: {error}",
   "swapChartUnavailable": "Prezzo non disponibile · Tocca per riprovare",
-  "swapChartMin": "Min",
-  "swapChartMax": "Max"
+  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}"
 }

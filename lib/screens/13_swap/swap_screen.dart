@@ -102,10 +102,17 @@ class _SwapScreenState extends State<SwapScreen>
     });
     try {
       final prices = await PriceService.getHistoricalPrices(range: 'ONE_DAY');
-      if (mounted && prices.isNotEmpty) {
+      if (!mounted) return;
+      if (prices.length >= 2) {
         setState(() {
           _chartData = prices.map((p) => p.priceUsd).toList();
           _isLoadingChart = false;
+        });
+      } else {
+        setState(() {
+          _chartData = [];
+          _isLoadingChart = false;
+          _chartError = true;
         });
       }
     } catch (_) {
@@ -731,9 +738,10 @@ class _SwapScreenState extends State<SwapScreen>
     if (hasData) {
       final minVal = _chartData.reduce(min);
       final maxVal = _chartData.reduce(max);
-      final minLabel = l10n.swapChartMin;
-      final maxLabel = l10n.swapChartMax;
-      minMaxStr = '24h  $minLabel: \$${fmt.format(minVal.round())} — $maxLabel: \$${fmt.format(maxVal.round())}';
+      minMaxStr = l10n.swapChartMinMax(
+        '\$${fmt.format(minVal.round())}',
+        '\$${fmt.format(maxVal.round())}',
+      );
     }
 
     return Column(

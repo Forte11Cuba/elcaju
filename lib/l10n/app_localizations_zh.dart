@@ -1250,8 +1250,7 @@ class L10nZh extends L10n {
   String get swapChartUnavailable => '价格不可用 · 点击重试';
 
   @override
-  String get swapChartMin => '最低';
-
-  @override
-  String get swapChartMax => '最高';
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  最低: $minPrice — 最高: $maxPrice';
+  }
 }

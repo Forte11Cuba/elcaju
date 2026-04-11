@@ -575,6 +575,5 @@
   "swapErrorExpired": "Bei imeisha muda",
   "swapErrorGeneric": "Kosa la ubadilishaji: {error}",
   "swapChartUnavailable": "Bei haipatikani · Gusa kurudia",
-  "swapChartMin": "Chini",
-  "swapChartMax": "Juu"
+  "swapChartMinMax": "24h  Chini: {minPrice} — Juu: {maxPrice}"
 }

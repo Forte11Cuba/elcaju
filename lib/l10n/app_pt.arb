@@ -575,6 +575,5 @@
   "swapErrorExpired": "A cotação expirou",
   "swapErrorGeneric": "Erro no swap: {error}",
   "swapChartUnavailable": "Preço indisponível · Toque para tentar novamente",
-  "swapChartMin": "Mín",
-  "swapChartMax": "Máx"
+  "swapChartMinMax": "24h  Mín: {minPrice} — Máx: {maxPrice}"
 }

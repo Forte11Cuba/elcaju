@@ -2437,17 +2437,11 @@ abstract class L10n {
   /// **'Precio no disponible · Toca para reintentar'**
   String get swapChartUnavailable;
 
-  /// No description provided for @swapChartMin.
+  /// No description provided for @swapChartMinMax.
   ///
   /// In es, this message translates to:
-  /// **'Mín'**
-  String get swapChartMin;
-
-  /// No description provided for @swapChartMax.
-  ///
-  /// In es, this message translates to:
-  /// **'Máx'**
-  String get swapChartMax;
+  /// **'24h  Mín: {minPrice} — Máx: {maxPrice}'**
+  String swapChartMinMax(String minPrice, String maxPrice);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

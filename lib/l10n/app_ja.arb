@@ -575,6 +575,5 @@
   "swapErrorExpired": "見積もりの有効期限切れ",
   "swapErrorGeneric": "スワップエラー: {error}",
   "swapChartUnavailable": "価格を取得できません・タップで再試行",
-  "swapChartMin": "安値",
-  "swapChartMax": "高値"
+  "swapChartMinMax": "24h  安値: {minPrice} — 高値: {maxPrice}"
 }

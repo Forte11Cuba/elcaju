@@ -575,6 +575,5 @@
   "swapErrorExpired": "견적이 만료되었습니다",
   "swapErrorGeneric": "교환 오류: {error}",
   "swapChartUnavailable": "가격 불러오기 실패 · 탭하여 재시도",
-  "swapChartMin": "최저",
-  "swapChartMax": "최고"
+  "swapChartMinMax": "24h  최저: {minPrice} — 최고: {maxPrice}"
 }

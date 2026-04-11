@@ -575,6 +575,5 @@
   "swapErrorExpired": "Le devis a expiré",
   "swapErrorGeneric": "Erreur de swap : {error}",
   "swapChartUnavailable": "Prix indisponible · Appuyez pour réessayer",
-  "swapChartMin": "Min",
-  "swapChartMax": "Max"
+  "swapChartMinMax": "24h  Min : {minPrice} — Max : {maxPrice}"
 }

@@ -468,6 +468,5 @@
   "swapErrorExpired": "Quote has expired",
   "swapErrorGeneric": "Swap error: {error}",
   "swapChartUnavailable": "Price unavailable · Tap to retry",
-  "swapChartMin": "Min",
-  "swapChartMax": "Max"
+  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}"
 }

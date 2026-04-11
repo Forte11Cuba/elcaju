@@ -575,6 +575,5 @@
   "swapErrorExpired": "Котировка истекла",
   "swapErrorGeneric": "Ошибка обмена: {error}",
   "swapChartUnavailable": "Цена недоступна · Нажмите для повтора",
-  "swapChartMin": "Мин",
-  "swapChartMax": "Макс"
+  "swapChartMinMax": "24h  Мин: {minPrice} — Макс: {maxPrice}"
 }

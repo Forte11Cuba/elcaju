@@ -1255,8 +1255,7 @@ class L10nJa extends L10n {
   String get swapChartUnavailable => '価格を取得できません・タップで再試行';
 
   @override
-  String get swapChartMin => '安値';
-
-  @override
-  String get swapChartMax => '高値';
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  安値: $minPrice — 高値: $maxPrice';
+  }
 }

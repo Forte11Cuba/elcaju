@@ -1295,8 +1295,7 @@ class L10nFr extends L10n {
       'Prix indisponible · Appuyez pour réessayer';
 
   @override
-  String get swapChartMin => 'Min';
-
-  @override
-  String get swapChartMax => 'Max';
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  Min : $minPrice — Max : $maxPrice';
+  }
 }

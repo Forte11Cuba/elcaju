@@ -1279,8 +1279,7 @@ class L10nSw extends L10n {
   String get swapChartUnavailable => 'Bei haipatikani · Gusa kurudia';
 
   @override
-  String get swapChartMin => 'Chini';
-
-  @override
-  String get swapChartMax => 'Juu';
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  Chini: $minPrice — Juu: $maxPrice';
+  }
 }
