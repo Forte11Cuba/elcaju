@@ -573,5 +573,8 @@
   "swapSuccess": "Swap abgeschlossen",
   "swapErrorInsufficient": "Unzureichendes Guthaben",
   "swapErrorExpired": "Angebot abgelaufen",
-  "swapErrorGeneric": "Swap-Fehler: {error}"
+  "swapErrorGeneric": "Swap-Fehler: {error}",
+  "swapChartUnavailable": "Preis nicht verfügbar · Tippen zum Wiederholen",
+  "swapChartMin": "Min",
+  "swapChartMax": "Max"
 }

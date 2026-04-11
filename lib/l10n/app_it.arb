@@ -573,5 +573,8 @@
   "swapSuccess": "Swap completato",
   "swapErrorInsufficient": "Saldo insufficiente",
   "swapErrorExpired": "Il preventivo è scaduto",
-  "swapErrorGeneric": "Errore swap: {error}"
+  "swapErrorGeneric": "Errore swap: {error}",
+  "swapChartUnavailable": "Prezzo non disponibile · Tocca per riprovare",
+  "swapChartMin": "Min",
+  "swapChartMax": "Max"
 }

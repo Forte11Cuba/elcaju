@@ -573,5 +573,8 @@
   "swapSuccess": "Ubadilishaji umekamilika",
   "swapErrorInsufficient": "Salio haitoshi",
   "swapErrorExpired": "Bei imeisha muda",
-  "swapErrorGeneric": "Kosa la ubadilishaji: {error}"
+  "swapErrorGeneric": "Kosa la ubadilishaji: {error}",
+  "swapChartUnavailable": "Bei haipatikani · Gusa kurudia",
+  "swapChartMin": "Chini",
+  "swapChartMax": "Juu"
 }

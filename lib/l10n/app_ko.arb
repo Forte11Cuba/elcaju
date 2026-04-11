@@ -573,5 +573,8 @@
   "swapSuccess": "교환 완료",
   "swapErrorInsufficient": "잔액 부족",
   "swapErrorExpired": "견적이 만료되었습니다",
-  "swapErrorGeneric": "교환 오류: {error}"
+  "swapErrorGeneric": "교환 오류: {error}",
+  "swapChartUnavailable": "가격 불러오기 실패 · 탭하여 재시도",
+  "swapChartMin": "최저",
+  "swapChartMax": "최고"
 }

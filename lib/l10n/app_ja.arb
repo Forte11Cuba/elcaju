@@ -573,5 +573,8 @@
   "swapSuccess": "スワップ完了",
   "swapErrorInsufficient": "残高不足",
   "swapErrorExpired": "見積もりの有効期限切れ",
-  "swapErrorGeneric": "スワップエラー: {error}"
+  "swapErrorGeneric": "スワップエラー: {error}",
+  "swapChartUnavailable": "価格を取得できません・タップで再試行",
+  "swapChartMin": "安値",
+  "swapChartMax": "高値"
 }

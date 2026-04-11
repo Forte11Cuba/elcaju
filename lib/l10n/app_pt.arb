@@ -573,5 +573,8 @@
   "swapSuccess": "Swap concluído",
   "swapErrorInsufficient": "Saldo insuficiente",
   "swapErrorExpired": "A cotação expirou",
-  "swapErrorGeneric": "Erro no swap: {error}"
+  "swapErrorGeneric": "Erro no swap: {error}",
+  "swapChartUnavailable": "Preço indisponível · Toque para tentar novamente",
+  "swapChartMin": "Mín",
+  "swapChartMax": "Máx"
 }

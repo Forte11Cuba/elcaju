@@ -1273,4 +1273,13 @@ class L10nRu extends L10n {
   String swapErrorGeneric(String error) {
     return 'Ошибка обмена: $error';
   }
+
+  @override
+  String get swapChartUnavailable => 'Цена недоступна · Нажмите для повтора';
+
+  @override
+  String get swapChartMin => 'Мин';
+
+  @override
+  String get swapChartMax => 'Макс';
 }

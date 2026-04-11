@@ -596,5 +596,8 @@
     "placeholders": {
       "error": { "type": "String" }
     }
-  }
+  },
+  "swapChartUnavailable": "Precio no disponible · Toca para reintentar",
+  "swapChartMin": "Mín",
+  "swapChartMax": "Máx"
 }

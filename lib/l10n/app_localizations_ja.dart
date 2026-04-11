@@ -1250,4 +1250,13 @@ class L10nJa extends L10n {
   String swapErrorGeneric(String error) {
     return 'スワップエラー: $error';
   }
+
+  @override
+  String get swapChartUnavailable => '価格を取得できません・タップで再試行';
+
+  @override
+  String get swapChartMin => '安値';
+
+  @override
+  String get swapChartMax => '高値';
 }
