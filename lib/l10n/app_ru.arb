@@ -575,5 +575,11 @@
   "swapErrorExpired": "Котировка истекла",
   "swapErrorGeneric": "Ошибка обмена: {error}",
   "swapChartUnavailable": "Цена недоступна · Нажмите для повтора",
-  "swapChartMinMax": "24h  Мин: {minPrice} — Макс: {maxPrice}"
+  "swapChartMinMax": "24h  Мин: {minPrice} — Макс: {maxPrice}",
+  "privacyPolicy": "Политика конфиденциальности",
+  "privacyTitle": "МЫ НЕ СОБИРАЕМ НИЧЕГО",
+  "privacyGoodbye": "ПОКА",
+  "privacyKeepReading": "(читай дальше, если хочешь…)",
+  "privacyBody": "Мы не знаем, кто ты\nМы не знаем, сколько у тебя\nМы не знаем, что ты делаешь",
+  "privacyConclusion": "Лучший способ защитить твои данные —\nне иметь их"
 }

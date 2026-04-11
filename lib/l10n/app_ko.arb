@@ -575,5 +575,11 @@
   "swapErrorExpired": "견적이 만료되었습니다",
   "swapErrorGeneric": "교환 오류: {error}",
   "swapChartUnavailable": "가격 불러오기 실패 · 탭하여 재시도",
-  "swapChartMinMax": "24h  최저: {minPrice} — 최고: {maxPrice}"
+  "swapChartMinMax": "24h  최저: {minPrice} — 최고: {maxPrice}",
+  "privacyPolicy": "개인정보 처리방침",
+  "privacyTitle": "우리는 아무것도 수집하지 않습니다",
+  "privacyGoodbye": "안녕",
+  "privacyKeepReading": "(계속 읽고 싶으면…)",
+  "privacyBody": "당신이 누구인지 모릅니다\n얼마를 가지고 있는지 모릅니다\n무엇을 하는지 모릅니다",
+  "privacyConclusion": "데이터를 보호하는 가장 좋은 방법은\n데이터를 갖지 않는 것입니다"
 }

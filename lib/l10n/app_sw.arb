@@ -575,5 +575,11 @@
   "swapErrorExpired": "Bei imeisha muda",
   "swapErrorGeneric": "Kosa la ubadilishaji: {error}",
   "swapChartUnavailable": "Bei haipatikani · Gusa kurudia",
-  "swapChartMinMax": "24h  Chini: {minPrice} — Juu: {maxPrice}"
+  "swapChartMinMax": "24h  Chini: {minPrice} — Juu: {maxPrice}",
+  "privacyPolicy": "Sera ya faragha",
+  "privacyTitle": "HATUKUSANYI CHOCHOTE",
+  "privacyGoodbye": "KWAHERI",
+  "privacyKeepReading": "(endelea kusoma ukitaka…)",
+  "privacyBody": "Hatujui wewe ni nani\nHatujui una kiasi gani\nHatujui unafanya nini",
+  "privacyConclusion": "Njia bora ya kulinda data yako\nni kutokuwa nayo"
 }

@@ -1281,4 +1281,24 @@ class L10nRu extends L10n {
   String swapChartMinMax(String minPrice, String maxPrice) {
     return '24h  Мин: $minPrice — Макс: $maxPrice';
   }
+
+  @override
+  String get privacyPolicy => 'Политика конфиденциальности';
+
+  @override
+  String get privacyTitle => 'МЫ НЕ СОБИРАЕМ НИЧЕГО';
+
+  @override
+  String get privacyGoodbye => 'ПОКА';
+
+  @override
+  String get privacyKeepReading => '(читай дальше, если хочешь…)';
+
+  @override
+  String get privacyBody =>
+      'Мы не знаем, кто ты\nМы не знаем, сколько у тебя\nМы не знаем, что ты делаешь';
+
+  @override
+  String get privacyConclusion =>
+      'Лучший способ защитить твои данные —\nне иметь их';
 }

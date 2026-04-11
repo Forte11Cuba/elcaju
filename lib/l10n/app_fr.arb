@@ -575,5 +575,11 @@
   "swapErrorExpired": "Le devis a expiré",
   "swapErrorGeneric": "Erreur de swap : {error}",
   "swapChartUnavailable": "Prix indisponible · Appuyez pour réessayer",
-  "swapChartMinMax": "24h  Min : {minPrice} — Max : {maxPrice}"
+  "swapChartMinMax": "24h  Min : {minPrice} — Max : {maxPrice}",
+  "privacyPolicy": "Politique de confidentialité",
+  "privacyTitle": "NOUS NE COLLECTONS RIEN",
+  "privacyGoodbye": "AU REVOIR",
+  "privacyKeepReading": "(continue à lire si tu veux…)",
+  "privacyBody": "Nous ne savons pas qui tu es\nNous ne savons pas combien tu as\nNous ne savons pas ce que tu fais",
+  "privacyConclusion": "La meilleure façon de protéger tes données,\nc'est de ne pas les avoir"
 }

@@ -2442,6 +2442,42 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'24h  Mín: {minPrice} — Máx: {maxPrice}'**
   String swapChartMinMax(String minPrice, String maxPrice);
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In es, this message translates to:
+  /// **'Política de privacidad'**
+  String get privacyPolicy;
+
+  /// No description provided for @privacyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'NO RECOPILAMOS NADA'**
+  String get privacyTitle;
+
+  /// No description provided for @privacyGoodbye.
+  ///
+  /// In es, this message translates to:
+  /// **'ADIÓS'**
+  String get privacyGoodbye;
+
+  /// No description provided for @privacyKeepReading.
+  ///
+  /// In es, this message translates to:
+  /// **'(sigue leyendo si quieres…)'**
+  String get privacyKeepReading;
+
+  /// No description provided for @privacyBody.
+  ///
+  /// In es, this message translates to:
+  /// **'No sabemos quién eres\nNo sabemos cuánto tienes\nNo sabemos qué haces'**
+  String get privacyBody;
+
+  /// No description provided for @privacyConclusion.
+  ///
+  /// In es, this message translates to:
+  /// **'La mejor forma de proteger tus datos\nes no tenerlos'**
+  String get privacyConclusion;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {
