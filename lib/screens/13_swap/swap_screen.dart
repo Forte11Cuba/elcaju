@@ -103,9 +103,13 @@ class _SwapScreenState extends State<SwapScreen>
     try {
       final prices = await PriceService.getHistoricalPrices(range: 'ONE_DAY');
       if (!mounted) return;
-      if (prices.length >= 2) {
+      final chartData = prices
+          .map((p) => p.priceUsd)
+          .where((price) => price.isFinite && price > 0)
+          .toList();
+      if (chartData.length >= 2) {
         setState(() {
-          _chartData = prices.map((p) => p.priceUsd).toList();
+          _chartData = chartData;
           _isLoadingChart = false;
         });
       } else {
