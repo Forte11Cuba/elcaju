@@ -1252,4 +1252,12 @@ class L10nKo extends L10n {
   String swapErrorGeneric(String error) {
     return '교환 오류: $error';
   }
+
+  @override
+  String get swapChartUnavailable => '가격 불러오기 실패 · 탭하여 재시도';
+
+  @override
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  최저: $minPrice — 최고: $maxPrice';
+  }
 }

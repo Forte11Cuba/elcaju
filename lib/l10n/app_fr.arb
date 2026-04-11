@@ -573,5 +573,7 @@
   "swapSuccess": "Swap terminé",
   "swapErrorInsufficient": "Solde insuffisant",
   "swapErrorExpired": "Le devis a expiré",
-  "swapErrorGeneric": "Erreur de swap : {error}"
+  "swapErrorGeneric": "Erreur de swap : {error}",
+  "swapChartUnavailable": "Prix indisponible · Appuyez pour réessayer",
+  "swapChartMinMax": "24h  Min : {minPrice} — Max : {maxPrice}"
 }

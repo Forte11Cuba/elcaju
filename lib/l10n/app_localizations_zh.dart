@@ -1245,4 +1245,12 @@ class L10nZh extends L10n {
   String swapErrorGeneric(String error) {
     return '兑换错误: $error';
   }
+
+  @override
+  String get swapChartUnavailable => '价格不可用 · 点击重试';
+
+  @override
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  最低: $minPrice — 最高: $maxPrice';
+  }
 }

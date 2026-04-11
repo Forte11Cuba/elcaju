@@ -573,5 +573,7 @@
   "swapSuccess": "Обмен завершён",
   "swapErrorInsufficient": "Недостаточный баланс",
   "swapErrorExpired": "Котировка истекла",
-  "swapErrorGeneric": "Ошибка обмена: {error}"
+  "swapErrorGeneric": "Ошибка обмена: {error}",
+  "swapChartUnavailable": "Цена недоступна · Нажмите для повтора",
+  "swapChartMinMax": "24h  Мин: {minPrice} — Макс: {maxPrice}"
 }

@@ -2430,6 +2430,18 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'Error en el swap: {error}'**
   String swapErrorGeneric(String error);
+
+  /// No description provided for @swapChartUnavailable.
+  ///
+  /// In es, this message translates to:
+  /// **'Precio no disponible · Toca para reintentar'**
+  String get swapChartUnavailable;
+
+  /// No description provided for @swapChartMinMax.
+  ///
+  /// In es, this message translates to:
+  /// **'24h  Mín: {minPrice} — Máx: {maxPrice}'**
+  String swapChartMinMax(String minPrice, String maxPrice);
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

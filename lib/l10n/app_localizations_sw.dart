@@ -1274,4 +1274,12 @@ class L10nSw extends L10n {
   String swapErrorGeneric(String error) {
     return 'Kosa la ubadilishaji: $error';
   }
+
+  @override
+  String get swapChartUnavailable => 'Bei haipatikani · Gusa kurudia';
+
+  @override
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  Chini: $minPrice — Juu: $maxPrice';
+  }
 }

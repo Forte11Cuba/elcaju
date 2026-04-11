@@ -466,5 +466,7 @@
   "swapSuccess": "Swap completed",
   "swapErrorInsufficient": "Insufficient balance",
   "swapErrorExpired": "Quote has expired",
-  "swapErrorGeneric": "Swap error: {error}"
+  "swapErrorGeneric": "Swap error: {error}",
+  "swapChartUnavailable": "Price unavailable · Tap to retry",
+  "swapChartMinMax": "24h  Min: {minPrice} — Max: {maxPrice}"
 }

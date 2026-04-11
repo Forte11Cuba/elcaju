@@ -573,5 +573,7 @@
   "swapSuccess": "兑换完成",
   "swapErrorInsufficient": "余额不足",
   "swapErrorExpired": "报价已过期",
-  "swapErrorGeneric": "兑换错误: {error}"
+  "swapErrorGeneric": "兑换错误: {error}",
+  "swapChartUnavailable": "价格不可用 · 点击重试",
+  "swapChartMinMax": "24h  最低: {minPrice} — 最高: {maxPrice}"
 }

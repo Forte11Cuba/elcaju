@@ -44,6 +44,7 @@ class _SwapScreenState extends State<SwapScreen>
 
   List<double> _chartData = [];
   bool _isLoadingChart = true;
+  bool _chartError = false;
 
   // --- Swap state ---
   bool _isSwapping = false;
@@ -81,7 +82,6 @@ class _SwapScreenState extends State<SwapScreen>
   Future<void> _loadBalances() async {
     final walletProvider = context.read<WalletProvider>();
     final mintUrl = WalletProvider.cubaBitcoinMint;
-    if (mintUrl == null) return;
 
     try {
       final balances = await walletProvider.getBalancesForMint(mintUrl);
@@ -96,31 +96,38 @@ class _SwapScreenState extends State<SwapScreen>
   }
 
   Future<void> _loadChartData() async {
+    setState(() {
+      _isLoadingChart = true;
+      _chartError = false;
+    });
     try {
       final prices = await PriceService.getHistoricalPrices(range: 'ONE_DAY');
-      if (mounted && prices.isNotEmpty) {
+      if (!mounted) return;
+      final chartData = prices
+          .map((p) => p.priceUsd)
+          .where((price) => price.isFinite && price > 0)
+          .toList();
+      if (chartData.length >= 2) {
         setState(() {
-          _chartData = prices.map((p) => p.priceUsd).toList();
+          _chartData = chartData;
           _isLoadingChart = false;
+        });
+      } else {
+        setState(() {
+          _chartData = [];
+          _isLoadingChart = false;
+          _chartError = true;
         });
       }
     } catch (_) {
       if (mounted) {
         setState(() {
-          _chartData = _generateMockData();
+          _chartData = [];
           _isLoadingChart = false;
+          _chartError = true;
         });
       }
     }
-  }
-
-  List<double> _generateMockData() {
-    final priceProvider = context.read<PriceProvider>();
-    final basePrice = priceProvider.btcPriceUsd ?? 65000;
-    final rng = Random();
-    return List.generate(24, (i) {
-      return basePrice + (rng.nextDouble() - 0.48) * basePrice * 0.02;
-    });
   }
 
   void _onFromChanged() {
@@ -263,7 +270,6 @@ class _SwapScreenState extends State<SwapScreen>
   Future<void> _startSwap() async {
     final walletProvider = context.read<WalletProvider>();
     final mintUrl = WalletProvider.cubaBitcoinMint;
-    if (mintUrl == null) return;
 
     final destAmount = _getDestAmount();
     if (destAmount <= BigInt.zero) return;
@@ -708,24 +714,43 @@ class _SwapScreenState extends State<SwapScreen>
   // --- Widgets ---
 
   Widget _buildPriceChart(PriceProvider priceProvider) {
+    final l10n = L10n.of(context)!;
     final btcPrice = priceProvider.btcPriceUsd;
-    final priceStr = btcPrice != null
-        ? '\$${NumberFormat('#,###').format(btcPrice.round())}'
-        : '...';
+    final fmt = NumberFormat('#,###');
+    final priceStr = btcPrice != null ? '\$${fmt.format(btcPrice.round())}' : '...';
 
     String rateStr = '...';
     if (btcPrice != null && btcPrice > 0) {
       final satsPerDollar = (100000000 / btcPrice).round();
-      rateStr = '1 USD ≈ ${NumberFormat('#,###').format(satsPerDollar)} sats';
+      rateStr = '1 USD ≈ ${fmt.format(satsPerDollar)} sats';
     }
 
-    final isUpTrend =
-        _chartData.length >= 2 && _chartData.last >= _chartData.first;
+    final hasData = _chartData.length >= 2;
+    final isUpTrend = hasData && _chartData.last >= _chartData.first;
     final trendColor = isUpTrend ? AppColors.success : AppColors.error;
+
+    // % cambio 24h
+    String? changeStr;
+    if (hasData) {
+      final change = ((_chartData.last - _chartData.first) / _chartData.first) * 100;
+      final sign = change >= 0 ? '+' : '';
+      changeStr = '$sign${change.toStringAsFixed(1)}% 24h';
+    }
+
+    // Min/Max 24h
+    String? minMaxStr;
+    if (hasData) {
+      final minVal = _chartData.reduce(min);
+      final maxVal = _chartData.reduce(max);
+      minMaxStr = l10n.swapChartMinMax(
+        '\$${fmt.format(minVal.round())}',
+        '\$${fmt.format(maxVal.round())}',
+      );
+    }
 
     return Column(
       children: [
-        // Price
+        // Precio centrado
         Text(
           priceStr,
           style: const TextStyle(
@@ -736,18 +761,35 @@ class _SwapScreenState extends State<SwapScreen>
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          'USD',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary.withValues(alpha: 0.6),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'BTC/USD',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary.withValues(alpha: 0.6),
+              ),
+            ),
+            if (changeStr != null) ...[
+              const SizedBox(width: 8),
+              Text(
+                changeStr,
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: trendColor,
+                ),
+              ),
+            ],
+          ],
         ),
         const SizedBox(height: 8),
 
-        // Sparkline (sin contenedor, integrado)
+        // Sparkline o estado de error
         SizedBox(
           height: 40,
           width: double.infinity,
@@ -762,15 +804,44 @@ class _SwapScreenState extends State<SwapScreen>
                     ),
                   ),
                 )
-              : CustomPaint(
-                  painter: _SparklinePainter(
-                    data: _chartData,
-                    lineColor: trendColor,
-                    fillColor: trendColor.withValues(alpha: 0.08),
-                  ),
-                ),
+              : _chartError
+                  ? GestureDetector(
+                      onTap: _loadChartData,
+                      child: Center(
+                        child: Text(
+                          l10n.swapChartUnavailable,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 12,
+                            color: AppColors.textSecondary.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ),
+                    )
+                  : CustomPaint(
+                      painter: _SparklinePainter(
+                        data: _chartData,
+                        lineColor: trendColor,
+                        fillColor: trendColor.withValues(alpha: 0.08),
+                      ),
+                    ),
         ),
         const SizedBox(height: 8),
+
+        // Min/Max 24h
+        if (minMaxStr != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(
+              minMaxStr,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary.withValues(alpha: 0.5),
+              ),
+            ),
+          ),
 
         // Exchange rate
         Text(

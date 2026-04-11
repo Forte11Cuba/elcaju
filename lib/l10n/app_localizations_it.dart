@@ -1277,4 +1277,13 @@ class L10nIt extends L10n {
   String swapErrorGeneric(String error) {
     return 'Errore swap: $error';
   }
+
+  @override
+  String get swapChartUnavailable =>
+      'Prezzo non disponibile · Tocca per riprovare';
+
+  @override
+  String swapChartMinMax(String minPrice, String maxPrice) {
+    return '24h  Min: $minPrice — Max: $maxPrice';
+  }
 }
