@@ -32,17 +32,15 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadMints());
   }
 
-  Future<void> _loadMints() async {
+  void _loadMints() {
     final walletProvider = context.read<WalletProvider>();
-    if (mounted) {
-      setState(() {
-        _availableMints = walletProvider.mintUrls;
-        _isLoadingMints = false;
-        if (_availableMints.isNotEmpty) {
-          _selectedMintUrl = _availableMints.first;
-        }
-      });
-    }
+    setState(() {
+      _availableMints = walletProvider.mintUrls;
+      _isLoadingMints = false;
+      if (_availableMints.isNotEmpty) {
+        _selectedMintUrl = _availableMints.first;
+      }
+    });
   }
 
   @override
