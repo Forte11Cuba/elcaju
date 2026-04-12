@@ -29,7 +29,7 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
   @override
   void initState() {
     super.initState();
-    _loadMints();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadMints());
   }
 
   Future<void> _loadMints() async {
