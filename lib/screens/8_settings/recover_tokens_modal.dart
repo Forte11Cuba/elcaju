@@ -440,6 +440,9 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
       padding: const EdgeInsets.only(top: AppDimensions.paddingMedium),
       child: TextField(
         controller: _mnemonicController,
+        autocorrect: false,
+        enableSuggestions: false,
+        textCapitalization: TextCapitalization.none,
         maxLines: 3,
         style: const TextStyle(
           fontFamily: 'Inter',
@@ -561,13 +564,14 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
           // Escanear todos los mints (retorna Map<String, Map<String, BigInt>>)
           final results = await walletProvider.restoreAllMints();
 
-          int mintsScanned = 0;
+          int mintsRecovered = 0;
           int mintsWithError = 0;
           final recoveredDetails = <String>[];
 
           for (final mintEntry in results.entries) {
             final unitBalances = mintEntry.value;
             bool hasError = false;
+            bool hasRecovered = false;
             for (final unitEntry in unitBalances.entries) {
               final unit = unitEntry.key;
               final balance = unitEntry.value;
@@ -577,21 +581,19 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
                 final formatted = UnitFormatter.formatBalance(balance, unit);
                 final label = UnitFormatter.getUnitLabel(unit);
                 recoveredDetails.add('$formatted $label');
+                hasRecovered = true;
               }
             }
 
-            if (hasError) {
-              mintsWithError++;
-            } else {
-              mintsScanned++;
-            }
+            if (hasError) mintsWithError++;
+            if (hasRecovered) mintsRecovered++;
           }
 
           if (!mounted) return;
           setState(() {
             _isSuccess = true;
             if (recoveredDetails.isNotEmpty) {
-              _result = l10n.recoveredTokens(recoveredDetails.join(", "), mintsScanned);
+              _result = l10n.recoveredTokens(recoveredDetails.join(", "), mintsRecovered);
             } else {
               _result = l10n.scanCompleteNoTokens;
             }
