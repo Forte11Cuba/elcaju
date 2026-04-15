@@ -550,6 +550,15 @@ class _SwapScreenState extends State<SwapScreen>
       _swapError = null;
     });
 
+    // Verificar que el fee no supere el monto (operación inviable)
+    if (meltQuote.amount <= meltQuote.feeReserve) {
+      setState(() {
+        _isSwapping = false;
+        _swapError = l10n.feeExceedsAmount;
+      });
+      return;
+    }
+
     late final PreparedMelt prepared;
     try {
       prepared = await srcWallet.prepareMelt(quote: meltQuote);
@@ -609,7 +618,9 @@ class _SwapScreenState extends State<SwapScreen>
       // Liberar solo las proofs reservadas para ESTE melt
       try {
         await srcWallet.cancelMelt(melt: prepared);
-      } catch (_) {}
+      } catch (cancelErr) {
+        debugPrint('[SWAP] cancelMelt failed: $cancelErr');
+      }
 
       if (!mounted) return;
       final errorStr = e.toString().toLowerCase();
