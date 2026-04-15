@@ -294,6 +294,9 @@ class L10nSw extends L10n {
   String get insufficientBalance => 'Salio halitoshi';
 
   @override
+  String get feeExceedsAmount => 'Ada inazidi kiasi cha kutuma';
+
+  @override
   String tokenCreationError(String error) {
     return 'Hitilafu ya kuunda tokeni: $error';
   }

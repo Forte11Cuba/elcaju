@@ -118,6 +118,7 @@
   "confirm": "Подтвердить",
   "cancel": "Отмена",
   "insufficientBalance": "Недостаточный баланс",
+  "feeExceedsAmount": "Комиссия превышает сумму отправки",
   "tokenCreationError": "Ошибка создания токена: {error}",
   "@tokenCreationError": {
     "placeholders": {

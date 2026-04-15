@@ -13,6 +13,25 @@ import 'token.dart';
 // These functions are ignored because they are not marked as `pub`: `mint_url`, `unit`, `update_balance_streams`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `cmp`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `into`, `partial_cmp`, `try_into`, `try_into`
 
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PreparedMelt>>
+abstract class PreparedMelt implements RustOpaqueInterface {
+  BigInt get amount;
+
+  BigInt get feeReserve;
+
+  BigInt get inputFee;
+
+  BigInt get swapFee;
+
+  set amount(BigInt amount);
+
+  set feeReserve(BigInt feeReserve);
+
+  set inputFee(BigInt inputFee);
+
+  set swapFee(BigInt swapFee);
+}
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PreparedSend>>
 abstract class PreparedSend implements RustOpaqueInterface {
   BigInt get amount;
@@ -44,11 +63,15 @@ abstract class Wallet implements RustOpaqueInterface {
 
   Future<BigInt> balance();
 
+  Future<void> cancelMelt({required PreparedMelt melt});
+
   Future<void> cancelSend({required PreparedSend send});
 
   Future<void> checkAllMintQuotes();
 
   Future<void> checkPendingTransactions();
+
+  Future<BigInt> confirmMelt({required PreparedMelt melt});
 
   /// Create a NUT-18 payment request with Nostr transport.
   ///
@@ -66,8 +89,6 @@ abstract class Wallet implements RustOpaqueInterface {
   Future<bool> isTokenSpent({required Token token});
 
   Future<List<Transaction>> listTransactions({TransactionDirection? direction});
-
-  Future<BigInt> melt({required MeltQuote quote});
 
   Future<MeltQuote> meltQuote({required String request});
 
@@ -97,13 +118,15 @@ abstract class Wallet implements RustOpaqueInterface {
     BigInt? customAmount,
   });
 
+  Future<PreparedMelt> prepareMelt({required MeltQuote quote});
+
   Future<PreparedSend> prepareSend({required BigInt amount, SendOptions? opts});
 
   Future<BigInt> receive({required Token token, ReceiveOptions? opts});
 
   /// Check pending-spent proofs with the mint and revert unspent ones.
-  /// Returns the number of proofs recovered.
-  Future<BigInt> reclaimPendingProofs();
+  /// Returns count and total amount of proofs recovered.
+  Future<ReclaimResult> reclaimPendingProofs();
 
   Future<void> recoverIncompleteSagas();
 
@@ -182,7 +205,7 @@ class MintQuote {
   final Token? token;
   final String? error;
 
-  /// Deterministic transaction ID (set when state == Issued)
+  /// Deterministic transaction ID (set when proofs are available, typically on Issued)
   final String? transactionId;
 
   const MintQuote({
@@ -243,6 +266,24 @@ class ReceiveOptions {
           runtimeType == other.runtimeType &&
           signingKeys == other.signingKeys &&
           preimages == other.preimages;
+}
+
+class ReclaimResult {
+  final BigInt count;
+  final BigInt amount;
+
+  const ReclaimResult({required this.count, required this.amount});
+
+  @override
+  int get hashCode => count.hashCode ^ amount.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReclaimResult &&
+          runtimeType == other.runtimeType &&
+          count == other.count &&
+          amount == other.amount;
 }
 
 class SendOptions {

@@ -118,6 +118,7 @@
   "confirm": "Conferma",
   "cancel": "Annulla",
   "insufficientBalance": "Saldo insufficiente",
+  "feeExceedsAmount": "La commissione supera l'importo da inviare",
   "tokenCreationError": "Errore creazione token: {error}",
   "@tokenCreationError": {
     "placeholders": {

@@ -661,6 +661,12 @@ abstract class L10n {
   /// **'Balance insuficiente'**
   String get insufficientBalance;
 
+  /// No description provided for @feeExceedsAmount.
+  ///
+  /// In es, this message translates to:
+  /// **'La comisión supera el monto a enviar'**
+  String get feeExceedsAmount;
+
   /// No description provided for @tokenCreationError.
   ///
   /// In es, this message translates to:

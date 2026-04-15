@@ -103,6 +103,7 @@
   "confirm": "Confirm",
   "cancel": "Cancel",
   "insufficientBalance": "Insufficient balance",
+  "feeExceedsAmount": "Fee exceeds the amount to send",
   "tokenCreationError": "Error creating token: {error}",
 
   "tokenCreated": "Token created",

@@ -118,6 +118,7 @@
   "confirm": "Bestätigen",
   "cancel": "Abbrechen",
   "insufficientBalance": "Unzureichendes Guthaben",
+  "feeExceedsAmount": "Die Gebühr übersteigt den Sendebetrag",
   "tokenCreationError": "Fehler beim Erstellen des Tokens: {error}",
   "@tokenCreationError": {
     "placeholders": {

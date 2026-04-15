@@ -297,6 +297,9 @@ class L10nFr extends L10n {
   String get insufficientBalance => 'Solde insuffisant';
 
   @override
+  String get feeExceedsAmount => 'Les frais dépassent le montant à envoyer';
+
+  @override
   String tokenCreationError(String error) {
     return 'Erreur de création du token : $error';
   }

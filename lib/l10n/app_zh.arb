@@ -118,6 +118,7 @@
   "confirm": "确认",
   "cancel": "取消",
   "insufficientBalance": "余额不足",
+  "feeExceedsAmount": "手续费超过发送金额",
   "tokenCreationError": "创建代币错误：{error}",
   "@tokenCreationError": {
     "placeholders": {

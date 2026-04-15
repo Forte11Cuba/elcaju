@@ -289,6 +289,9 @@ class L10nJa extends L10n {
   String get insufficientBalance => '残高不足';
 
   @override
+  String get feeExceedsAmount => '手数料が送金額を超えています';
+
+  @override
   String tokenCreationError(String error) {
     return 'トークン作成エラー：$error';
   }

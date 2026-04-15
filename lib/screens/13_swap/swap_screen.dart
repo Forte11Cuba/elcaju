@@ -550,9 +550,22 @@ class _SwapScreenState extends State<SwapScreen>
       _swapError = null;
     });
 
+    late final PreparedMelt prepared;
+    try {
+      prepared = await srcWallet.prepareMelt(quote: meltQuote);
+    } catch (e) {
+      // prepareMelt falló: no hay proofs reservadas, solo mostrar error
+      if (!mounted) return;
+      setState(() {
+        _isSwapping = false;
+        _swapError = l10n.swapErrorGeneric(e.toString());
+      });
+      return;
+    }
+
     try {
       // Ejecutar melt (paga el invoice Lightning)
-      await srcWallet.melt(quote: meltQuote);
+      await srcWallet.confirmMelt(melt: prepared);
 
       // Guardar metadata del melt (lado enviado)
       await walletProvider.saveSwapMeltMetadata(
@@ -592,6 +605,12 @@ class _SwapScreenState extends State<SwapScreen>
     } catch (e) {
       _mintSubscription?.cancel();
       _mintSubscription = null;
+
+      // Liberar solo las proofs reservadas para ESTE melt
+      try {
+        await srcWallet.cancelMelt(melt: prepared);
+      } catch (_) {}
+
       if (!mounted) return;
       final errorStr = e.toString().toLowerCase();
       setState(() {
