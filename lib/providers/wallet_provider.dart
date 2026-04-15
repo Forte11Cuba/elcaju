@@ -1092,7 +1092,7 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Método de conveniencia: prepara y confirma en un solo paso.
-  /// Si confirmSend falla, libera proofs reservados con cancelSend.
+  /// Si confirmSend falla, intenta recuperar proofs consultando el mint.
   Future<String> sendTokens(BigInt amount, String? memo) async {
     final prepared = await prepareSend(amount);
     debugPrint('[SEND] prepareSend OK - fee=${prepared.fee}');
@@ -1102,9 +1102,10 @@ class WalletProvider extends ChangeNotifier {
       return token;
     } catch (e) {
       try {
-        await cancelSend(prepared);
-      } catch (cancelErr) {
-        debugPrint('[SEND] cancelSend failed: $cancelErr');
+        final wallet = await getActiveWallet();
+        await wallet.reclaimPendingProofs();
+      } catch (reclaimErr) {
+        debugPrint('[SEND] reclaimPendingProofs failed: $reclaimErr');
       }
       rethrow;
     }
@@ -1112,7 +1113,7 @@ class WalletProvider extends ChangeNotifier {
 
   /// Envía tokens P2PK (bloqueados a una clave pública).
   /// CDK 0.15+ con includeFee: true maneja correctamente mints con ppk>0.
-  /// Si confirmSend falla, libera proofs reservados con cancelSend.
+  /// Si confirmSend falla, intenta recuperar proofs consultando el mint.
   Future<String> sendTokensP2pk(BigInt amount, String pubkey, String? memo) async {
     debugPrint('[P2PK] Sending $amount to ${pubkey.length > 16 ? pubkey.substring(0, 16) : pubkey}...');
     final prepared = await prepareSendP2pk(amount, pubkey);
@@ -1123,9 +1124,10 @@ class WalletProvider extends ChangeNotifier {
       return token;
     } catch (e) {
       try {
-        await cancelSend(prepared);
-      } catch (cancelErr) {
-        debugPrint('[P2PK] cancelSend failed: $cancelErr');
+        final wallet = await getActiveWallet();
+        await wallet.reclaimPendingProofs();
+      } catch (reclaimErr) {
+        debugPrint('[P2PK] reclaimPendingProofs failed: $reclaimErr');
       }
       rethrow;
     }
@@ -1498,7 +1500,8 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Ejecuta el pago del invoice.
-  /// Usa prepare/confirm/cancel para recuperar proofs si el pago falla.
+  /// Si confirmMelt falla, intenta recuperar proofs consultando el mint.
+  /// FRB consume PreparedMelt por valor, así que cancelMelt no es posible.
   Future<BigInt> melt(MeltQuote quote) async {
     final wallet = await getActiveWallet();
     final prepared = await wallet.prepareMelt(quote: quote);
@@ -1514,10 +1517,13 @@ class WalletProvider extends ChangeNotifier {
       notifyListeners();
       return totalPaid;
     } catch (e) {
+      // PreparedMelt ya fue consumido por FRB — cancelMelt es imposible.
+      // reclaimPendingProofs verifica con el mint antes de restaurar,
+      // así que es seguro incluso si el pago realmente se procesó.
       try {
-        await wallet.cancelMelt(melt: prepared);
-      } catch (cancelErr) {
-        debugPrint('[MELT] cancelMelt failed: $cancelErr');
+        await wallet.reclaimPendingProofs();
+      } catch (reclaimErr) {
+        debugPrint('[MELT] reclaimPendingProofs failed: $reclaimErr');
       }
       rethrow;
     }
@@ -1526,10 +1532,9 @@ class WalletProvider extends ChangeNotifier {
   /// Recupera proofs huérfanas en PendingSpent consultando el mint.
   /// Solo revierte proofs que el mint confirma como no gastadas.
   /// Si [mintUrl] es null, escanea todos los mints.
-  /// Retorna {count, amount} total de proofs recuperadas.
-  Future<ReclaimResult> reclaimPendingProofs({String? mintUrl}) async {
-    var totalCount = BigInt.zero;
-    var totalAmount = BigInt.zero;
+  /// Retorna Map<unit, ReclaimResult> con resultados agrupados por unidad.
+  Future<Map<String, ReclaimResult>> reclaimPendingProofs({String? mintUrl}) async {
+    final perUnit = <String, ReclaimResult>{};
     final mints = mintUrl != null
         ? {mintUrl: _mintUnits[mintUrl] ?? ['sat']}
         : _mintUnits;
@@ -1538,17 +1543,22 @@ class WalletProvider extends ChangeNotifier {
         try {
           final wallet = await getWallet(entry.key, unit);
           final result = await wallet.reclaimPendingProofs();
-          totalCount += result.count;
-          totalAmount += result.amount;
+          if (result.count > BigInt.zero) {
+            final prev = perUnit[unit];
+            perUnit[unit] = ReclaimResult(
+              count: (prev?.count ?? BigInt.zero) + result.count,
+              amount: (prev?.amount ?? BigInt.zero) + result.amount,
+            );
+          }
         } catch (e) {
           debugPrint('Reclaim pending proofs failed for ${entry.key}:$unit: $e');
         }
       }
     }
-    if (totalCount > BigInt.zero) {
+    if (perUnit.isNotEmpty) {
       notifyListeners();
     }
-    return ReclaimResult(count: totalCount, amount: totalAmount);
+    return perUnit;
   }
 
   /// Guarda metadata para una transacción de melt (Lightning withdrawal).
