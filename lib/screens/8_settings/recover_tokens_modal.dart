@@ -593,12 +593,14 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
           if (!mounted) return;
 
           // Agregar cada unidad reclamada por separado
-          for (final entry in reclaimMap.entries) {
-            final unit = entry.key;
-            final reclaim = entry.value;
-            final formatted = UnitFormatter.formatBalance(reclaim.amount, unit);
-            final label = UnitFormatter.getUnitLabel(unit);
-            recoveredDetails.add('$formatted $label (${reclaim.count} proofs)');
+          if (reclaimMap.isNotEmpty) {
+            for (final entry in reclaimMap.entries) {
+              final unit = entry.key;
+              final reclaim = entry.value;
+              final formatted = UnitFormatter.formatBalance(reclaim.amount, unit);
+              final label = UnitFormatter.getUnitLabel(unit);
+              recoveredDetails.add('$formatted $label (${reclaim.count} proofs)');
+            }
             mintsRecovered++;
           }
 

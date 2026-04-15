@@ -1092,45 +1092,27 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Método de conveniencia: prepara y confirma en un solo paso.
-  /// Si confirmSend falla, intenta recuperar proofs consultando el mint.
+  /// Si confirmSend falla, los proofs quedan en PendingSpent.
+  /// No llamamos reclaimPendingProofs aquí porque podría revocar
+  /// tokens de otros envíos no reclamados. El usuario puede recuperar
+  /// manualmente desde Settings → Recover Tokens.
   Future<String> sendTokens(BigInt amount, String? memo) async {
     final prepared = await prepareSend(amount);
     debugPrint('[SEND] prepareSend OK - fee=${prepared.fee}');
-    try {
-      final token = await confirmSend(prepared, memo);
-      debugPrint('[SEND] Send completed');
-      return token;
-    } catch (e) {
-      try {
-        final wallet = await getActiveWallet();
-        await wallet.reclaimPendingProofs();
-      } catch (reclaimErr) {
-        debugPrint('[SEND] reclaimPendingProofs failed: $reclaimErr');
-      }
-      rethrow;
-    }
+    final token = await confirmSend(prepared, memo);
+    debugPrint('[SEND] Send completed');
+    return token;
   }
 
   /// Envía tokens P2PK (bloqueados a una clave pública).
   /// CDK 0.15+ con includeFee: true maneja correctamente mints con ppk>0.
-  /// Si confirmSend falla, intenta recuperar proofs consultando el mint.
   Future<String> sendTokensP2pk(BigInt amount, String pubkey, String? memo) async {
     debugPrint('[P2PK] Sending $amount to ${pubkey.length > 16 ? pubkey.substring(0, 16) : pubkey}...');
     final prepared = await prepareSendP2pk(amount, pubkey);
     debugPrint('[P2PK] prepareSend OK - fee=${prepared.fee}');
-    try {
-      final token = await confirmSend(prepared, memo);
-      debugPrint('[P2PK] Send completed');
-      return token;
-    } catch (e) {
-      try {
-        final wallet = await getActiveWallet();
-        await wallet.reclaimPendingProofs();
-      } catch (reclaimErr) {
-        debugPrint('[P2PK] reclaimPendingProofs failed: $reclaimErr');
-      }
-      rethrow;
-    }
+    final token = await confirmSend(prepared, memo);
+    debugPrint('[P2PK] Send completed');
+    return token;
   }
 
   /// Verifica si hay transacciones salientes pendientes en el wallet activo.
@@ -1500,8 +1482,9 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Ejecuta el pago del invoice.
-  /// Si confirmMelt falla, intenta recuperar proofs consultando el mint.
   /// FRB consume PreparedMelt por valor, así que cancelMelt no es posible.
+  /// Si falla, usamos recoverIncompleteSagas para reanudar solo esta operación
+  /// sin afectar otros proofs pendientes (como tokens enviados no reclamados).
   Future<BigInt> melt(MeltQuote quote) async {
     final wallet = await getActiveWallet();
     final prepared = await wallet.prepareMelt(quote: quote);
@@ -1518,12 +1501,12 @@ class WalletProvider extends ChangeNotifier {
       return totalPaid;
     } catch (e) {
       // PreparedMelt ya fue consumido por FRB — cancelMelt es imposible.
-      // reclaimPendingProofs verifica con el mint antes de restaurar,
-      // así que es seguro incluso si el pago realmente se procesó.
+      // recoverIncompleteSagas reanuda solo la saga interrumpida,
+      // sin afectar otros proofs en PendingSpent (sends no reclamados).
       try {
-        await wallet.reclaimPendingProofs();
-      } catch (reclaimErr) {
-        debugPrint('[MELT] reclaimPendingProofs failed: $reclaimErr');
+        await wallet.recoverIncompleteSagas();
+      } catch (recoverErr) {
+        debugPrint('[MELT] recoverIncompleteSagas failed: $recoverErr');
       }
       rethrow;
     }
