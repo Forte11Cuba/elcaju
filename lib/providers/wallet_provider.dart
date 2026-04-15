@@ -1733,6 +1733,13 @@ class WalletProvider extends ChangeNotifier {
             debugPrint('Check pending failed: $e');
           }
 
+          try {
+            // Recuperar proofs huérfanas (melts fallidos, sends no completados)
+            await wallet.reclaimPendingProofs();
+          } catch (e) {
+            debugPrint('Reclaim pending proofs failed: $e');
+          }
+
         } catch (e) {
           debugPrint('Error getting wallet ${entry.key}:$unit: $e');
         }
