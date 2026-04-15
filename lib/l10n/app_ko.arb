@@ -118,6 +118,7 @@
   "confirm": "확인",
   "cancel": "취소",
   "insufficientBalance": "잔액 부족",
+  "feeExceedsAmount": "수수료가 송금액을 초과합니다",
   "tokenCreationError": "토큰 생성 오류: {error}",
   "@tokenCreationError": {
     "placeholders": {

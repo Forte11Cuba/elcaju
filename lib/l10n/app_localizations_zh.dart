@@ -288,6 +288,9 @@ class L10nZh extends L10n {
   String get insufficientBalance => '余额不足';
 
   @override
+  String get feeExceedsAmount => '手续费超过发送金额';
+
+  @override
   String tokenCreationError(String error) {
     return '创建代币错误：$error';
   }

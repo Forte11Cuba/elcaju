@@ -294,6 +294,9 @@ class L10nIt extends L10n {
   String get insufficientBalance => 'Saldo insufficiente';
 
   @override
+  String get feeExceedsAmount => 'La commissione supera l\'importo da inviare';
+
+  @override
   String tokenCreationError(String error) {
     return 'Errore creazione token: $error';
   }

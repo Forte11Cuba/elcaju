@@ -587,7 +587,20 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
             if (hasRecovered) mintsRecovered++;
           }
 
+          // Recuperar proofs pendientes (sends no reclamados, melts fallidos)
+          final reclaim = await walletProvider.reclaimPendingProofs();
+
           if (!mounted) return;
+
+          // Sumar monto del reclaim a los detalles de recuperación
+          if (reclaim.count > BigInt.zero) {
+            final activeUnit = walletProvider.activeUnit;
+            final formatted = UnitFormatter.formatBalance(reclaim.amount, activeUnit);
+            final label = UnitFormatter.getUnitLabel(activeUnit);
+            recoveredDetails.add('$formatted $label (${reclaim.count} proofs)');
+            mintsRecovered++;
+          }
+
           setState(() {
             _isSuccess = true;
             if (recoveredDetails.isNotEmpty) {
@@ -624,7 +637,19 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
             }
           }
 
+          // Recuperar proofs pendientes de este mint
+          final reclaim = await walletProvider.reclaimPendingProofs(mintUrl: _selectedMintUrl);
+
           if (!mounted) return;
+
+          // Sumar monto del reclaim a los detalles
+          if (reclaim.count > BigInt.zero) {
+            final activeUnit = walletProvider.activeUnit;
+            final formatted = UnitFormatter.formatBalance(reclaim.amount, activeUnit);
+            final label = UnitFormatter.getUnitLabel(activeUnit);
+            recoveredDetails.add('$formatted $label (${reclaim.count} proofs)');
+          }
+
           setState(() {
             _isSuccess = true;
             if (recoveredDetails.isNotEmpty) {

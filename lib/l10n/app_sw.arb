@@ -118,6 +118,7 @@
   "confirm": "Thibitisha",
   "cancel": "Ghairi",
   "insufficientBalance": "Salio halitoshi",
+  "feeExceedsAmount": "Ada inazidi kiasi cha kutuma",
   "tokenCreationError": "Hitilafu ya kuunda tokeni: {error}",
   "@tokenCreationError": {
     "placeholders": {

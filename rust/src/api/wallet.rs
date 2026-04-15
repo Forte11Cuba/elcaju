@@ -421,15 +421,52 @@ impl Wallet {
             .into())
     }
 
-    pub async fn melt(&self, quote: MeltQuote) -> Result<u64, Error> {
-        let melted = self
+    pub async fn prepare_melt(&self, quote: MeltQuote) -> Result<PreparedMelt, Error> {
+        let prepared = self
             .inner
             .prepare_melt(&quote.id, HashMap::new())
-            .await?
-            .confirm()
+            .await?;
+        Ok(PreparedMelt {
+            amount: prepared.amount().into(),
+            fee_reserve: prepared.quote().fee_reserve.into(),
+            swap_fee: prepared.swap_fee().into(),
+            input_fee: prepared.input_fee().into(),
+            operation_id: prepared.operation_id(),
+            cdk_quote: prepared.quote().clone(),
+            proofs: prepared.proofs().clone(),
+            proofs_to_swap: prepared.proofs_to_swap().clone(),
+            cdk_input_fee: prepared.input_fee(),
+            cdk_input_fee_without_swap: prepared.input_fee_without_swap(),
+        })
+    }
+
+    pub async fn confirm_melt(&self, melt: PreparedMelt) -> Result<u64, Error> {
+        let finalized = self
+            .inner
+            .confirm_prepared_melt(
+                melt.operation_id,
+                melt.cdk_quote,
+                melt.proofs,
+                melt.proofs_to_swap,
+                melt.cdk_input_fee,
+                melt.cdk_input_fee_without_swap,
+                HashMap::new(),
+            )
             .await?;
         self.update_balance_streams().await;
-        Ok(melted.total_amount().into())
+        Ok(finalized.total_amount().into())
+    }
+
+    pub async fn cancel_melt(&self, melt: PreparedMelt) -> Result<(), Error> {
+        self.inner
+            .cancel_prepared_melt(
+                melt.operation_id,
+                melt.proofs,
+                melt.proofs_to_swap,
+            )
+            .await?;
+        self.update_balance_streams().await;
+        Ok(())
     }
 
     // === Transactions ===
@@ -494,11 +531,19 @@ impl Wallet {
     // === Reclaim orphaned proofs ===
 
     /// Check pending-spent proofs with the mint and revert unspent ones.
-    /// Returns the number of proofs recovered.
-    pub async fn reclaim_pending_proofs(&self) -> Result<u64, Error> {
+    /// Returns count and total amount of proofs recovered.
+    pub async fn reclaim_pending_proofs(&self) -> Result<ReclaimResult, Error> {
         let pending = self.inner.get_pending_spent_proofs().await?;
         if pending.is_empty() {
-            return Ok(0);
+            return Ok(ReclaimResult { count: 0, amount: 0 });
+        }
+
+        // Build a map of Y → amount for later lookup
+        let mut amount_by_y: HashMap<PublicKey, u64> = HashMap::new();
+        for proof in &pending {
+            if let Ok(y) = proof.y() {
+                amount_by_y.insert(y, u64::from(proof.amount));
+            }
         }
 
         // check_proofs_spent: queries mint AND removes spent proofs from local DB
@@ -514,6 +559,10 @@ impl Wallet {
             .collect();
 
         let count = unspent_ys.len() as u64;
+        let amount: u64 = unspent_ys.iter()
+            .filter_map(|y| amount_by_y.get(y))
+            .sum();
+
         if count > 0 {
             // Revert from PendingSpent to Unspent
             self.inner.unreserve_proofs(unspent_ys).await?;
@@ -521,7 +570,7 @@ impl Wallet {
 
         // Always refresh: check_proofs_spent may have removed spent proofs
         self.update_balance_streams().await;
-        Ok(count)
+        Ok(ReclaimResult { count, amount })
     }
 
     // === Utility ===
@@ -675,6 +724,25 @@ impl<'a> From<CdkPreparedSend<'a>> for PreparedSend {
             cdk_send_fee: send_fee,
         }
     }
+}
+
+pub struct ReclaimResult {
+    pub count: u64,
+    pub amount: u64,
+}
+
+pub struct PreparedMelt {
+    pub amount: u64,
+    pub fee_reserve: u64,
+    pub swap_fee: u64,
+    pub input_fee: u64,
+
+    operation_id: Uuid,
+    cdk_quote: CdkMeltQuote,
+    proofs: cdk::nuts::Proofs,
+    proofs_to_swap: cdk::nuts::Proofs,
+    cdk_input_fee: Amount,
+    cdk_input_fee_without_swap: Amount,
 }
 
 #[derive(Default)]

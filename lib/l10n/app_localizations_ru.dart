@@ -293,6 +293,9 @@ class L10nRu extends L10n {
   String get insufficientBalance => 'Недостаточный баланс';
 
   @override
+  String get feeExceedsAmount => 'Комиссия превышает сумму отправки';
+
+  @override
   String tokenCreationError(String error) {
     return 'Ошибка создания токена: $error';
   }

@@ -118,6 +118,7 @@
   "confirm": "確認",
   "cancel": "キャンセル",
   "insufficientBalance": "残高不足",
+  "feeExceedsAmount": "手数料が送金額を超えています",
   "tokenCreationError": "トークン作成エラー：{error}",
   "@tokenCreationError": {
     "placeholders": {

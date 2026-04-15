@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -7,6 +8,7 @@ import 'package:elcaju/l10n/app_localizations.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
+import '../../core/utils/keyset_debug.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
@@ -572,8 +574,29 @@ class _SendScreenState extends State<SendScreen> {
         });
         return;
       }
+      // Offline: verificar monto mínimo con ppk del keyset local (fallback 100)
+      var ppk = await KeysetDebug.getInputFeePpk(mintUrl, _activeUnit);
+      if (ppk < 0) ppk = 100;
+      final minReceiveFee = ppk > 0 ? BigInt.from((ppk + 999) ~/ 1000) : BigInt.zero;
+      if (!mounted) return;
+      if (_amount <= minReceiveFee) {
+        setState(() {
+          _errorMessage = L10n.of(context)!.feeExceedsAmount;
+        });
+        return;
+      }
       // Offline: ir directo a selección de monedas
       _goToOfflineModeWithMessage();
+      return;
+    }
+
+    // Online: verificar monto mínimo con ppk real del mint
+    final minReceiveFee = await _getMinReceiveFee(mintUrl);
+    if (!mounted) return;
+    if (_amount <= minReceiveFee) {
+      setState(() {
+        _errorMessage = L10n.of(context)!.feeExceedsAmount;
+      });
       return;
     }
 
@@ -593,6 +616,32 @@ class _SendScreenState extends State<SendScreen> {
         onCancel: () => Navigator.pop(context),
       ),
     );
+  }
+
+  /// Calcula el fee mínimo que el receptor pagará al reclamar el token.
+  /// Consulta /v1/keysets del mint para obtener el ppk real.
+  /// Fallback: ppk=100 (estándar) → fee mínimo = 1 sat.
+  Future<BigInt> _getMinReceiveFee(String mintUrl) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$mintUrl/v1/keysets'),
+      ).timeout(const Duration(seconds: 3));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final keysets = data['keysets'] as List<dynamic>? ?? [];
+        for (final ks in keysets) {
+          if (ks['active'] == true && ks['unit'] == _activeUnit) {
+            final ppk = (ks['input_fee_ppk'] as num?)?.toInt() ?? 0;
+            if (ppk > 0) {
+              return BigInt.from((ppk + 999) ~/ 1000); // ceil(ppk / 1000)
+            }
+            return BigInt.zero;
+          }
+        }
+      }
+    } catch (_) {}
+    // Fallback: ppk=100 estándar
+    return BigInt.one;
   }
 
   /// Verifica conectividad haciendo petición HTTP real al mint.

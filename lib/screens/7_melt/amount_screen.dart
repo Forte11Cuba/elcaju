@@ -404,6 +404,8 @@ class _AmountScreenState extends State<AmountScreen> {
   Future<void> _processPayment() async {
     if (!_canPay) return;
 
+    final walletProvider = context.read<WalletProvider>();
+
     setState(() {
       _isProcessing = true;
       _errorMessage = null;
@@ -431,14 +433,22 @@ class _AmountScreenState extends State<AmountScreen> {
       if (!mounted) return;
 
       // 3. Obtener quote del mint (en la unidad del mint)
-      final walletProvider = context.read<WalletProvider>();
       final quote = await walletProvider.getMeltQuote(invoiceResult.invoice);
 
       if (!mounted) return;
 
       final total = quote.amount + quote.feeReserve;
 
-      // 4. Verificar balance suficiente
+      // 4a. Verificar que el fee no supere el monto (operación inviable)
+      if (quote.amount <= quote.feeReserve) {
+        setState(() {
+          _isProcessing = false;
+          _errorMessage = L10n.of(context)!.feeExceedsAmount;
+        });
+        return;
+      }
+
+      // 4b. Verificar balance suficiente
       if (total > _availableBalance) {
         setState(() {
           _isProcessing = false;

@@ -296,6 +296,9 @@ class L10nDe extends L10n {
   String get insufficientBalance => 'Unzureichendes Guthaben';
 
   @override
+  String get feeExceedsAmount => 'Die Gebühr übersteigt den Sendebetrag';
+
+  @override
   String tokenCreationError(String error) {
     return 'Fehler beim Erstellen des Tokens: $error';
   }

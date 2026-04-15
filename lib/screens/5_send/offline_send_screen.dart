@@ -11,6 +11,7 @@ import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
 import '../../widgets/proof/proof_selector.dart';
+import '../../core/utils/keyset_debug.dart';
 import 'share_token_screen.dart';
 
 /// Pantalla para enviar tokens de forma offline seleccionando proofs manualmente.
@@ -325,6 +326,21 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
   Future<void> _createOfflineToken() async {
     final selectedProofs = _selectedProofs;
     final selectedTotal = _proofService.calculateTotal(selectedProofs);
+
+    // Validar monto mínimo viable para el receptor
+    // Leer ppk del keyset local, fallback a 100 (estándar)
+    var ppk = await KeysetDebug.getInputFeePpk(widget.mintUrl, widget.unit);
+    if (ppk < 0) ppk = 100; // -1 = error leyendo DB, asumir fee estándar
+    final minReceiveFee = ppk > 0 ? BigInt.from((ppk + 999) ~/ 1000) : BigInt.zero;
+    if (selectedTotal <= minReceiveFee) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = L10n.of(context)!.feeExceedsAmount;
+        });
+      }
+      return;
+    }
+
     var proofsMarkedPending = false;
 
     setState(() {

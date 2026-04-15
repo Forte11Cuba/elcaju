@@ -291,6 +291,9 @@ class L10nKo extends L10n {
   String get insufficientBalance => '잔액 부족';
 
   @override
+  String get feeExceedsAmount => '수수료가 송금액을 초과합니다';
+
+  @override
   String tokenCreationError(String error) {
     return '토큰 생성 오류: $error';
   }

@@ -1498,19 +1498,57 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Ejecuta el pago del invoice.
-  /// Guarda metadata type=lightning para identificar en historial.
+  /// Usa prepare/confirm/cancel para recuperar proofs si el pago falla.
   Future<BigInt> melt(MeltQuote quote) async {
     final wallet = await getActiveWallet();
-    final totalPaid = await wallet.melt(quote: quote);
+    final prepared = await wallet.prepareMelt(quote: quote);
+    try {
+      final totalPaid = await wallet.confirmMelt(melt: prepared);
 
-    // Guardar metadata con el invoice
-    if (_pendingMeltInvoice != null) {
-      await _saveMeltMetadata(wallet, _pendingMeltInvoice!);
-      _pendingMeltInvoice = null;
+      // Guardar metadata con el invoice
+      if (_pendingMeltInvoice != null) {
+        await _saveMeltMetadata(wallet, _pendingMeltInvoice!);
+        _pendingMeltInvoice = null;
+      }
+
+      notifyListeners();
+      return totalPaid;
+    } catch (e) {
+      try {
+        await wallet.cancelMelt(melt: prepared);
+      } catch (cancelErr) {
+        debugPrint('[MELT] cancelMelt failed: $cancelErr');
+      }
+      rethrow;
     }
+  }
 
-    notifyListeners();
-    return totalPaid;
+  /// Recupera proofs huérfanas en PendingSpent consultando el mint.
+  /// Solo revierte proofs que el mint confirma como no gastadas.
+  /// Si [mintUrl] es null, escanea todos los mints.
+  /// Retorna {count, amount} total de proofs recuperadas.
+  Future<ReclaimResult> reclaimPendingProofs({String? mintUrl}) async {
+    var totalCount = BigInt.zero;
+    var totalAmount = BigInt.zero;
+    final mints = mintUrl != null
+        ? {mintUrl: _mintUnits[mintUrl] ?? ['sat']}
+        : _mintUnits;
+    for (final entry in mints.entries) {
+      for (final unit in entry.value) {
+        try {
+          final wallet = await getWallet(entry.key, unit);
+          final result = await wallet.reclaimPendingProofs();
+          totalCount += result.count;
+          totalAmount += result.amount;
+        } catch (e) {
+          debugPrint('Reclaim pending proofs failed for ${entry.key}:$unit: $e');
+        }
+      }
+    }
+    if (totalCount > BigInt.zero) {
+      notifyListeners();
+    }
+    return ReclaimResult(count: totalCount, amount: totalAmount);
   }
 
   /// Guarda metadata para una transacción de melt (Lightning withdrawal).
@@ -1694,6 +1732,7 @@ class WalletProvider extends ChangeNotifier {
             // Silencioso - puede fallar offline
             debugPrint('Check pending failed: $e');
           }
+
         } catch (e) {
           debugPrint('Error getting wallet ${entry.key}:$unit: $e');
         }
