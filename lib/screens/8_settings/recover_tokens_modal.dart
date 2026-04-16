@@ -588,16 +588,19 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
           }
 
           // Recuperar proofs pendientes (sends no reclamados, melts fallidos)
-          final reclaim = await walletProvider.reclaimPendingProofs();
+          final reclaimMap = await walletProvider.reclaimPendingProofs();
 
           if (!mounted) return;
 
-          // Sumar monto del reclaim a los detalles de recuperación
-          if (reclaim.count > BigInt.zero) {
-            final activeUnit = walletProvider.activeUnit;
-            final formatted = UnitFormatter.formatBalance(reclaim.amount, activeUnit);
-            final label = UnitFormatter.getUnitLabel(activeUnit);
-            recoveredDetails.add('$formatted $label (${reclaim.count} proofs)');
+          // Agregar cada unidad reclamada por separado
+          if (reclaimMap.isNotEmpty) {
+            for (final entry in reclaimMap.entries) {
+              final unit = entry.key;
+              final reclaim = entry.value;
+              final formatted = UnitFormatter.formatBalance(reclaim.amount, unit);
+              final label = UnitFormatter.getUnitLabel(unit);
+              recoveredDetails.add('$formatted $label (${reclaim.count} proofs)');
+            }
             mintsRecovered++;
           }
 
@@ -638,15 +641,16 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
           }
 
           // Recuperar proofs pendientes de este mint
-          final reclaim = await walletProvider.reclaimPendingProofs(mintUrl: _selectedMintUrl);
+          final reclaimMap = await walletProvider.reclaimPendingProofs(mintUrl: _selectedMintUrl);
 
           if (!mounted) return;
 
-          // Sumar monto del reclaim a los detalles
-          if (reclaim.count > BigInt.zero) {
-            final activeUnit = walletProvider.activeUnit;
-            final formatted = UnitFormatter.formatBalance(reclaim.amount, activeUnit);
-            final label = UnitFormatter.getUnitLabel(activeUnit);
+          // Agregar cada unidad reclamada por separado
+          for (final entry in reclaimMap.entries) {
+            final unit = entry.key;
+            final reclaim = entry.value;
+            final formatted = UnitFormatter.formatBalance(reclaim.amount, unit);
+            final label = UnitFormatter.getUnitLabel(unit);
             recoveredDetails.add('$formatted $label (${reclaim.count} proofs)');
           }
 

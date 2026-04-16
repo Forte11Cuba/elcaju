@@ -615,11 +615,13 @@ class _SwapScreenState extends State<SwapScreen>
       _mintSubscription?.cancel();
       _mintSubscription = null;
 
-      // Liberar solo las proofs reservadas para ESTE melt
+      // PreparedMelt ya fue consumido por FRB — cancelMelt es imposible.
+      // recoverIncompleteSagas reanuda solo la saga interrumpida,
+      // sin afectar otros proofs en PendingSpent (sends no reclamados).
       try {
-        await srcWallet.cancelMelt(melt: prepared);
-      } catch (cancelErr) {
-        debugPrint('[SWAP] cancelMelt failed: $cancelErr');
+        await srcWallet.recoverIncompleteSagas();
+      } catch (recoverErr) {
+        debugPrint('[SWAP] recoverIncompleteSagas failed: $recoverErr');
       }
 
       if (!mounted) return;
