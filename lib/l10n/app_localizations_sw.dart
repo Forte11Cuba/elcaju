@@ -237,8 +237,7 @@ class L10nSw extends L10n {
   String get pendingOfflineSend => 'Kutuma nje ya mtandao kunasubiri';
 
   @override
-  String get pendingOfflineSendsHeader =>
-      'Matumizi ya nje ya mtandao ambayo hayajadaiwa';
+  String get pendingOfflineSendsHeader => 'Kutuma nje ya mtandao bila kudaiwa';
 
   @override
   String get pendingSendDetailTitle => 'Kutuma kunakusubiri';

@@ -38,10 +38,10 @@ class PendingSend {
     required this.amount,
     required this.mintUrl,
     required this.unit,
-    required this.proofYs,
+    required List<String> proofYs,
     required this.createdAt,
     this.memo,
-  });
+  }) : proofYs = List.unmodifiable(proofYs);
 
   PendingSend copyWith({
     String? id,

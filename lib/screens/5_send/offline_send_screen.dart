@@ -35,6 +35,13 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
   final TextEditingController _memoController = TextEditingController();
   final ProofService _proofService = ProofService();
 
+  // Capturado en initState para poder persistir el PendingSend incluso si
+  // el widget se desmonta durante el await de markProofsPendingSpent.
+  // Usar `context.read` después del await es inseguro (widget puede no
+  // existir), y gatear con `mounted` perdería el record — los proofs
+  // quedan marcados PENDING_SPENT pero sin handle para reclamar.
+  late final WalletProvider _walletProvider;
+
   List<LocalProof> _availableProofs = [];
   Set<String> _selectedIds = {};
   bool _isLoading = true;
@@ -44,6 +51,7 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
   @override
   void initState() {
     super.initState();
+    _walletProvider = context.read<WalletProvider>();
     _loadProofs();
   }
 
@@ -369,17 +377,17 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
 
       // Rastrear el envío offline como pendiente para poder cancelarlo
       // desde el historial. Los offline sends no crean CDK Transaction.
-      if (mounted) {
-        final walletProvider = context.read<WalletProvider>();
-        await walletProvider.addPendingSend(
-          encoded: token,
-          amount: selectedTotal,
-          mintUrl: widget.mintUrl,
-          unit: widget.unit,
-          proofYs: selectedProofs.map((p) => p.yHex).toList(),
-          memo: memo,
-        );
-      }
+      // Usamos el provider capturado en initState (no context.read) para
+      // que el record se persista aunque el widget se haya desmontado
+      // mientras esperábamos markProofsPendingSpent.
+      await _walletProvider.addPendingSend(
+        encoded: token,
+        amount: selectedTotal,
+        mintUrl: widget.mintUrl,
+        unit: widget.unit,
+        proofYs: selectedProofs.map((p) => p.yHex).toList(),
+        memo: memo,
+      );
 
       if (mounted) {
         _isCreating = false;

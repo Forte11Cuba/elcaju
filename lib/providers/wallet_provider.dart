@@ -183,13 +183,17 @@ class WalletProvider extends ChangeNotifier {
   Future<ReclaimResult> reclaimPendingSend(PendingSend send) async {
     final wallet = await getWallet(send.mintUrl, send.unit);
     final result = await wallet.reclaimProofsByYs(ys: send.proofYs);
-    // Si recuperamos algo O si no había nada que recuperar (todos los proofs
-    // ya fueron gastados por el receptor), removemos el registro — la
-    // transacción está terminada en ambos casos.
-    await _pendingSendStorage.remove(send.id);
+    // Solo removemos el registro si el mint confirmó que había proofs
+    // UNSPENT y las revertimos. Un count=0 es ambiguo: puede significar
+    // "receptor ya reclamó (SPENT)" o "receptor en medio del swap
+    // (PENDING)". En el caso PENDING, necesitamos conservar el record
+    // para poder reintentar después — borrar perdería el retry handle.
+    // Esto puede dejar records "fantasma" tras un SPENT real; se puede
+    // agregar dismissal manual como mejora futura.
     if (result.count > BigInt.zero) {
-      notifyListeners();
+      await _pendingSendStorage.remove(send.id);
     }
+    notifyListeners();
     return result;
   }
 
@@ -2030,6 +2034,10 @@ class WalletProvider extends ChangeNotifier {
 
       // Limpiar metadata de transacciones
       await _txMetaStorage.clear();
+
+      // Limpiar envíos offline pendientes (storage separado, sobrevive al
+      // borrado del wallet.sqlite si no se limpia acá).
+      await _pendingSendStorage.clear();
 
       // Borrar archivo
       final dir = await getApplicationDocumentsDirectory();

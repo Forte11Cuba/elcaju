@@ -99,7 +99,7 @@
   },
   "cancelSendAlreadyClaimed": "Mpokeaji tayari alitumia tokeni",
   "pendingOfflineSend": "Kutuma nje ya mtandao kunasubiri",
-  "pendingOfflineSendsHeader": "Matumizi ya nje ya mtandao ambayo hayajadaiwa",
+  "pendingOfflineSendsHeader": "Kutuma nje ya mtandao bila kudaiwa",
   "pendingSendDetailTitle": "Kutuma kunakusubiri",
   "validToken": "Tokeni halali",
   "invalidToken": "Tokeni batili au imeharibika",
