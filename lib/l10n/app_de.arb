@@ -87,6 +87,20 @@
   "pasteTheCashuToken": "Füge den Cashu Token ein:",
   "pasteFromClipboard": "Aus Zwischenablage einfügen",
   "emptyClipboard": "Zwischenablage leer",
+  "cancelSend": "Senden abbrechen",
+  "cancelSendConfirmTitle": "Diesen Versand abbrechen?",
+  "cancelSendConfirmBody": "Funktioniert nur, wenn der Empfänger das Token noch nicht eingelöst hat. Falls doch, wird der Versand als abgeschlossen markiert.",
+  "cancelSendSuccess": "Versand abgebrochen. {amount} {unit} zurückerhalten",
+  "@cancelSendSuccess": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "cancelSendAlreadyClaimed": "Der Empfänger hat das Token bereits eingelöst",
+  "pendingOfflineSend": "Ausstehender Offline-Versand",
+  "pendingOfflineSendsHeader": "Nicht eingelöste Offline-Versendungen",
+  "pendingSendDetailTitle": "Ausstehender Versand",
   "validToken": "Token gültig",
   "invalidToken": "Ungültiger oder fehlerhafter Token",
   "amount": "Betrag:",

@@ -217,6 +217,33 @@ class L10nPt extends L10n {
   String get emptyClipboard => 'Área de transferência vazia';
 
   @override
+  String get cancelSend => 'Cancelar envio';
+
+  @override
+  String get cancelSendConfirmTitle => 'Cancelar este envio?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      'Só funciona se o destinatário ainda não resgatou o token. Se já resgatou, o envio será marcado como concluído.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return 'Envio cancelado. Recuperou $amount $unit';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed => 'O destinatário já resgatou o token';
+
+  @override
+  String get pendingOfflineSend => 'Envio offline pendente';
+
+  @override
+  String get pendingOfflineSendsHeader => 'Envios offline não resgatados';
+
+  @override
+  String get pendingSendDetailTitle => 'Envio pendente';
+
+  @override
   String get validToken => 'Token válido';
 
   @override

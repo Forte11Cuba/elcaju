@@ -87,6 +87,20 @@
   "pasteTheCashuToken": "Collez le token Cashu :",
   "pasteFromClipboard": "Coller depuis le presse-papiers",
   "emptyClipboard": "Presse-papiers vide",
+  "cancelSend": "Annuler l'envoi",
+  "cancelSendConfirmTitle": "Annuler cet envoi ?",
+  "cancelSendConfirmBody": "Ne fonctionne que si le destinataire n'a pas encore réclamé le token. S'il l'a déjà fait, l'envoi sera marqué comme terminé.",
+  "cancelSendSuccess": "Envoi annulé. Récupéré {amount} {unit}",
+  "@cancelSendSuccess": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "cancelSendAlreadyClaimed": "Le destinataire a déjà réclamé le token",
+  "pendingOfflineSend": "Envoi hors ligne en attente",
+  "pendingOfflineSendsHeader": "Envois hors ligne non réclamés",
+  "pendingSendDetailTitle": "Envoi en attente",
   "validToken": "Token valide",
   "invalidToken": "Token invalide ou malformé",
   "amount": "Montant :",

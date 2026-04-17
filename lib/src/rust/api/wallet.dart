@@ -128,7 +128,18 @@ abstract class Wallet implements RustOpaqueInterface {
   /// Returns count and total amount of proofs recovered.
   Future<ReclaimResult> reclaimPendingProofs();
 
+  /// Reclaim proofs belonging to a specific transaction identified by its Y values.
+  /// Works like reclaim_pending_proofs but scoped: only proofs whose Y matches
+  /// the input list are checked with the mint and reverted if Unspent.
+  /// Use tx.ys from a pending outgoing transaction to cancel that specific send.
+  Future<ReclaimResult> reclaimProofsByYs({required List<String> ys});
+
   Future<void> recoverIncompleteSagas();
+
+  /// Recalcula el balance desde la DB y lo empuja al stream.
+  /// Llamar después de manipulaciones directas al DB (ej: offline send
+  /// marking proofs as PendingSpent fuera de la API de CDK).
+  Future<void> refreshBalance();
 
   Future<void> restore();
 

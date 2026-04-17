@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:elcaju/l10n/app_localizations.dart';
+import '../../providers/wallet_provider.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/models/proof.dart';
@@ -364,6 +366,20 @@ class _OfflineSendScreenState extends State<OfflineSendScreen> {
         unit: widget.unit,
       );
       final token = cdkToken.encoded;
+
+      // Rastrear el envío offline como pendiente para poder cancelarlo
+      // desde el historial. Los offline sends no crean CDK Transaction.
+      if (mounted) {
+        final walletProvider = context.read<WalletProvider>();
+        await walletProvider.addPendingSend(
+          encoded: token,
+          amount: selectedTotal,
+          mintUrl: widget.mintUrl,
+          unit: widget.unit,
+          proofYs: selectedProofs.map((p) => p.yHex).toList(),
+          memo: memo,
+        );
+      }
 
       if (mounted) {
         _isCreating = false;

@@ -219,6 +219,35 @@ class L10nDe extends L10n {
   String get emptyClipboard => 'Zwischenablage leer';
 
   @override
+  String get cancelSend => 'Senden abbrechen';
+
+  @override
+  String get cancelSendConfirmTitle => 'Diesen Versand abbrechen?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      'Funktioniert nur, wenn der Empfänger das Token noch nicht eingelöst hat. Falls doch, wird der Versand als abgeschlossen markiert.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return 'Versand abgebrochen. $amount $unit zurückerhalten';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed =>
+      'Der Empfänger hat das Token bereits eingelöst';
+
+  @override
+  String get pendingOfflineSend => 'Ausstehender Offline-Versand';
+
+  @override
+  String get pendingOfflineSendsHeader =>
+      'Nicht eingelöste Offline-Versendungen';
+
+  @override
+  String get pendingSendDetailTitle => 'Ausstehender Versand';
+
+  @override
   String get validToken => 'Token gültig';
 
   @override

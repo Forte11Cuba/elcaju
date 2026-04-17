@@ -216,6 +216,33 @@ class L10nRu extends L10n {
   String get emptyClipboard => 'Буфер обмена пуст';
 
   @override
+  String get cancelSend => 'Отменить отправку';
+
+  @override
+  String get cancelSendConfirmTitle => 'Отменить эту отправку?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      'Работает только если получатель еще не получил токен. Если уже получил, отправка будет помечена как завершенная.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return 'Отправка отменена. Восстановлено $amount $unit';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed => 'Получатель уже получил токен';
+
+  @override
+  String get pendingOfflineSend => 'Ожидающая оффлайн-отправка';
+
+  @override
+  String get pendingOfflineSendsHeader => 'Неполученные оффлайн-отправки';
+
+  @override
+  String get pendingSendDetailTitle => 'Ожидающая отправка';
+
+  @override
   String get validToken => 'Токен действителен';
 
   @override

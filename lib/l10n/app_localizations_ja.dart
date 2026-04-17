@@ -212,6 +212,33 @@ class L10nJa extends L10n {
   String get emptyClipboard => 'クリップボードは空です';
 
   @override
+  String get cancelSend => '送金をキャンセル';
+
+  @override
+  String get cancelSendConfirmTitle => 'この送金をキャンセルしますか？';
+
+  @override
+  String get cancelSendConfirmBody =>
+      '受取人がまだトークンを引き換えていない場合のみ機能します。既に引き換え済みの場合、送金は完了として記録されます。';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return '送金をキャンセルしました。$amount $unitを回復しました';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed => '受取人は既にトークンを引き換えました';
+
+  @override
+  String get pendingOfflineSend => '保留中のオフライン送金';
+
+  @override
+  String get pendingOfflineSendsHeader => '未請求のオフライン送金';
+
+  @override
+  String get pendingSendDetailTitle => '保留中の送金';
+
+  @override
   String get validToken => '有効なトークン';
 
   @override

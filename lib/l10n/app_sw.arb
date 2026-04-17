@@ -87,6 +87,20 @@
   "pasteTheCashuToken": "Bandika tokeni ya Cashu:",
   "pasteFromClipboard": "Bandika kutoka ubao",
   "emptyClipboard": "Ubao wa kunakili ni tupu",
+  "cancelSend": "Ghairi kutuma",
+  "cancelSendConfirmTitle": "Ghairi kutuma huku?",
+  "cancelSendConfirmBody": "Hufanya kazi tu ikiwa mpokeaji hajatumia tokeni. Ikiwa tayari alitumia, kutuma kutaonyeshwa kama kumekamilika.",
+  "cancelSendSuccess": "Kutuma kumeghairiwa. Umerudisha {amount} {unit}",
+  "@cancelSendSuccess": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "cancelSendAlreadyClaimed": "Mpokeaji tayari alitumia tokeni",
+  "pendingOfflineSend": "Kutuma nje ya mtandao kunasubiri",
+  "pendingOfflineSendsHeader": "Matumizi ya nje ya mtandao ambayo hayajadaiwa",
+  "pendingSendDetailTitle": "Kutuma kunakusubiri",
   "validToken": "Tokeni halali",
   "invalidToken": "Tokeni batili au imeharibika",
   "amount": "Kiasi:",

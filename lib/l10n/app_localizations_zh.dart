@@ -211,6 +211,32 @@ class L10nZh extends L10n {
   String get emptyClipboard => '剪贴板为空';
 
   @override
+  String get cancelSend => '取消发送';
+
+  @override
+  String get cancelSendConfirmTitle => '取消此次发送？';
+
+  @override
+  String get cancelSendConfirmBody => '仅当接收方尚未领取代币时有效。如已领取，发送将标记为已完成。';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return '发送已取消。已恢复 $amount $unit';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed => '接收方已领取代币';
+
+  @override
+  String get pendingOfflineSend => '待处理的离线发送';
+
+  @override
+  String get pendingOfflineSendsHeader => '未领取的离线发送';
+
+  @override
+  String get pendingSendDetailTitle => '待处理发送';
+
+  @override
   String get validToken => '有效代币';
 
   @override
