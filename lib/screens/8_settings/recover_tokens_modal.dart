@@ -6,6 +6,7 @@ import '../../core/constants/colors.dart';
 import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../providers/wallet_provider.dart';
+import '../../widgets/common/bottom_sheet_container.dart';
 
 /// Modal para recuperar tokens usando NUT-13
 class RecoverTokensModal extends StatefulWidget {
@@ -51,34 +52,13 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-        decoration: BoxDecoration(
-          color: AppColors.deepVoidPurple,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle
-              Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+    return BottomSheetContainer(
+      respectKeyboard: true,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+              const BottomSheetHandle(),
 
               // Icono
               Container(
@@ -144,7 +124,6 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
             ],
           ),
         ),
-      ),
     );
   }
 
