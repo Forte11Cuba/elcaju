@@ -12,6 +12,8 @@ import '../../core/services/lnurl_service.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
+import '../../widgets/common/secondary_button.dart';
+import '../../widgets/common/bottom_sheet_container.dart';
 import '../../providers/wallet_provider.dart';
 import '../10_scanner/scan_screen.dart';
 import 'amount_screen.dart';
@@ -858,29 +860,12 @@ class _ConfirmationModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-      decoration: BoxDecoration(
-        color: AppColors.deepVoidPurple,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
+    final l10n = L10n.of(context)!;
+    return BottomSheetContainer(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle
-          Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+          const BottomSheetHandle(),
 
           // Icono
           Container(
@@ -900,7 +885,7 @@ class _ConfirmationModal extends StatelessWidget {
 
           // Título
           Text(
-            L10n.of(context)!.confirmPayment,
+            l10n.confirmPayment,
             style: const TextStyle(
               fontFamily: 'Inter',
               fontSize: 20,
@@ -945,40 +930,22 @@ class _ConfirmationModal extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: onCancel,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(
-                        L10n.of(context)!.cancel,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
+                child: SecondaryButton(
+                  text: l10n.cancel,
+                  onPressed: onCancel,
+                  height: 52,
                 ),
               ),
               const SizedBox(width: AppDimensions.paddingMedium),
               Expanded(
                 child: PrimaryButton(
-                  text: L10n.of(context)!.pay,
+                  text: l10n.pay,
                   onPressed: onConfirm,
                   height: 52,
                 ),
               ),
             ],
           ),
-
-          const SizedBox(height: AppDimensions.paddingSmall),
         ],
       ),
     );

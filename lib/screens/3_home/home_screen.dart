@@ -9,6 +9,7 @@ import '../../core/utils/incoming_data_parser.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/animated_action_button.dart';
+import '../../widgets/common/bottom_sheet_container.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../providers/p2pk_provider.dart';
@@ -573,29 +574,11 @@ class _MethodSelectorModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-      decoration: BoxDecoration(
-        color: AppColors.deepVoidPurple,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
+    return BottomSheetContainer(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle
-          Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+          const BottomSheetHandle(),
 
           // Título
           Text(
@@ -618,9 +601,6 @@ class _MethodSelectorModal extends StatelessWidget {
               child: _MethodOptionTile(option: option),
             ),
           ),
-
-          // Espacio para la barra de navegación del sistema
-          SizedBox(height: MediaQuery.of(context).padding.bottom + AppDimensions.paddingSmall),
         ],
       ),
     );
@@ -635,67 +615,76 @@ class _MethodOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: option.onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+    return Semantics(
+      button: true,
+      label: option.label,
+      hint: option.description,
+      child: Material(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          onTap: option.onTap,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            // Icono
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: AppColors.buttonGradient,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                // Icono
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: AppColors.buttonGradient,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(option.icon, color: Colors.white, size: 24),
                 ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(option.icon, color: Colors.white, size: 24),
-            ),
-            const SizedBox(width: AppDimensions.paddingMedium),
-            // Texto
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    option.label,
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
+                const SizedBox(width: AppDimensions.paddingMedium),
+                // Texto
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        option.label,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        option.description,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 14,
+                          color: AppColors.textSecondary.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    option.description,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 14,
-                      color: AppColors.textSecondary.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                // Flecha
+                Icon(
+                  LucideIcons.chevronRight,
+                  color: Colors.white.withValues(alpha: 0.5),
+                  size: 24,
+                ),
+              ],
             ),
-            // Flecha
-            Icon(
-              LucideIcons.chevronRight,
-              color: Colors.white.withValues(alpha: 0.5),
-              size: 24,
-            ),
-          ],
+          ),
         ),
       ),
     );

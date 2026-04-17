@@ -14,6 +14,8 @@ import '../../src/rust/api/wallet.dart';
 import '../../widgets/common/gradient_background.dart';
 import '../../widgets/common/glass_card.dart';
 import '../../widgets/common/primary_button.dart';
+import '../../widgets/common/secondary_button.dart';
+import '../../widgets/common/bottom_sheet_container.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/price_provider.dart';
 
@@ -380,29 +382,11 @@ class _SwapScreenState extends State<SwapScreen>
       backgroundColor: Colors.transparent,
       isDismissible: false,
       enableDrag: false,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-        decoration: BoxDecoration(
-          color: AppColors.deepVoidPurple,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
+      builder: (ctx) => BottomSheetContainer(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle
-            Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            const BottomSheetHandle(),
 
             // Icono swap
             Container(
@@ -483,29 +467,13 @@ class _SwapScreenState extends State<SwapScreen>
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () {
+                  child: SecondaryButton(
+                    text: l10n.cancel,
+                    onPressed: () {
                       Navigator.pop(ctx);
                       _mintSubscription?.cancel();
                     },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Text(
-                          l10n.cancel,
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
+                    height: 52,
                   ),
                 ),
                 const SizedBox(width: AppDimensions.paddingMedium),
@@ -526,8 +494,6 @@ class _SwapScreenState extends State<SwapScreen>
                 ),
               ],
             ),
-
-            const SizedBox(height: AppDimensions.paddingSmall),
           ],
         ),
       ),
