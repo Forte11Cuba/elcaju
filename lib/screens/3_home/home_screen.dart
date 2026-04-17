@@ -357,6 +357,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: AnimatedActionButton(
               label: l10n.sendAction,
+              icon: LucideIcons.arrowUpRight,
+              showIcon: true,
+              iconTrailing: true,
               type: ButtonType.criticalAction,
               onTap: _showSendOptions,
             ),
@@ -369,6 +372,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: AnimatedActionButton(
               label: l10n.receiveAction,
+              icon: LucideIcons.arrowDownRight,
+              showIcon: true,
               type: ButtonType.primaryAction,
               onTap: _showReceiveOptions,
             ),

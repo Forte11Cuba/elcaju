@@ -154,10 +154,10 @@ class L10nPt extends L10n {
   String get send => 'Enviar';
 
   @override
-  String get sendAction => 'Enviar ↗';
+  String get sendAction => 'Enviar';
 
   @override
-  String get receiveAction => '↘ Receber';
+  String get receiveAction => 'Receber';
 
   @override
   String get deposit => 'Depositar';

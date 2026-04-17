@@ -151,10 +151,10 @@ class L10nKo extends L10n {
   String get send => '보내기';
 
   @override
-  String get sendAction => '보내기 ↗';
+  String get sendAction => '보내기';
 
   @override
-  String get receiveAction => '↘ 받기';
+  String get receiveAction => '받기';
 
   @override
   String get deposit => '입금';

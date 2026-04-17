@@ -148,10 +148,10 @@ class L10nZh extends L10n {
   String get send => '付款';
 
   @override
-  String get sendAction => '付款 ↗';
+  String get sendAction => '付款';
 
   @override
-  String get receiveAction => '↘ 收款';
+  String get receiveAction => '收款';
 
   @override
   String get deposit => '存入';

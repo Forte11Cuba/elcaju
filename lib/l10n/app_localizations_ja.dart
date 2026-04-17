@@ -149,10 +149,10 @@ class L10nJa extends L10n {
   String get send => '送金';
 
   @override
-  String get sendAction => '送金 ↗';
+  String get sendAction => '送金';
 
   @override
-  String get receiveAction => '↘ 受取';
+  String get receiveAction => '受取';
 
   @override
   String get deposit => '入金';

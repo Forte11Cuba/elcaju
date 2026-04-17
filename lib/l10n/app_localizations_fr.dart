@@ -157,10 +157,10 @@ class L10nFr extends L10n {
   String get send => 'Envoyer';
 
   @override
-  String get sendAction => 'Envoyer ↗';
+  String get sendAction => 'Envoyer';
 
   @override
-  String get receiveAction => '↘ Recevoir';
+  String get receiveAction => 'Recevoir';
 
   @override
   String get deposit => 'Déposer';

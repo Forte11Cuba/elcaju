@@ -153,10 +153,10 @@ class L10nSw extends L10n {
   String get send => 'Tuma';
 
   @override
-  String get sendAction => 'Tuma ↗';
+  String get sendAction => 'Tuma';
 
   @override
-  String get receiveAction => '↘ Pokea';
+  String get receiveAction => 'Pokea';
 
   @override
   String get deposit => 'Weka';
