@@ -58,6 +58,9 @@ class AnimatedActionButton extends StatefulWidget {
   /// Si mostrar el icono (default: false)
   final bool showIcon;
 
+  /// Si el icono va después del texto (default: false = antes del texto)
+  final bool iconTrailing;
+
   /// Ancho del botón (default: expandir al padre)
   final double? width;
 
@@ -73,6 +76,7 @@ class AnimatedActionButton extends StatefulWidget {
     this.backgroundColor,
     this.icon,
     this.showIcon = false,
+    this.iconTrailing = false,
     this.width,
     this.height,
   });
@@ -300,8 +304,8 @@ class _AnimatedActionButtonState extends State<AnimatedActionButton>
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icono opcional
-              if (widget.showIcon && widget.icon != null) ...[
+              // Icono leading (antes del texto)
+              if (widget.showIcon && widget.icon != null && !widget.iconTrailing) ...[
                 Icon(
                   widget.icon,
                   color: Colors.white,
@@ -319,6 +323,15 @@ class _AnimatedActionButtonState extends State<AnimatedActionButton>
                   color: Colors.white,
                 ),
               ),
+              // Icono trailing (después del texto)
+              if (widget.showIcon && widget.icon != null && widget.iconTrailing) ...[
+                const SizedBox(width: AppDimensions.paddingSmall),
+                Icon(
+                  widget.icon,
+                  color: Colors.white,
+                  size: widget.type == ButtonType.navigation ? 28 : 20,
+                ),
+              ],
             ],
           ),
         ),

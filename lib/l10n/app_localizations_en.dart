@@ -153,10 +153,10 @@ class L10nEn extends L10n {
   String get send => 'Send';
 
   @override
-  String get sendAction => 'Send ↗';
+  String get sendAction => 'Send';
 
   @override
-  String get receiveAction => '↘ Receive';
+  String get receiveAction => 'Receive';
 
   @override
   String get deposit => 'Deposit';

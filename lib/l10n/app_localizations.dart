@@ -388,13 +388,13 @@ abstract class L10n {
   /// No description provided for @sendAction.
   ///
   /// In es, this message translates to:
-  /// **'Enviar ↗'**
+  /// **'Enviar'**
   String get sendAction;
 
   /// No description provided for @receiveAction.
   ///
   /// In es, this message translates to:
-  /// **'↘ Recibir'**
+  /// **'Recibir'**
   String get receiveAction;
 
   /// No description provided for @deposit.

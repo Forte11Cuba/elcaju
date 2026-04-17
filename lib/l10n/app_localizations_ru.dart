@@ -153,10 +153,10 @@ class L10nRu extends L10n {
   String get send => 'Отправить';
 
   @override
-  String get sendAction => 'Отправить ↗';
+  String get sendAction => 'Отправить';
 
   @override
-  String get receiveAction => '↘ Получить';
+  String get receiveAction => 'Получить';
 
   @override
   String get deposit => 'Пополнить';
