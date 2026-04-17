@@ -214,6 +214,9 @@ class L10nPt extends L10n {
   String get pasteFromClipboard => 'Colar da área de transferência';
 
   @override
+  String get emptyClipboard => 'Área de transferência vazia';
+
+  @override
   String get validToken => 'Token válido';
 
   @override

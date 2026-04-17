@@ -217,6 +217,9 @@ class L10nFr extends L10n {
   String get pasteFromClipboard => 'Coller depuis le presse-papiers';
 
   @override
+  String get emptyClipboard => 'Presse-papiers vide';
+
+  @override
   String get validToken => 'Token valide';
 
   @override

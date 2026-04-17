@@ -86,6 +86,7 @@
   "receiveCashu": "Receber Cashu",
   "pasteTheCashuToken": "Cole o token Cashu:",
   "pasteFromClipboard": "Colar da área de transferência",
+  "emptyClipboard": "Área de transferência vazia",
   "validToken": "Token válido",
   "invalidToken": "Token inválido ou malformado",
   "amount": "Valor:",

@@ -76,6 +76,7 @@
   "receiveCashu": "Receive Cashu",
   "pasteTheCashuToken": "Paste the Cashu token:",
   "pasteFromClipboard": "Paste from clipboard",
+  "emptyClipboard": "Clipboard is empty",
   "validToken": "Valid token",
   "invalidToken": "Invalid or malformed token",
   "amount": "Amount:",

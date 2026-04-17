@@ -209,6 +209,9 @@ class L10nJa extends L10n {
   String get pasteFromClipboard => 'クリップボードから貼り付け';
 
   @override
+  String get emptyClipboard => 'クリップボードは空です';
+
+  @override
   String get validToken => '有効なトークン';
 
   @override

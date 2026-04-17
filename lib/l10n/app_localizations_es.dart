@@ -213,6 +213,9 @@ class L10nEs extends L10n {
   String get pasteFromClipboard => 'Pegar del portapapeles';
 
   @override
+  String get emptyClipboard => 'Portapapeles vacío';
+
+  @override
   String get validToken => 'Token válido';
 
   @override

@@ -86,6 +86,7 @@
   "receiveCashu": "Recevoir Cashu",
   "pasteTheCashuToken": "Collez le token Cashu :",
   "pasteFromClipboard": "Coller depuis le presse-papiers",
+  "emptyClipboard": "Presse-papiers vide",
   "validToken": "Token valide",
   "invalidToken": "Token invalide ou malformé",
   "amount": "Montant :",

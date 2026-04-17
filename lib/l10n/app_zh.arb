@@ -86,6 +86,7 @@
   "receiveCashu": "接收 Cashu",
   "pasteTheCashuToken": "粘贴 Cashu 代币：",
   "pasteFromClipboard": "从剪贴板粘贴",
+  "emptyClipboard": "剪贴板为空",
   "validToken": "有效代币",
   "invalidToken": "无效或格式错误的代币",
   "amount": "金额：",

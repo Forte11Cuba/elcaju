@@ -505,6 +505,12 @@ abstract class L10n {
   /// **'Pegar del portapapeles'**
   String get pasteFromClipboard;
 
+  /// No description provided for @emptyClipboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Portapapeles vacío'**
+  String get emptyClipboard;
+
   /// No description provided for @validToken.
   ///
   /// In es, this message translates to:

@@ -211,6 +211,9 @@ class L10nKo extends L10n {
   String get pasteFromClipboard => '클립보드에서 붙여넣기';
 
   @override
+  String get emptyClipboard => '클립보드가 비어 있음';
+
+  @override
   String get validToken => '유효한 토큰';
 
   @override

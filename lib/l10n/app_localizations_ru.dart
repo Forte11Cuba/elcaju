@@ -213,6 +213,9 @@ class L10nRu extends L10n {
   String get pasteFromClipboard => 'Вставить из буфера обмена';
 
   @override
+  String get emptyClipboard => 'Буфер обмена пуст';
+
+  @override
   String get validToken => 'Токен действителен';
 
   @override

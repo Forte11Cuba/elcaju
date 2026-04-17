@@ -86,6 +86,7 @@
   "receiveCashu": "Cashuを受け取る",
   "pasteTheCashuToken": "Cashuトークンを貼り付け：",
   "pasteFromClipboard": "クリップボードから貼り付け",
+  "emptyClipboard": "クリップボードは空です",
   "validToken": "有効なトークン",
   "invalidToken": "無効または不正なトークン",
   "amount": "金額：",
