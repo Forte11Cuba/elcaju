@@ -86,6 +86,7 @@
   "receiveCashu": "Cashu 받기",
   "pasteTheCashuToken": "Cashu 토큰을 붙여넣으세요:",
   "pasteFromClipboard": "클립보드에서 붙여넣기",
+  "emptyClipboard": "클립보드가 비어 있음",
   "validToken": "유효한 토큰",
   "invalidToken": "유효하지 않거나 손상된 토큰",
   "amount": "금액:",

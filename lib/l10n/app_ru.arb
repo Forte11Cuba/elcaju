@@ -86,6 +86,7 @@
   "receiveCashu": "Получить Cashu",
   "pasteTheCashuToken": "Вставьте Cashu токен:",
   "pasteFromClipboard": "Вставить из буфера обмена",
+  "emptyClipboard": "Буфер обмена пуст",
   "validToken": "Токен действителен",
   "invalidToken": "Недействительный или повреждённый токен",
   "amount": "Сумма:",

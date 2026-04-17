@@ -86,6 +86,7 @@
   "receiveCashu": "Pokea Cashu",
   "pasteTheCashuToken": "Bandika tokeni ya Cashu:",
   "pasteFromClipboard": "Bandika kutoka ubao",
+  "emptyClipboard": "Ubao wa kunakili ni tupu",
   "validToken": "Tokeni halali",
   "invalidToken": "Tokeni batili au imeharibika",
   "amount": "Kiasi:",

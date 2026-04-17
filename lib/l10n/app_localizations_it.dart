@@ -214,6 +214,9 @@ class L10nIt extends L10n {
   String get pasteFromClipboard => 'Incolla dagli appunti';
 
   @override
+  String get emptyClipboard => 'Appunti vuoti';
+
+  @override
   String get validToken => 'Token valido';
 
   @override

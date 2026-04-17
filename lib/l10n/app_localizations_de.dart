@@ -216,6 +216,9 @@ class L10nDe extends L10n {
   String get pasteFromClipboard => 'Aus Zwischenablage einfügen';
 
   @override
+  String get emptyClipboard => 'Zwischenablage leer';
+
+  @override
   String get validToken => 'Token gültig';
 
   @override

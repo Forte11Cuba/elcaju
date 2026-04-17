@@ -213,6 +213,9 @@ class L10nSw extends L10n {
   String get pasteFromClipboard => 'Bandika kutoka ubao';
 
   @override
+  String get emptyClipboard => 'Ubao wa kunakili ni tupu';
+
+  @override
   String get validToken => 'Tokeni halali';
 
   @override

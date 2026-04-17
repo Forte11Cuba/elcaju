@@ -213,6 +213,9 @@ class L10nEn extends L10n {
   String get pasteFromClipboard => 'Paste from clipboard';
 
   @override
+  String get emptyClipboard => 'Clipboard is empty';
+
+  @override
   String get validToken => 'Valid token';
 
   @override

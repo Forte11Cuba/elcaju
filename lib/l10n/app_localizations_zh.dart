@@ -208,6 +208,9 @@ class L10nZh extends L10n {
   String get pasteFromClipboard => '从剪贴板粘贴';
 
   @override
+  String get emptyClipboard => '剪贴板为空';
+
+  @override
   String get validToken => '有效代币';
 
   @override

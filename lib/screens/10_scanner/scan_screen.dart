@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:elcaju/l10n/app_localizations.dart';
@@ -59,38 +60,81 @@ class _ScanScreenState extends State<ScanScreen> {
           children: [
             // Scanner
             QrScannerWidget(
-            onDetect: _onCodeDetected,
-            showFlashControl: true,
-            showCameraSwitch: false,
-          ),
-
-          // Instrucciones en la parte inferior
-          Positioned(
-            bottom: 100,
-            left: 24,
-            right: 24,
-            child: Text(
-              _getInstructionForMode(l10n),
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                color: Colors.white.withValues(alpha: 0.8),
-              ),
-              textAlign: TextAlign.center,
+              onDetect: _onCodeDetected,
+              showFlashControl: true,
+              showCameraSwitch: false,
             ),
-          ),
 
-          // Indicador de procesamiento
-          if (_isProcessing)
-            Container(
-              color: Colors.black54,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primaryAction,
+            // Instrucciones en la parte inferior
+            Positioned(
+              bottom: 170,
+              left: 24,
+              right: 24,
+              child: Text(
+                _getInstructionForMode(l10n),
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 16,
+                  color: Colors.white.withValues(alpha: 0.8),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+            // Botón pegar del portapapeles (encima del flash)
+            Positioned(
+              bottom: 100,
+              left: 24,
+              right: 24,
+              child: Center(
+                child: Material(
+                  color: Colors.white.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(24),
+                  child: InkWell(
+                    onTap: _isProcessing ? null : _pasteFromClipboard,
+                    borderRadius: BorderRadius.circular(24),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            LucideIcons.clipboard,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.pasteFromClipboard,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-        ],
+
+            // Indicador de procesamiento
+            if (_isProcessing)
+              Container(
+                color: Colors.black54,
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryAction,
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
@@ -116,6 +160,24 @@ class _ScanScreenState extends State<ScanScreen> {
       case ScanMode.invoiceOnly:
         return l10n.pointCameraAtInvoiceQr;
     }
+  }
+
+  Future<void> _pasteFromClipboard() async {
+    final l10n = L10n.of(context)!;
+    final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = clipboardData?.text?.trim();
+    if (!mounted) return;
+    if (text == null || text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.emptyClipboard),
+          backgroundColor: AppColors.warning,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    _onCodeDetected(text);
   }
 
   void _onCodeDetected(String rawData) async {
