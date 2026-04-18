@@ -579,20 +579,28 @@ impl Wallet {
             return Ok(ReclaimResult::empty());
         }
 
+        let total = target_ys.len() as u64;
+
         let pending = self.inner.get_pending_spent_proofs().await?;
         // Filter to only proofs with a Y in our target set.
         let relevant: Vec<_> = pending
             .into_iter()
             .filter(|proof| proof.y().map(|y| target_ys.contains(&y)).unwrap_or(false))
             .collect();
+
+        // Target Ys that aren't in local PendingSpent anymore are treated as
+        // spent — a previous `check_proofs_spent` call removed them from the
+        // local DB because the mint confirmed SPENT. This matches
+        // `check_proofs_by_ys` and keeps `ReclaimResult`'s bucket invariant
+        // (`unspent + pending + spent == total`) across both paths.
+        let resolved_out_of_pending = total.saturating_sub(relevant.len() as u64);
+
         if relevant.is_empty() {
-            // Nothing left locally for this send → already reconciled.
-            // Caller can safely drop the record.
             return Ok(ReclaimResult {
                 count: 0,
                 amount: 0,
                 pending_count: 0,
-                spent_count: target_ys.len() as u64,
+                spent_count: total,
             });
         }
 
@@ -611,7 +619,9 @@ impl Wallet {
         }
 
         self.update_balance_streams().await;
-        Ok(buckets.into_result())
+        let mut result = buckets.into_result();
+        result.spent_count += resolved_out_of_pending;
+        Ok(result)
     }
 
     /// Observe-only counterpart of `reclaim_proofs_by_ys`. Queries the mint

@@ -82,8 +82,10 @@ class PendingSend {
   bool get isSettled => status == PendingSendStatus.settled;
 
   /// Para ordenar en el historial: si está settled, usar settledAt; si no,
-  /// usar createdAt.
-  DateTime get effectiveTimestamp => settledAt ?? createdAt;
+  /// usar createdAt. Condicionado en `isSettled` (no sólo en `settledAt != null`)
+  /// para que una corrupción futura del campo no reubique un record activo.
+  DateTime get effectiveTimestamp =>
+      isSettled ? (settledAt ?? createdAt) : createdAt;
 
   PendingSend copyWith({
     String? id,

@@ -132,8 +132,10 @@ class PendingSendStorage {
       memo: memo,
       // status default = active
     );
-    _cache[send.id] = send;
+    // Persistencia primero: si SQLite falla, la cache no queda contaminada
+    // con un record que el reinicio no va a encontrar.
     await _db?.insert(_tableName, send.toMap());
+    _cache[send.id] = send;
     _changesController.add(null);
     return send;
   }
@@ -149,13 +151,16 @@ class PendingSendStorage {
       status: PendingSendStatus.settled,
       settledAt: DateTime.now(),
     );
-    _cache[id] = updated;
+    // Persistencia primero: si SQLite falla, la cache queda activa y un
+    // próximo reconcile reintenta. Con el orden inverso, la idempotencia
+    // (`isSettled → early return`) impediría el retry tras una falla.
     await _db?.update(
       _tableName,
       updated.toMap(),
       where: 'id = ?',
       whereArgs: [id],
     );
+    _cache[id] = updated;
     _changesController.add(null);
   }
 
@@ -163,8 +168,10 @@ class PendingSendStorage {
   /// hoy en UI) o cleanup explícito del wallet (`clear`). Para el caso
   /// "receptor reclamó", usar `markSettled` en vez de este.
   Future<void> remove(String id) async {
-    _cache.remove(id);
+    // Persistencia primero: igual que add/markSettled, la cache no se
+    // adelanta al storage.
     await _db?.delete(_tableName, where: 'id = ?', whereArgs: [id]);
+    _cache.remove(id);
     _changesController.add(null);
   }
 

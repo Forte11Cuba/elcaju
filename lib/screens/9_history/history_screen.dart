@@ -173,10 +173,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
 
     // Envíos offline activos (receptor aún no reclamó) → tile warning arriba
-    // con botón de cancel. Solo visibles en filtros "all" y "pending".
+    // con botón de cancel. Son Cashu por definición, así que aparecen en
+    // "all", "pending" y "cashu" (consistente con los settled).
     final activeSends =
         (_currentFilter == HistoryFilter.all ||
-                _currentFilter == HistoryFilter.pending)
+                _currentFilter == HistoryFilter.pending ||
+                _currentFilter == HistoryFilter.cashu)
             ? walletProvider.listActivePendingSends()
             : <PendingSend>[];
 

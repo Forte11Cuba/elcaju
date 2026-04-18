@@ -244,13 +244,12 @@ class WalletProvider extends ChangeNotifier {
   /// Decisión central sobre qué hacer con un PendingSend tras consultar
   /// el mint. Devuelve `true` si el record dejó de estar activo.
   ///
-  ///   - `count > 0`                 → recuperamos nosotros: el envío se
-  ///       abortó, no hay ledger que mostrar. REMOVE el record.
-  ///   - `count == 0 && pending == 0` → receptor reclamó (o reconciliación
-  ///       previa ya lo procesó): el envío se completó. SETTLE el record
-  ///       para que aparezca en histórico como outgoing liquidado.
-  ///   - `pending_count > 0`         → receptor mid-swap: conservar activo
-  ///       para retry.
+  ///   - `count > 0`                                → recuperamos nosotros:
+  ///       el envío se abortó, no hay ledger que mostrar. REMOVE.
+  ///   - `pending == 0 && spent >= proofYs.length`  → mint confirmó todos
+  ///       spent: receptor reclamó. SETTLE para histórico.
+  ///   - cualquier otro caso (pending > 0, o cobertura parcial de spent)
+  ///       → conservar activo; próxima reconciliación reintenta.
   Future<bool> _settlePendingSendOutcome(
     PendingSend send,
     ReclaimResult result,
@@ -260,13 +259,22 @@ class WalletProvider extends ChangeNotifier {
       await _pendingSendStorage.remove(send.id);
       return true;
     }
-    if (result.pendingCount == BigInt.zero) {
-      // Ninguna unspent, ninguna pending → todas consumidas por el receptor.
+    // Defensa en profundidad: aunque `pending_count == 0` suele bastar para
+    // decir "todas consumidas", exigimos además que `spent_count` cubra
+    // todos los proofs del send. Un resultado parcial o malformado podría
+    // dejar `pending == 0` sin haber observado spent para todos los ys.
+    final expected = BigInt.from(send.proofYs.length);
+    final allAccountedSpent = expected > BigInt.zero &&
+        result.pendingCount == BigInt.zero &&
+        result.spentCount >= expected;
+    if (allAccountedSpent) {
+      // Ninguna unspent, ninguna pending, todas spent → receptor reclamó.
       // Pasa a histórico como "outgoing liquidado".
       await _pendingSendStorage.markSettled(send.id);
       return true;
     }
-    // pending > 0 → todavía hay proofs mid-swap; conservamos activo.
+    // pending > 0 (receptor mid-swap) o cobertura parcial → conservamos
+    // activo para que la próxima reconciliación lo resuelva.
     return false;
   }
 
