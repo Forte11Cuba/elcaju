@@ -275,52 +275,53 @@ class _MintsScreenState extends State<MintsScreen> {
     );
   }
 
-  /// Badges de balance compactos (estilo cashu.me)
+  /// Badges de balance compactos (estilo cashu.me).
+  /// Muestra todas las unidades soportadas por el mint: las de saldo > 0
+  /// con estilo activo y las de saldo 0 atenuadas, para reflejar las
+  /// capacidades del mint aunque aún no se hayan usado.
   Widget _buildBalanceBadges(List<String> units, Map<String, BigInt> balances) {
-    final nonZeroBalances = balances.entries
-        .where((e) => e.value > BigInt.zero)
-        .toList();
+    final entries = balances.isNotEmpty
+        ? balances.entries.toList()
+        : units.map((u) => MapEntry(u, BigInt.zero)).toList();
 
-    if (nonZeroBalances.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          '0 ${units.isNotEmpty ? units.first : "sat"}',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 12,
-            color: Colors.white.withValues(alpha: 0.6),
-          ),
-        ),
-      );
+    if (entries.isEmpty) {
+      return const SizedBox.shrink();
     }
+
+    entries.sort((a, b) {
+      final aZero = a.value == BigInt.zero;
+      final bZero = b.value == BigInt.zero;
+      if (aZero == bZero) return 0;
+      return aZero ? 1 : -1;
+    });
 
     return Wrap(
       spacing: 6,
       runSpacing: 4,
-      children: nonZeroBalances.map((entry) {
+      children: entries.map((entry) {
         final unit = entry.key;
         final balance = entry.value;
+        final isZero = balance == BigInt.zero;
         final formatted = UnitFormatter.formatBalance(balance, unit);
         final label = UnitFormatter.getUnitLabel(unit);
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: AppColors.primaryAction.withValues(alpha: 0.15),
+            color: isZero
+                ? Colors.white.withValues(alpha: 0.08)
+                : AppColors.primaryAction.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             '$formatted $label',
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Inter',
               fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.primaryAction,
+              fontWeight: isZero ? FontWeight.w400 : FontWeight.w500,
+              color: isZero
+                  ? Colors.white.withValues(alpha: 0.5)
+                  : AppColors.primaryAction,
             ),
           ),
         );
