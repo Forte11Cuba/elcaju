@@ -243,6 +243,8 @@
   "pendingStatus": "Ausstehend",
   "receivedStatus": "Empfangen",
   "sentStatus": "Gesendet",
+  "receiving": "Wird empfangen",
+  "sending": "Wird gesendet",
   "now": "Jetzt",
   "agoMinutes": "Vor {minutes} Min",
   "@agoMinutes": {

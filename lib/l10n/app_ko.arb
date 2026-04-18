@@ -243,6 +243,8 @@
   "pendingStatus": "대기 중",
   "receivedStatus": "받음",
   "sentStatus": "보냄",
+  "receiving": "받는 중",
+  "sending": "보내는 중",
   "now": "방금",
   "agoMinutes": "{minutes}분 전",
   "@agoMinutes": {

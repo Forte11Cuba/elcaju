@@ -135,10 +135,22 @@ class WalletProvider extends ChangeNotifier {
   // ============================================================
 
   int get pendingSendCount => _pendingSendStorage.count;
+  int get activePendingSendCount => _pendingSendStorage.activeCount;
   bool get hasPendingSends => _pendingSendStorage.hasPendingSends;
+  bool get hasActivePendingSends => _pendingSendStorage.hasActivePendingSends;
   Stream<void> get pendingSendChanges => _pendingSendStorage.changes;
 
   List<PendingSend> listPendingSends() => _pendingSendStorage.listAll();
+
+  /// Envíos activos (receptor aún no reclamó). Render: tile warning con
+  /// botón cancel.
+  List<PendingSend> listActivePendingSends() =>
+      _pendingSendStorage.listActive();
+
+  /// Envíos liquidados (receptor reclamó). Render: tile outgoing settled,
+  /// sin botón cancel.
+  List<PendingSend> listSettledPendingSends() =>
+      _pendingSendStorage.listSettled();
 
   List<PendingSend> listPendingSendsByMintUnit(String mintUrl, String unit) =>
       _pendingSendStorage.listByMintUnit(mintUrl, unit);
@@ -176,25 +188,94 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Reclama las proofs de un envío offline pendiente. Verifica con el mint:
-  /// - Si están UNSPENT → revierte a Unspent local y borra el PendingSend.
-  /// - Si están SPENT (receptor ya reclamó) → borra el PendingSend igual
-  ///   (el envío se completó).
-  /// - Si algunas PENDING en el mint → deja el PendingSend para reintento.
+  /// - Si algunas están UNSPENT → revierte localmente y borra el PendingSend.
+  /// - Si ninguna UNSPENT y ninguna PENDING (todas SPENT o ya reconciliadas)
+  ///   → el receptor reclamó: borra el PendingSend.
+  /// - Si hay proofs PENDING en el mint → conserva el PendingSend para retry.
   Future<ReclaimResult> reclaimPendingSend(PendingSend send) async {
     final wallet = await getWallet(send.mintUrl, send.unit);
     final result = await wallet.reclaimProofsByYs(ys: send.proofYs);
-    // Solo removemos el registro si el mint confirmó que había proofs
-    // UNSPENT y las revertimos. Un count=0 es ambiguo: puede significar
-    // "receptor ya reclamó (SPENT)" o "receptor en medio del swap
-    // (PENDING)". En el caso PENDING, necesitamos conservar el record
-    // para poder reintentar después — borrar perdería el retry handle.
-    // Esto puede dejar records "fantasma" tras un SPENT real; se puede
-    // agregar dismissal manual como mejora futura.
-    if (result.count > BigInt.zero) {
-      await _pendingSendStorage.remove(send.id);
-    }
+    await _settlePendingSendOutcome(send, result);
     notifyListeners();
     return result;
+  }
+
+  /// Reconcilia todos los PendingSend contra el mint. Análogo a
+  /// `checkPendingTransactions` pero para el storage propio de envíos
+  /// offline (que CDK no conoce). Pensado para correr en pull-to-refresh,
+  /// history mount y startup.
+  ///
+  /// **Importante:** usa `checkProofsByYs` (observe-only), no
+  /// `reclaimProofsByYs`. La reconciliación automática NO debe revertir
+  /// proofs Unspent — eso cancelaría envíos legítimos que el receptor
+  /// todavía no reclamó, abriendo una ventana de doble-gasto.
+  ///
+  /// Sólo marca `settled` cuando el mint confirma que todos los proofs
+  /// están gastados. Cualquier otro caso (pending mid-swap o unspent
+  /// esperando al receptor) mantiene el record activo.
+  ///
+  /// Tolera errores por-record (un mint offline no rompe el resto).
+  /// Devuelve cuántos records pasaron a settled.
+  Future<int> reconcilePendingSends() async {
+    // Sólo activos: los settled ya están resueltos.
+    final sends = _pendingSendStorage.listActive();
+    if (sends.isEmpty) return 0;
+
+    var settled = 0;
+    for (final send in sends) {
+      try {
+        final wallet = await getWallet(send.mintUrl, send.unit);
+        final result = await wallet.checkProofsByYs(ys: send.proofYs);
+        final total = BigInt.from(send.proofYs.length);
+        final allSpent = result.pendingCount == BigInt.zero &&
+            result.spentCount >= total;
+        if (allSpent) {
+          await _pendingSendStorage.markSettled(send.id);
+          settled++;
+        }
+      } catch (e) {
+        debugPrint('reconcilePendingSends: ${send.id} failed: $e');
+      }
+    }
+    if (settled > 0) notifyListeners();
+    return settled;
+  }
+
+  /// Decisión central sobre qué hacer con un PendingSend tras consultar
+  /// el mint. Devuelve `true` si el record dejó de estar activo.
+  ///
+  ///   - `count > 0`                                → recuperamos nosotros:
+  ///       el envío se abortó, no hay ledger que mostrar. REMOVE.
+  ///   - `pending == 0 && spent >= proofYs.length`  → mint confirmó todos
+  ///       spent: receptor reclamó. SETTLE para histórico.
+  ///   - cualquier otro caso (pending > 0, o cobertura parcial de spent)
+  ///       → conservar activo; próxima reconciliación reintenta.
+  Future<bool> _settlePendingSendOutcome(
+    PendingSend send,
+    ReclaimResult result,
+  ) async {
+    if (result.count > BigInt.zero) {
+      // Recuperamos las proofs; el envío se canceló desde nuestro lado.
+      await _pendingSendStorage.remove(send.id);
+      return true;
+    }
+    // Defensa en profundidad: aunque `pending_count == 0` suele bastar para
+    // decir "todas consumidas", exigimos además que `spent_count` cubra
+    // todos los proofs del send. Un resultado parcial o malformado podría
+    // dejar `pending == 0` sin haber observado spent para todos los ys.
+    final expected = BigInt.from(send.proofYs.length);
+    final allAccountedSpent = expected > BigInt.zero &&
+        result.pendingCount == BigInt.zero &&
+        result.spentCount >= expected;
+    if (allAccountedSpent) {
+      // Ninguna unspent, ninguna pending, todas spent → receptor reclamó.
+      // Pasa a histórico como "outgoing liquidado".
+      await _pendingSendStorage.markSettled(send.id);
+      return true;
+    }
+    // pending > 0 (receptor mid-swap) o cobertura parcial → conservamos
+    // activo para que la próxima reconciliación lo resuelva.
+    return false;
   }
 
   Future<void> removePendingSend(String id) async {
@@ -1611,6 +1692,10 @@ class WalletProvider extends ChangeNotifier {
             perUnit[unit] = ReclaimResult(
               count: (prev?.count ?? BigInt.zero) + result.count,
               amount: (prev?.amount ?? BigInt.zero) + result.amount,
+              pendingCount:
+                  (prev?.pendingCount ?? BigInt.zero) + result.pendingCount,
+              spentCount:
+                  (prev?.spentCount ?? BigInt.zero) + result.spentCount,
             );
           }
         } catch (e) {

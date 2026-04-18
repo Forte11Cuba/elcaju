@@ -552,6 +552,12 @@ class L10nEn extends L10n {
   String get sentStatus => 'Sent';
 
   @override
+  String get receiving => 'Receiving';
+
+  @override
+  String get sending => 'Sending';
+
+  @override
   String get now => 'Now';
 
   @override

@@ -243,6 +243,8 @@
   "pendingStatus": "保留中",
   "receivedStatus": "受取済み",
   "sentStatus": "送金済み",
+  "receiving": "受取中",
+  "sending": "送金中",
   "now": "たった今",
   "agoMinutes": "{minutes}分前",
   "@agoMinutes": {

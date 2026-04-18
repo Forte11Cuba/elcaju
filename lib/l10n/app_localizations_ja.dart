@@ -545,6 +545,12 @@ class L10nJa extends L10n {
   String get sentStatus => '送金済み';
 
   @override
+  String get receiving => '受取中';
+
+  @override
+  String get sending => '送金中';
+
+  @override
   String get now => 'たった今';
 
   @override

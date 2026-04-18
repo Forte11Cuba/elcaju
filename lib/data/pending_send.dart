@@ -1,4 +1,30 @@
-/// Modelo para rastrear envíos offline pendientes.
+/// Estado del envío dentro del storage propio.
+///
+/// - [active]  : el receptor aún no reclamó; los proofs están PendingSpent
+///               localmente. Mostrar con acción de cancelar/reclamar.
+/// - [settled] : la reconciliación con el mint confirmó que los proofs
+///               fueron gastados (receptor reclamó) o que una reconciliación
+///               previa ya los procesó. Mostrar como tx saliente histórica,
+///               sin acción de cancel.
+enum PendingSendStatus {
+  active,
+  settled;
+
+  String get wireName => name;
+
+  static PendingSendStatus fromWire(String? raw) {
+    switch (raw) {
+      case 'settled':
+        return PendingSendStatus.settled;
+      case 'active':
+      case null:
+      default:
+        return PendingSendStatus.active;
+    }
+  }
+}
+
+/// Modelo para rastrear envíos offline.
 ///
 /// Los envíos offline no crean una Transaction en CDK (porque se hacen con
 /// selección manual de proofs + createOfflineToken), por lo que necesitamos
@@ -32,6 +58,13 @@ class PendingSend {
   /// Memo opcional
   final String? memo;
 
+  /// Estado del envío. Ver [PendingSendStatus].
+  final PendingSendStatus status;
+
+  /// Timestamp de cuando el envío pasó a [PendingSendStatus.settled].
+  /// Null mientras esté activo. Se usa para ordenar en el historial.
+  final DateTime? settledAt;
+
   PendingSend({
     required this.id,
     required this.encoded,
@@ -41,7 +74,18 @@ class PendingSend {
     required List<String> proofYs,
     required this.createdAt,
     this.memo,
+    this.status = PendingSendStatus.active,
+    this.settledAt,
   }) : proofYs = List.unmodifiable(proofYs);
+
+  bool get isActive => status == PendingSendStatus.active;
+  bool get isSettled => status == PendingSendStatus.settled;
+
+  /// Para ordenar en el historial: si está settled, usar settledAt; si no,
+  /// usar createdAt. Condicionado en `isSettled` (no sólo en `settledAt != null`)
+  /// para que una corrupción futura del campo no reubique un record activo.
+  DateTime get effectiveTimestamp =>
+      isSettled ? (settledAt ?? createdAt) : createdAt;
 
   PendingSend copyWith({
     String? id,
@@ -52,6 +96,8 @@ class PendingSend {
     List<String>? proofYs,
     DateTime? createdAt,
     String? memo,
+    PendingSendStatus? status,
+    DateTime? settledAt,
   }) {
     return PendingSend(
       id: id ?? this.id,
@@ -62,6 +108,8 @@ class PendingSend {
       proofYs: proofYs ?? this.proofYs,
       createdAt: createdAt ?? this.createdAt,
       memo: memo ?? this.memo,
+      status: status ?? this.status,
+      settledAt: settledAt ?? this.settledAt,
     );
   }
 
@@ -75,6 +123,8 @@ class PendingSend {
       'proof_ys': proofYs.join(','),
       'created_at': createdAt.millisecondsSinceEpoch,
       'memo': memo,
+      'status': status.wireName,
+      'settled_at': settledAt?.millisecondsSinceEpoch,
     };
   }
 
@@ -83,6 +133,7 @@ class PendingSend {
     final ys = ysRaw.isEmpty
         ? <String>[]
         : ysRaw.split(',').where((s) => s.isNotEmpty).toList();
+    final settledAtRaw = map['settled_at'] as int?;
     return PendingSend(
       id: map['id'] as String,
       encoded: map['encoded'] as String,
@@ -92,10 +143,14 @@ class PendingSend {
       proofYs: ys,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
       memo: map['memo'] as String?,
+      status: PendingSendStatus.fromWire(map['status'] as String?),
+      settledAt: settledAtRaw == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(settledAtRaw),
     );
   }
 
   @override
   String toString() =>
-      'PendingSend(id: $id, amount: $amount $unit, mintUrl: $mintUrl, ys: ${proofYs.length})';
+      'PendingSend(id: $id, amount: $amount $unit, mintUrl: $mintUrl, ys: ${proofYs.length}, status: ${status.name})';
 }

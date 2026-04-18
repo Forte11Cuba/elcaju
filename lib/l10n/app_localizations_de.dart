@@ -559,6 +559,12 @@ class L10nDe extends L10n {
   String get sentStatus => 'Gesendet';
 
   @override
+  String get receiving => 'Wird empfangen';
+
+  @override
+  String get sending => 'Wird gesendet';
+
+  @override
   String get now => 'Jetzt';
 
   @override

@@ -243,6 +243,8 @@
   "pendingStatus": "Inasubiri",
   "receivedStatus": "Imepokelewa",
   "sentStatus": "Imetumwa",
+  "receiving": "Inapokea",
+  "sending": "Inatumwa",
   "now": "Sasa",
   "agoMinutes": "Dakika {minutes} zilizopita",
   "@agoMinutes": {
