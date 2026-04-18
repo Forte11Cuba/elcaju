@@ -531,11 +531,11 @@ impl Wallet {
     // === Reclaim orphaned proofs ===
 
     /// Check pending-spent proofs with the mint and revert unspent ones.
-    /// Returns count and total amount of proofs recovered.
+    /// Returns per-state buckets (unspent reverted, still pending, spent).
     pub async fn reclaim_pending_proofs(&self) -> Result<ReclaimResult, Error> {
         let pending = self.inner.get_pending_spent_proofs().await?;
         if pending.is_empty() {
-            return Ok(ReclaimResult { count: 0, amount: 0 });
+            return Ok(ReclaimResult::empty());
         }
 
         // Build a map of Y → amount for later lookup
@@ -548,56 +548,52 @@ impl Wallet {
 
         // check_proofs_spent: queries mint AND removes spent proofs from local DB
         let states = self.inner.check_proofs_spent(pending).await?;
+        let buckets = StateBuckets::from_states(states, &amount_by_y);
 
-        // Collect Y values of proofs the mint says are NOT spent
-        // Only reclaim proofs the mint explicitly reports as Unspent.
-        // Pending proofs (still being processed) must not be unreserved.
-        let unspent_ys: Vec<PublicKey> = states
-            .into_iter()
-            .filter(|s| s.state == ProofState::Unspent)
-            .map(|s| s.y)
-            .collect();
-
-        let count = unspent_ys.len() as u64;
-        let amount: u64 = unspent_ys.iter()
-            .filter_map(|y| amount_by_y.get(y))
-            .sum();
-
-        if count > 0 {
+        if !buckets.unspent_ys.is_empty() {
             // Revert from PendingSpent to Unspent
-            self.inner.unreserve_proofs(unspent_ys).await?;
+            self.inner.unreserve_proofs(buckets.unspent_ys.clone()).await?;
         }
 
         // Always refresh: check_proofs_spent may have removed spent proofs
         self.update_balance_streams().await;
-        Ok(ReclaimResult { count, amount })
+        Ok(buckets.into_result())
     }
 
-    /// Reclaim proofs belonging to a specific transaction identified by its Y values.
-    /// Works like reclaim_pending_proofs but scoped: only proofs whose Y matches
+    /// Reclaim proofs belonging to a specific send identified by its Y values.
+    /// Scoped variant of `reclaim_pending_proofs`: only proofs whose Y matches
     /// the input list are checked with the mint and reverted if Unspent.
-    /// Use tx.ys from a pending outgoing transaction to cancel that specific send.
+    ///
+    /// Empty returns:
+    /// - Input `ys` empty or all unparseable → `ReclaimResult::empty()`.
+    /// - None of the target Ys are in local pending anymore (a previous
+    ///   reconciliation already processed them) → `spent_count` is set to
+    ///   the number of targets, signalling to callers that the send is
+    ///   definitively finished and any local record can be removed.
     pub async fn reclaim_proofs_by_ys(&self, ys: Vec<String>) -> Result<ReclaimResult, Error> {
         let target_ys: std::collections::HashSet<PublicKey> = ys
             .iter()
             .filter_map(|y| PublicKey::from_hex(y).ok())
             .collect();
         if target_ys.is_empty() {
-            return Ok(ReclaimResult { count: 0, amount: 0 });
+            return Ok(ReclaimResult::empty());
         }
 
         let pending = self.inner.get_pending_spent_proofs().await?;
-        if pending.is_empty() {
-            return Ok(ReclaimResult { count: 0, amount: 0 });
-        }
-
         // Filter to only proofs with a Y in our target set.
         let relevant: Vec<_> = pending
             .into_iter()
             .filter(|proof| proof.y().map(|y| target_ys.contains(&y)).unwrap_or(false))
             .collect();
         if relevant.is_empty() {
-            return Ok(ReclaimResult { count: 0, amount: 0 });
+            // Nothing left locally for this send → already reconciled.
+            // Caller can safely drop the record.
+            return Ok(ReclaimResult {
+                count: 0,
+                amount: 0,
+                pending_count: 0,
+                spent_count: target_ys.len() as u64,
+            });
         }
 
         let mut amount_by_y: HashMap<PublicKey, u64> = HashMap::new();
@@ -608,22 +604,83 @@ impl Wallet {
         }
 
         let states = self.inner.check_proofs_spent(relevant).await?;
+        let buckets = StateBuckets::from_states(states, &amount_by_y);
 
-        let unspent_ys: Vec<PublicKey> = states
-            .into_iter()
-            .filter(|s| s.state == ProofState::Unspent)
-            .map(|s| s.y)
-            .collect();
-
-        let count = unspent_ys.len() as u64;
-        let amount: u64 = unspent_ys.iter().filter_map(|y| amount_by_y.get(y)).sum();
-
-        if count > 0 {
-            self.inner.unreserve_proofs(unspent_ys).await?;
+        if !buckets.unspent_ys.is_empty() {
+            self.inner.unreserve_proofs(buckets.unspent_ys.clone()).await?;
         }
 
         self.update_balance_streams().await;
-        Ok(ReclaimResult { count, amount })
+        Ok(buckets.into_result())
+    }
+
+    /// Observe-only counterpart of `reclaim_proofs_by_ys`. Queries the mint
+    /// for the state of the target Ys but **does NOT** revert Unspent proofs
+    /// to the local Unspent state.
+    ///
+    /// Use this for periodic reconciliation where we want to auto-settle
+    /// sends the receiver already claimed, without accidentally cancelling
+    /// sends the receiver has not claimed yet (which `reclaim_proofs_by_ys`
+    /// would do by calling `unreserve_proofs`).
+    ///
+    /// Return semantics:
+    /// - `count` / `amount` always 0 (nothing is recovered).
+    /// - `pending_count` / `spent_count` reflect the mint's report.
+    /// - `spent_count` also includes target Ys that are no longer present
+    ///   in local PendingSpent (already reconciled or externally cleaned).
+    /// The caller can infer "all resolved as spent" from
+    /// `spent_count == target_ys.len() && pending_count == 0`.
+    pub async fn check_proofs_by_ys(&self, ys: Vec<String>) -> Result<ReclaimResult, Error> {
+        let target_ys: std::collections::HashSet<PublicKey> = ys
+            .iter()
+            .filter_map(|y| PublicKey::from_hex(y).ok())
+            .collect();
+        if target_ys.is_empty() {
+            return Ok(ReclaimResult::empty());
+        }
+        let total = target_ys.len() as u64;
+
+        let pending = self.inner.get_pending_spent_proofs().await?;
+        let relevant: Vec<_> = pending
+            .into_iter()
+            .filter(|proof| proof.y().map(|y| target_ys.contains(&y)).unwrap_or(false))
+            .collect();
+
+        // Ys we expected to be in local PendingSpent but aren't anymore.
+        // Safe assumption: they were reconciled out earlier because the
+        // mint confirmed them spent (check_proofs_spent removed them).
+        let resolved_out_of_pending = total.saturating_sub(relevant.len() as u64);
+
+        if relevant.is_empty() {
+            return Ok(ReclaimResult {
+                count: 0,
+                amount: 0,
+                pending_count: 0,
+                spent_count: total,
+            });
+        }
+
+        let mut amount_by_y: HashMap<PublicKey, u64> = HashMap::new();
+        for proof in &relevant {
+            if let Ok(y) = proof.y() {
+                amount_by_y.insert(y, u64::from(proof.amount));
+            }
+        }
+
+        // check_proofs_spent queries the mint AND removes locally-spent
+        // proofs from the DB. That cleanup is fine — it doesn't cancel
+        // an active send, it just advances state once the mint confirms
+        // SPENT. The part we deliberately skip is `unreserve_proofs`.
+        let states = self.inner.check_proofs_spent(relevant).await?;
+        let buckets = StateBuckets::from_states(states, &amount_by_y);
+
+        self.update_balance_streams().await;
+        Ok(ReclaimResult {
+            count: 0,
+            amount: 0,
+            pending_count: buckets.pending_count,
+            spent_count: buckets.spent_count + resolved_out_of_pending,
+        })
     }
 
     // === Utility ===
@@ -787,8 +844,86 @@ impl<'a> From<CdkPreparedSend<'a>> for PreparedSend {
 }
 
 pub struct ReclaimResult {
+    /// Proofs reverted from PendingSpent to Unspent. Also the number of
+    /// recovered proofs reflected in `amount`.
     pub count: u64,
+    /// Total value of the recovered proofs.
     pub amount: u64,
+    /// Proofs the mint reports as still Pending (receiver mid-swap). The
+    /// caller should keep the record for retry — a later reconciliation
+    /// will resolve them.
+    pub pending_count: u64,
+    /// Proofs the mint reports as Spent (receiver already claimed). When
+    /// `count == 0 && pending_count == 0`, the send is definitively
+    /// finished and the caller can delete its local record.
+    pub spent_count: u64,
+}
+
+impl ReclaimResult {
+    #[frb(ignore)]
+    fn empty() -> Self {
+        Self {
+            count: 0,
+            amount: 0,
+            pending_count: 0,
+            spent_count: 0,
+        }
+    }
+}
+
+/// Internal helper: partition the response of `check_proofs_spent` into
+/// the three buckets we care about (Unspent / Pending / Spent) and carry
+/// the Ys/amount needed to build a `ReclaimResult`.
+#[frb(ignore)]
+struct StateBuckets {
+    unspent_ys: Vec<PublicKey>,
+    unspent_amount: u64,
+    pending_count: u64,
+    spent_count: u64,
+}
+
+impl StateBuckets {
+    fn from_states(
+        states: Vec<cdk::nuts::ProofState>,
+        amount_by_y: &HashMap<PublicKey, u64>,
+    ) -> Self {
+        let mut unspent_ys = Vec::new();
+        let mut unspent_amount: u64 = 0;
+        let mut pending_count: u64 = 0;
+        let mut spent_count: u64 = 0;
+
+        for s in states {
+            match s.state {
+                ProofState::Unspent => {
+                    if let Some(&a) = amount_by_y.get(&s.y) {
+                        unspent_amount = unspent_amount.saturating_add(a);
+                    }
+                    unspent_ys.push(s.y);
+                }
+                ProofState::Pending => pending_count += 1,
+                ProofState::Spent => spent_count += 1,
+                // Reserved / other states: not expected for pending-spent
+                // queries; ignore so we don't miscount.
+                _ => {}
+            }
+        }
+
+        Self {
+            unspent_ys,
+            unspent_amount,
+            pending_count,
+            spent_count,
+        }
+    }
+
+    fn into_result(self) -> ReclaimResult {
+        ReclaimResult {
+            count: self.unspent_ys.len() as u64,
+            amount: self.unspent_amount,
+            pending_count: self.pending_count,
+            spent_count: self.spent_count,
+        }
+    }
 }
 
 pub struct PreparedMelt {

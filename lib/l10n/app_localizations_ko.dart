@@ -547,6 +547,12 @@ class L10nKo extends L10n {
   String get sentStatus => '보냄';
 
   @override
+  String get receiving => '받는 중';
+
+  @override
+  String get sending => '보내는 중';
+
+  @override
   String get now => '방금';
 
   @override

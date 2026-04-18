@@ -554,6 +554,12 @@ class L10nIt extends L10n {
   String get sentStatus => 'Inviato';
 
   @override
+  String get receiving => 'In ricezione';
+
+  @override
+  String get sending => 'In invio';
+
+  @override
   String get now => 'Adesso';
 
   @override

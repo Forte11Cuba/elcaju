@@ -243,6 +243,8 @@
   "pendingStatus": "待处理",
   "receivedStatus": "已收到",
   "sentStatus": "已发送",
+  "receiving": "接收中",
+  "sending": "发送中",
   "now": "刚刚",
   "agoMinutes": "{minutes} 分钟前",
   "@agoMinutes": {

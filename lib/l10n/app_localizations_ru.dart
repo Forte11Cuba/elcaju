@@ -553,6 +553,12 @@ class L10nRu extends L10n {
   String get sentStatus => 'Отправлено';
 
   @override
+  String get receiving => 'Получение';
+
+  @override
+  String get sending => 'Отправка';
+
+  @override
   String get now => 'Сейчас';
 
   @override

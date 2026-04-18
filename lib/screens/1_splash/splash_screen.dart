@@ -166,7 +166,12 @@ class _SplashScreenState extends State<SplashScreen>
   /// Se ejecuta sin bloquear la navegación.
   Future<void> _checkPendingTransactions(WalletProvider wallet) async {
     try {
-      await wallet.checkPendingTransactions();
+      // CDK reconcilia online; reconcilePendingSends reconcilia los envíos
+      // offline (storage propio).
+      await Future.wait([
+        wallet.checkPendingTransactions(),
+        wallet.reconcilePendingSends(),
+      ]);
       debugPrint('Verificación de proofs completada');
     } catch (e) {
       debugPrint('Error verificando proofs: $e');

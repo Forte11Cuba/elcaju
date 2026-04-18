@@ -243,6 +243,8 @@
   "pendingStatus": "Ожидание",
   "receivedStatus": "Получено",
   "sentStatus": "Отправлено",
+  "receiving": "Получение",
+  "sending": "Отправка",
   "now": "Сейчас",
   "agoMinutes": "{minutes} мин назад",
   "@agoMinutes": {

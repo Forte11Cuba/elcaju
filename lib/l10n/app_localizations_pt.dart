@@ -555,6 +555,12 @@ class L10nPt extends L10n {
   String get sentStatus => 'Enviado';
 
   @override
+  String get receiving => 'Recebendo';
+
+  @override
+  String get sending => 'Enviando';
+
+  @override
   String get now => 'Agora';
 
   @override

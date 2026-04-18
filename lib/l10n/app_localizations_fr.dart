@@ -559,6 +559,12 @@ class L10nFr extends L10n {
   String get sentStatus => 'Envoyé';
 
   @override
+  String get receiving => 'En réception';
+
+  @override
+  String get sending => 'En envoi';
+
+  @override
   String get now => 'Maintenant';
 
   @override

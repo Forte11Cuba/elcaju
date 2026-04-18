@@ -1135,6 +1135,18 @@ abstract class L10n {
   /// **'Enviado'**
   String get sentStatus;
 
+  /// No description provided for @receiving.
+  ///
+  /// In es, this message translates to:
+  /// **'Recibiendo'**
+  String get receiving;
+
+  /// No description provided for @sending.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviando'**
+  String get sending;
+
   /// No description provided for @now.
   ///
   /// In es, this message translates to:

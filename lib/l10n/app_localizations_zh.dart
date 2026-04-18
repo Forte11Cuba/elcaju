@@ -543,6 +543,12 @@ class L10nZh extends L10n {
   String get sentStatus => '已发送';
 
   @override
+  String get receiving => '接收中';
+
+  @override
+  String get sending => '发送中';
+
+  @override
   String get now => '刚刚';
 
   @override

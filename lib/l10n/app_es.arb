@@ -251,6 +251,8 @@
   "pendingStatus": "Pendiente",
   "receivedStatus": "Recibido",
   "sentStatus": "Enviado",
+  "receiving": "Recibiendo",
+  "sending": "Enviando",
   "now": "Ahora",
   "agoMinutes": "Hace {minutes} min",
   "@agoMinutes": {

@@ -552,6 +552,12 @@ class L10nSw extends L10n {
   String get sentStatus => 'Imetumwa';
 
   @override
+  String get receiving => 'Inapokea';
+
+  @override
+  String get sending => 'Inatumwa';
+
+  @override
   String get now => 'Sasa';
 
   @override

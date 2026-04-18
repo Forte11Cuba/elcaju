@@ -552,6 +552,12 @@ class L10nEs extends L10n {
   String get sentStatus => 'Enviado';
 
   @override
+  String get receiving => 'Recibiendo';
+
+  @override
+  String get sending => 'Enviando';
+
+  @override
   String get now => 'Ahora';
 
   @override

@@ -10,7 +10,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'payment_request.dart';
 import 'token.dart';
 
-// These functions are ignored because they are not marked as `pub`: `mint_url`, `unit`, `update_balance_streams`
+// These functions are ignored because they are not marked as `pub`: `empty`, `from_states`, `into_result`, `mint_url`, `unit`, `update_balance_streams`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `StateBuckets`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `clone`, `cmp`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `from`, `from`, `into`, `partial_cmp`, `try_into`, `try_into`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<PreparedMelt>>
@@ -71,6 +72,24 @@ abstract class Wallet implements RustOpaqueInterface {
 
   Future<void> checkPendingTransactions();
 
+  /// Observe-only counterpart of `reclaim_proofs_by_ys`. Queries the mint
+  /// for the state of the target Ys but **does NOT** revert Unspent proofs
+  /// to the local Unspent state.
+  ///
+  /// Use this for periodic reconciliation where we want to auto-settle
+  /// sends the receiver already claimed, without accidentally cancelling
+  /// sends the receiver has not claimed yet (which `reclaim_proofs_by_ys`
+  /// would do by calling `unreserve_proofs`).
+  ///
+  /// Return semantics:
+  /// - `count` / `amount` always 0 (nothing is recovered).
+  /// - `pending_count` / `spent_count` reflect the mint's report.
+  /// - `spent_count` also includes target Ys that are no longer present
+  ///   in local PendingSpent (already reconciled or externally cleaned).
+  /// The caller can infer "all resolved as spent" from
+  /// `spent_count == target_ys.len() && pending_count == 0`.
+  Future<ReclaimResult> checkProofsByYs({required List<String> ys});
+
   Future<BigInt> confirmMelt({required PreparedMelt melt});
 
   /// Create a NUT-18 payment request with Nostr transport.
@@ -125,13 +144,19 @@ abstract class Wallet implements RustOpaqueInterface {
   Future<BigInt> receive({required Token token, ReceiveOptions? opts});
 
   /// Check pending-spent proofs with the mint and revert unspent ones.
-  /// Returns count and total amount of proofs recovered.
+  /// Returns per-state buckets (unspent reverted, still pending, spent).
   Future<ReclaimResult> reclaimPendingProofs();
 
-  /// Reclaim proofs belonging to a specific transaction identified by its Y values.
-  /// Works like reclaim_pending_proofs but scoped: only proofs whose Y matches
+  /// Reclaim proofs belonging to a specific send identified by its Y values.
+  /// Scoped variant of `reclaim_pending_proofs`: only proofs whose Y matches
   /// the input list are checked with the mint and reverted if Unspent.
-  /// Use tx.ys from a pending outgoing transaction to cancel that specific send.
+  ///
+  /// Empty returns:
+  /// - Input `ys` empty or all unparseable → `ReclaimResult::empty()`.
+  /// - None of the target Ys are in local pending anymore (a previous
+  ///   reconciliation already processed them) → `spent_count` is set to
+  ///   the number of targets, signalling to callers that the send is
+  ///   definitively finished and any local record can be removed.
   Future<ReclaimResult> reclaimProofsByYs({required List<String> ys});
 
   Future<void> recoverIncompleteSagas();
@@ -280,13 +305,36 @@ class ReceiveOptions {
 }
 
 class ReclaimResult {
+  /// Proofs reverted from PendingSpent to Unspent. Also the number of
+  /// recovered proofs reflected in `amount`.
   final BigInt count;
+
+  /// Total value of the recovered proofs.
   final BigInt amount;
 
-  const ReclaimResult({required this.count, required this.amount});
+  /// Proofs the mint reports as still Pending (receiver mid-swap). The
+  /// caller should keep the record for retry — a later reconciliation
+  /// will resolve them.
+  final BigInt pendingCount;
+
+  /// Proofs the mint reports as Spent (receiver already claimed). When
+  /// `count == 0 && pending_count == 0`, the send is definitively
+  /// finished and the caller can delete its local record.
+  final BigInt spentCount;
+
+  const ReclaimResult({
+    required this.count,
+    required this.amount,
+    required this.pendingCount,
+    required this.spentCount,
+  });
 
   @override
-  int get hashCode => count.hashCode ^ amount.hashCode;
+  int get hashCode =>
+      count.hashCode ^
+      amount.hashCode ^
+      pendingCount.hashCode ^
+      spentCount.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -294,7 +342,9 @@ class ReclaimResult {
       other is ReclaimResult &&
           runtimeType == other.runtimeType &&
           count == other.count &&
-          amount == other.amount;
+          amount == other.amount &&
+          pendingCount == other.pendingCount &&
+          spentCount == other.spentCount;
 }
 
 class SendOptions {

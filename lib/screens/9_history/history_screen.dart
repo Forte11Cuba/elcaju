@@ -45,6 +45,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool _isRefreshing = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Reconciliar al entrar para capturar envíos que el receptor reclamó
+    // desde la última vez. Evita que el usuario tenga que pull-to-refresh
+    // manualmente para que un pending offline pase a histórico.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _refreshTransactions();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GradientBackground(
       child: Scaffold(
@@ -161,12 +172,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
       return _buildPendingTokensList(walletProvider);
     }
 
-    // Envíos offline pendientes (no tienen Transaction en CDK).
-    // Solo mostrar en filtros "all" y "pending".
-    final pendingSends =
+    // Envíos offline activos (receptor aún no reclamó) → tile warning arriba
+    // con botón de cancel. Solo visibles en filtros "all" y "pending".
+    final activeSends =
         (_currentFilter == HistoryFilter.all ||
                 _currentFilter == HistoryFilter.pending)
-            ? walletProvider.listPendingSends()
+            ? walletProvider.listActivePendingSends()
+            : <PendingSend>[];
+
+    // Envíos offline liquidados (receptor reclamó) → se mezclan con las
+    // transactions de CDK por timestamp, renderizados como outgoing settled.
+    // Visibles en "all" y "cashu" (son cashu por definición).
+    final settledSends =
+        (_currentFilter == HistoryFilter.all ||
+                _currentFilter == HistoryFilter.cashu)
+            ? walletProvider.listSettledPendingSends()
             : <PendingSend>[];
 
     return FutureBuilder<List<Transaction>>(
@@ -184,11 +204,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
         final filteredTransactions =
             _applyFilter(allTransactions, walletProvider);
 
-        if (filteredTransactions.isEmpty && pendingSends.isEmpty) {
+        if (filteredTransactions.isEmpty &&
+            activeSends.isEmpty &&
+            settledSends.isEmpty) {
           return _buildEmptyState();
         }
 
-        final totalCount = pendingSends.length + filteredTransactions.length;
+        // Merge settled sends + transactions en una sola lista ordenada por
+        // timestamp descendente. Cada item es Transaction o PendingSend.
+        final merged = <Object>[
+          ...filteredTransactions,
+          ...settledSends,
+        ]..sort((a, b) {
+            final ta = a is Transaction
+                ? a.timestamp.toInt() * 1000
+                : (a as PendingSend)
+                    .effectiveTimestamp
+                    .millisecondsSinceEpoch;
+            final tb = b is Transaction
+                ? b.timestamp.toInt() * 1000
+                : (b as PendingSend)
+                    .effectiveTimestamp
+                    .millisecondsSinceEpoch;
+            return tb.compareTo(ta);
+          });
+
+        final totalCount = activeSends.length + merged.length;
 
         return RefreshIndicator(
           onRefresh: _refreshTransactions,
@@ -197,17 +238,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.all(AppDimensions.paddingMedium),
             itemCount: totalCount,
             itemBuilder: (context, index) {
-              if (index < pendingSends.length) {
-                final send = pendingSends[index];
+              // Activos primero (pin al tope).
+              if (index < activeSends.length) {
                 return _PendingSendTile(
-                  send: send,
+                  send: activeSends[index],
                   walletProvider: walletProvider,
                 );
               }
-              final tx = filteredTransactions[index - pendingSends.length];
-              return _HistoryTransactionTile(
-                transaction: tx,
-                walletProvider: walletProvider,
+              final item = merged[index - activeSends.length];
+              if (item is Transaction) {
+                return _HistoryTransactionTile(
+                  transaction: item,
+                  walletProvider: walletProvider,
+                );
+              }
+              return _SettledPendingSendTile(
+                send: item as PendingSend,
               );
             },
           ),
@@ -386,7 +432,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     try {
       final walletProvider = context.read<WalletProvider>();
-      await walletProvider.checkPendingTransactions();
+      // CDK reconcilia sus Transaction pendientes (online); reconcilePendingSends
+      // hace lo mismo para el storage de envíos offline. Paralelos e
+      // independientes.
+      await Future.wait([
+        walletProvider.checkPendingTransactions(),
+        walletProvider.reconcilePendingSends(),
+      ]);
     } finally {
       if (mounted) {
         setState(() => _isRefreshing = false);
@@ -575,7 +627,13 @@ class _HistoryTransactionTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        isIncoming ? L10n.of(context)!.receivedStatus : L10n.of(context)!.sentStatus,
+                        isPending
+                            ? (isIncoming
+                                ? L10n.of(context)!.receiving
+                                : L10n.of(context)!.sending)
+                            : (isIncoming
+                                ? L10n.of(context)!.receivedStatus
+                                : L10n.of(context)!.sentStatus),
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontSize: 12,
@@ -1675,6 +1733,10 @@ class _MinimalDetailRow extends StatelessWidget {
 
 /// Tile para mostrar un envío offline pendiente en el historial.
 /// Se renderiza arriba de las Transactions de CDK.
+/// Tile para un envío offline activo (receptor aún no reclamó).
+/// Visualmente idéntico a una Transaction saliente pending (ecash online):
+/// fondo blanco 5%, ícono coins, título "Ecash", badge Pendiente y fila
+/// "↗ Enviando • timestamp". Al tap abre el detail screen con QR + cancel.
 class _PendingSendTile extends StatelessWidget {
   final PendingSend send;
   final WalletProvider walletProvider;
@@ -1689,7 +1751,7 @@ class _PendingSendTile extends StatelessWidget {
     final l10n = L10n.of(context)!;
     final formattedAmount = UnitFormatter.formatBalance(send.amount, send.unit);
     final unitLabel = UnitFormatter.getUnitLabel(send.unit);
-    final mintDisplay = UnitFormatter.getMintDisplayName(send.mintUrl);
+    final dateStr = _formatRelativeDate(send.createdAt, context);
 
     return GestureDetector(
       onTap: () {
@@ -1704,10 +1766,10 @@ class _PendingSendTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppDimensions.paddingSmall),
         padding: const EdgeInsets.all(AppDimensions.paddingMedium),
         decoration: BoxDecoration(
-          color: AppColors.warning.withValues(alpha: 0.08),
+          color: Colors.white.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.warning.withValues(alpha: 0.3),
+            color: Colors.white.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
@@ -1717,12 +1779,12 @@ class _PendingSendTile extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.2),
+                color: AppColors.primaryAction.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                LucideIcons.clock,
-                color: AppColors.warning,
+              child: const Icon(
+                LucideIcons.coins,
+                color: AppColors.primaryAction,
                 size: 22,
               ),
             ),
@@ -1733,11 +1795,11 @@ class _PendingSendTile extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        l10n.pendingOfflineSend,
-                        style: const TextStyle(
+                      const Text(
+                        'Ecash',
+                        style: TextStyle(
                           fontFamily: 'Inter',
-                          fontSize: 15,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
@@ -1765,14 +1827,47 @@ class _PendingSendTile extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    mintDisplay,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 12,
-                      color: AppColors.textSecondary.withValues(alpha: 0.8),
-                    ),
+                  Row(
+                    children: [
+                      const Icon(
+                        LucideIcons.arrowUpRight,
+                        size: 12,
+                        color: AppColors.primaryAction,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.sending,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          color: AppColors.primaryAction,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '• $dateStr',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          color: AppColors.textSecondary.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
                   ),
+                  if (send.memo != null && send.memo!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      send.memo!,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        color: AppColors.textSecondary.withValues(alpha: 0.5),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1784,19 +1879,25 @@ class _PendingSendTile extends StatelessWidget {
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryAction,
                   ),
                 ),
                 Text(
                   unitLabel,
                   style: TextStyle(
                     fontFamily: 'Inter',
-                    fontSize: 11,
-                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                    fontSize: 12,
+                    color: AppColors.textSecondary.withValues(alpha: 0.6),
                   ),
                 ),
               ],
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              LucideIcons.chevronRight,
+              color: Colors.white.withValues(alpha: 0.3),
+              size: 20,
             ),
           ],
         ),
@@ -1805,8 +1906,170 @@ class _PendingSendTile extends StatelessWidget {
   }
 }
 
-/// Pantalla de detalle para un envío offline pendiente.
-/// Muestra QR del token, monto, y botón para cancelar/reclamar.
+/// Tile para un envío offline liquidado (receptor ya reclamó). Visualmente
+/// equivalente a una Transaction saliente Cashu settled, para que el
+/// historial sea uniforme entre online y offline.
+class _SettledPendingSendTile extends StatelessWidget {
+  final PendingSend send;
+
+  const _SettledPendingSendTile({required this.send});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = L10n.of(context)!;
+    final formattedAmount =
+        UnitFormatter.formatBalance(send.amount, send.unit);
+    final unitLabel = UnitFormatter.getUnitLabel(send.unit);
+    final dateStr = _formatRelativeDate(
+      send.effectiveTimestamp,
+      context,
+    );
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => _PendingSendDetailScreen(send: send),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppDimensions.paddingSmall),
+        padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppColors.primaryAction.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                LucideIcons.coins,
+                color: AppColors.primaryAction,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: AppDimensions.paddingMedium),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Ecash',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(
+                        LucideIcons.arrowUpRight,
+                        size: 12,
+                        color: AppColors.primaryAction,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.sentStatus,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          color: AppColors.primaryAction,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '• $dateStr',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 12,
+                          color: AppColors.textSecondary.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (send.memo != null && send.memo!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      send.memo!,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                        color: AppColors.textSecondary.withValues(alpha: 0.5),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '-$formattedAmount',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryAction,
+                  ),
+                ),
+                Text(
+                  unitLabel,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 12,
+                    color: AppColors.textSecondary.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              LucideIcons.chevronRight,
+              color: Colors.white.withValues(alpha: 0.3),
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Formateo relativo de fecha. Compartido por los tiles del historial.
+String _formatRelativeDate(DateTime date, BuildContext context) {
+  final l10n = L10n.of(context)!;
+  final now = DateTime.now();
+  final diff = now.difference(date);
+  if (diff.inMinutes < 1) return l10n.now;
+  if (diff.inHours < 1) return l10n.agoMinutes(diff.inMinutes);
+  if (diff.inDays < 1) return l10n.agoHours(diff.inHours);
+  if (diff.inDays < 7) return l10n.agoDays(diff.inDays);
+  final locale = Localizations.localeOf(context).toString();
+  return DateFormat.yMd(locale).format(date);
+}
+
+/// Pantalla de detalle para un envío offline. Si el envío está activo,
+/// muestra QR + botón cancel. Si está liquidado (receptor reclamó), muestra
+/// solo el audit trail.
 class _PendingSendDetailScreen extends StatefulWidget {
   final PendingSend send;
 
@@ -1833,7 +2096,9 @@ class _PendingSendDetailScreenState extends State<_PendingSendDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _encodeTokenToUR();
+    // Para settled el QR ya no sirve (receptor reclamó), no desperdiciamos
+    // ciclos codificándolo.
+    if (widget.send.isActive) _encodeTokenToUR();
   }
 
   @override
@@ -2058,6 +2323,7 @@ class _PendingSendDetailScreenState extends State<_PendingSendDetailScreen> {
     final unitLabel = UnitFormatter.getUnitLabel(widget.send.unit);
     final mintDisplay =
         UnitFormatter.getMintDisplayName(widget.send.mintUrl);
+    final isActive = widget.send.isActive;
     final qrData = _urFragments.isNotEmpty
         ? _urFragments[_currentFragment]
         : widget.send.encoded;
@@ -2090,26 +2356,29 @@ class _PendingSendDetailScreenState extends State<_PendingSendDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // 2. QR
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                // 2. QR — solo cuando el envío está activo (receptor aún no
+                // reclamó). Cuando está settled, el token ya es obsoleto.
+                if (isActive) ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: QrImageView(
+                      data: qrData,
+                      version: QrVersions.auto,
+                      size: 240,
+                      backgroundColor: Colors.white,
+                      errorCorrectionLevel: QrErrorCorrectLevel.L,
+                      padding: EdgeInsets.zero,
+                    ),
                   ),
-                  child: QrImageView(
-                    data: qrData,
-                    version: QrVersions.auto,
-                    size: 240,
-                    backgroundColor: Colors.white,
-                    errorCorrectionLevel: QrErrorCorrectLevel.L,
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-                // 3. Controles del QR (si es animado)
-                if (_urFragments.length > 1) ...[
-                  const SizedBox(height: 12),
-                  _buildQRControls(),
+                  // 3. Controles del QR (si es animado)
+                  if (_urFragments.length > 1) ...[
+                    const SizedBox(height: 12),
+                    _buildQRControls(),
+                  ],
                 ],
                 const SizedBox(height: 32),
                 // 4. Monto grande
@@ -2137,10 +2406,11 @@ class _PendingSendDetailScreenState extends State<_PendingSendDetailScreen> {
                       value: mintDisplay,
                     ),
                     _MinimalDetailRow(
-                      icon: LucideIcons.clock,
+                      icon: isActive ? LucideIcons.clock : LucideIcons.check,
                       label: l10n.status,
-                      value: l10n.pending,
-                      valueColor: AppColors.warning,
+                      value: isActive ? l10n.pending : l10n.sentStatus,
+                      valueColor:
+                          isActive ? AppColors.warning : AppColors.success,
                     ),
                     if (widget.send.memo != null &&
                         widget.send.memo!.isNotEmpty)
@@ -2186,6 +2456,8 @@ class _PendingSendDetailScreenState extends State<_PendingSendDetailScreen> {
                     ),
                   ),
                 ),
+                // Botón cancel sólo cuando el envío está activo.
+                if (isActive) ...[
                 const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
@@ -2223,6 +2495,7 @@ class _PendingSendDetailScreenState extends State<_PendingSendDetailScreen> {
                     ),
                   ),
                 ),
+                ],
                 const SizedBox(height: 40),
               ],
             ),

@@ -209,6 +209,8 @@
   "pendingStatus": "Pending",
   "receivedStatus": "Received",
   "sentStatus": "Sent",
+  "receiving": "Receiving",
+  "sending": "Sending",
   "now": "Now",
   "agoMinutes": "{minutes} min ago",
   "agoHours": "{hours} h ago",
