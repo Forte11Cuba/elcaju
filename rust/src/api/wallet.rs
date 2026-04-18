@@ -573,6 +573,59 @@ impl Wallet {
         Ok(ReclaimResult { count, amount })
     }
 
+    /// Reclaim proofs belonging to a specific transaction identified by its Y values.
+    /// Works like reclaim_pending_proofs but scoped: only proofs whose Y matches
+    /// the input list are checked with the mint and reverted if Unspent.
+    /// Use tx.ys from a pending outgoing transaction to cancel that specific send.
+    pub async fn reclaim_proofs_by_ys(&self, ys: Vec<String>) -> Result<ReclaimResult, Error> {
+        let target_ys: std::collections::HashSet<PublicKey> = ys
+            .iter()
+            .filter_map(|y| PublicKey::from_hex(y).ok())
+            .collect();
+        if target_ys.is_empty() {
+            return Ok(ReclaimResult { count: 0, amount: 0 });
+        }
+
+        let pending = self.inner.get_pending_spent_proofs().await?;
+        if pending.is_empty() {
+            return Ok(ReclaimResult { count: 0, amount: 0 });
+        }
+
+        // Filter to only proofs with a Y in our target set.
+        let relevant: Vec<_> = pending
+            .into_iter()
+            .filter(|proof| proof.y().map(|y| target_ys.contains(&y)).unwrap_or(false))
+            .collect();
+        if relevant.is_empty() {
+            return Ok(ReclaimResult { count: 0, amount: 0 });
+        }
+
+        let mut amount_by_y: HashMap<PublicKey, u64> = HashMap::new();
+        for proof in &relevant {
+            if let Ok(y) = proof.y() {
+                amount_by_y.insert(y, u64::from(proof.amount));
+            }
+        }
+
+        let states = self.inner.check_proofs_spent(relevant).await?;
+
+        let unspent_ys: Vec<PublicKey> = states
+            .into_iter()
+            .filter(|s| s.state == ProofState::Unspent)
+            .map(|s| s.y)
+            .collect();
+
+        let count = unspent_ys.len() as u64;
+        let amount: u64 = unspent_ys.iter().filter_map(|y| amount_by_y.get(y)).sum();
+
+        if count > 0 {
+            self.inner.unreserve_proofs(unspent_ys).await?;
+        }
+
+        self.update_balance_streams().await;
+        Ok(ReclaimResult { count, amount })
+    }
+
     // === Utility ===
 
     pub async fn is_token_spent(&self, token: Token) -> Result<bool, Error> {
@@ -599,6 +652,13 @@ impl Wallet {
 
     fn unit(&self) -> CurrencyUnit {
         CurrencyUnit::from_str(&self.unit).unwrap_or(CurrencyUnit::Custom(self.unit.clone()))
+    }
+
+    /// Recalcula el balance desde la DB y lo empuja al stream.
+    /// Llamar después de manipulaciones directas al DB (ej: offline send
+    /// marking proofs as PendingSpent fuera de la API de CDK).
+    pub async fn refresh_balance(&self) {
+        self.update_balance_streams().await;
     }
 
     pub(crate) async fn update_balance_streams(&self) {

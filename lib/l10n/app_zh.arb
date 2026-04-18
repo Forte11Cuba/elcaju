@@ -87,6 +87,20 @@
   "pasteTheCashuToken": "粘贴 Cashu 代币：",
   "pasteFromClipboard": "从剪贴板粘贴",
   "emptyClipboard": "剪贴板为空",
+  "cancelSend": "取消发送",
+  "cancelSendConfirmTitle": "取消此次发送？",
+  "cancelSendConfirmBody": "仅当接收方尚未领取代币时有效。如已领取，发送将标记为已完成。",
+  "cancelSendSuccess": "发送已取消。已恢复 {amount} {unit}",
+  "@cancelSendSuccess": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "cancelSendAlreadyClaimed": "接收方已领取代币",
+  "pendingOfflineSend": "待处理的离线发送",
+  "pendingOfflineSendsHeader": "未领取的离线发送",
+  "pendingSendDetailTitle": "待处理发送",
   "validToken": "有效代币",
   "invalidToken": "无效或格式错误的代币",
   "amount": "金额：",

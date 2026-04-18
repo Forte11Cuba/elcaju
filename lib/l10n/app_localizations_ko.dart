@@ -214,6 +214,33 @@ class L10nKo extends L10n {
   String get emptyClipboard => '클립보드가 비어 있음';
 
   @override
+  String get cancelSend => '전송 취소';
+
+  @override
+  String get cancelSendConfirmTitle => '이 전송을 취소하시겠습니까?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      '수신자가 아직 토큰을 받지 않은 경우에만 작동합니다. 이미 받았다면 전송이 완료로 표시됩니다.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return '전송이 취소되었습니다. $amount $unit를 복구했습니다';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed => '수신자가 이미 토큰을 받았습니다';
+
+  @override
+  String get pendingOfflineSend => '대기 중인 오프라인 전송';
+
+  @override
+  String get pendingOfflineSendsHeader => '청구되지 않은 오프라인 전송';
+
+  @override
+  String get pendingSendDetailTitle => '대기 중인 전송';
+
+  @override
   String get validToken => '유효한 토큰';
 
   @override

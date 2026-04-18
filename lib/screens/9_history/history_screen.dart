@@ -13,10 +13,14 @@ import '../../core/constants/dimensions.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/transaction_meta_storage.dart';
 import '../../data/pending_token.dart';
+import '../../data/pending_send.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/p2pk_provider.dart';
 import '../../core/utils/p2pk_utils.dart';
 import '../../widgets/common/gradient_background.dart';
+import '../../widgets/common/bottom_sheet_container.dart';
+import '../../widgets/common/primary_button.dart';
+import '../../widgets/common/secondary_button.dart';
 
 /// Filtros disponibles para el historial
 enum HistoryFilter {
@@ -157,6 +161,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
       return _buildPendingTokensList(walletProvider);
     }
 
+    // Envíos offline pendientes (no tienen Transaction en CDK).
+    // Solo mostrar en filtros "all" y "pending".
+    final pendingSends =
+        (_currentFilter == HistoryFilter.all ||
+                _currentFilter == HistoryFilter.pending)
+            ? walletProvider.listPendingSends()
+            : <PendingSend>[];
+
     return FutureBuilder<List<Transaction>>(
       future: walletProvider.getAllTransactions(),
       builder: (context, snapshot) {
@@ -169,22 +181,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
         }
 
         final allTransactions = snapshot.data ?? [];
+        final filteredTransactions =
+            _applyFilter(allTransactions, walletProvider);
 
-        // Aplicar filtro
-        final filteredTransactions = _applyFilter(allTransactions, walletProvider);
-
-        if (filteredTransactions.isEmpty) {
+        if (filteredTransactions.isEmpty && pendingSends.isEmpty) {
           return _buildEmptyState();
         }
+
+        final totalCount = pendingSends.length + filteredTransactions.length;
 
         return RefreshIndicator(
           onRefresh: _refreshTransactions,
           color: AppColors.primaryAction,
           child: ListView.builder(
             padding: const EdgeInsets.all(AppDimensions.paddingMedium),
-            itemCount: filteredTransactions.length,
+            itemCount: totalCount,
             itemBuilder: (context, index) {
-              final tx = filteredTransactions[index];
+              if (index < pendingSends.length) {
+                final send = pendingSends[index];
+                return _PendingSendTile(
+                  send: send,
+                  walletProvider: walletProvider,
+                );
+              }
+              final tx = filteredTransactions[index - pendingSends.length];
               return _HistoryTransactionTile(
                 transaction: tx,
                 walletProvider: walletProvider,
@@ -703,6 +723,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
   String? _tokenOrInvoice;
   late final bool _shouldShowQR;
   bool _isLoadingPendingInvoice = false;
+  bool _isReclaiming = false;
 
   @override
   void initState() {
@@ -941,6 +962,12 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
                 // 6. Botón COPY (grande, prominente)
                 if (_tokenOrInvoice != null) _buildCopyButton(),
 
+                // 7. Botón CANCEL / RECLAIM — solo para pending outgoing ecash
+                if (isPending && !_isIncoming && !_isLightning) ...[
+                  const SizedBox(height: 12),
+                  _buildReclaimButton(),
+                ],
+
                 const SizedBox(height: 40),
               ],
             ),
@@ -1116,6 +1143,162 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildReclaimButton() {
+    final l10n = L10n.of(context)!;
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: _isReclaiming ? null : _confirmReclaim,
+        icon: _isReclaiming
+            ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
+                ),
+              )
+            : const Icon(LucideIcons.undo2, size: 18, color: Colors.white70),
+        label: Text(
+          l10n.cancelSend,
+          style: const TextStyle(
+            fontFamily: 'Inter',
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: Colors.white70,
+            letterSpacing: 0.5,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmReclaim() async {
+    final l10n = L10n.of(context)!;
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => BottomSheetContainer(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const BottomSheetHandle(),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                LucideIcons.undo2,
+                color: AppColors.warning,
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.paddingMedium),
+            Text(
+              l10n.cancelSendConfirmTitle,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppDimensions.paddingSmall),
+            Text(
+              l10n.cancelSendConfirmBody,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                color: AppColors.textSecondary.withValues(alpha: 0.8),
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppDimensions.paddingLarge),
+            Row(
+              children: [
+                Expanded(
+                  child: SecondaryButton(
+                    text: l10n.cancel,
+                    onPressed: () => Navigator.pop(ctx, false),
+                    height: 52,
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.paddingMedium),
+                Expanded(
+                  child: PrimaryButton(
+                    text: l10n.cancelSend,
+                    onPressed: () => Navigator.pop(ctx, true),
+                    height: 52,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed == true && mounted) {
+      await _doReclaim();
+    }
+  }
+
+  Future<void> _doReclaim() async {
+    final l10n = L10n.of(context)!;
+    setState(() => _isReclaiming = true);
+    try {
+      final result = await widget.walletProvider
+          .reclaimTransaction(widget.transaction);
+      if (!mounted) return;
+      if (result.count > BigInt.zero) {
+        final formatted = UnitFormatter.formatBalance(
+          result.amount,
+          widget.transaction.unit,
+        );
+        final unitLabel = UnitFormatter.getUnitLabel(widget.transaction.unit);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.cancelSendSuccess(formatted, unitLabel)),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.cancelSendAlreadyClaimed),
+            backgroundColor: AppColors.warning,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isReclaiming = false);
+    }
   }
 }
 
@@ -1485,6 +1668,566 @@ class _MinimalDetailRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Tile para mostrar un envío offline pendiente en el historial.
+/// Se renderiza arriba de las Transactions de CDK.
+class _PendingSendTile extends StatelessWidget {
+  final PendingSend send;
+  final WalletProvider walletProvider;
+
+  const _PendingSendTile({
+    required this.send,
+    required this.walletProvider,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = L10n.of(context)!;
+    final formattedAmount = UnitFormatter.formatBalance(send.amount, send.unit);
+    final unitLabel = UnitFormatter.getUnitLabel(send.unit);
+    final mintDisplay = UnitFormatter.getMintDisplayName(send.mintUrl);
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => _PendingSendDetailScreen(send: send),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppDimensions.paddingSmall),
+        padding: const EdgeInsets.all(AppDimensions.paddingMedium),
+        decoration: BoxDecoration(
+          color: AppColors.warning.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.warning.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                LucideIcons.clock,
+                color: AppColors.warning,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: AppDimensions.paddingMedium),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        l10n.pendingOfflineSend,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          l10n.pendingStatus,
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.warning,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    mintDisplay,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 12,
+                      color: AppColors.textSecondary.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '-$formattedAmount',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  unitLabel,
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 11,
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Pantalla de detalle para un envío offline pendiente.
+/// Muestra QR del token, monto, y botón para cancelar/reclamar.
+class _PendingSendDetailScreen extends StatefulWidget {
+  final PendingSend send;
+
+  const _PendingSendDetailScreen({required this.send});
+
+  @override
+  State<_PendingSendDetailScreen> createState() =>
+      _PendingSendDetailScreenState();
+}
+
+class _PendingSendDetailScreenState extends State<_PendingSendDetailScreen> {
+  List<String> _urFragments = [];
+  int _currentFragment = 0;
+  Timer? _animationTimer;
+  bool _isReclaiming = false;
+
+  // Control de velocidad del QR animado (alineado con _TransactionDetailScreen)
+  static const int _intervalFast = 100;
+  static const int _intervalMedium = 200;
+  static const int _intervalSlow = 400;
+  int _currentInterval = _intervalMedium;
+  String _speedLabel = 'M';
+
+  @override
+  void initState() {
+    super.initState();
+    _encodeTokenToUR();
+  }
+
+  @override
+  void dispose() {
+    _animationTimer?.cancel();
+    super.dispose();
+  }
+
+  void _encodeTokenToUR() {
+    try {
+      final token = cdk.Token.parse(encoded: widget.send.encoded);
+      _urFragments = cdk.encodeQrToken(token: token);
+      if (_urFragments.length > 1) {
+        _startAnimation();
+      }
+    } catch (_) {
+      _urFragments = [widget.send.encoded];
+    }
+  }
+
+  void _startAnimation() {
+    _animationTimer?.cancel();
+    _animationTimer = Timer.periodic(
+      Duration(milliseconds: _currentInterval),
+      (_) {
+        if (mounted) {
+          setState(() {
+            _currentFragment =
+                (_currentFragment + 1) % _urFragments.length;
+          });
+        }
+      },
+    );
+  }
+
+  void _cycleSpeed() {
+    setState(() {
+      if (_currentInterval == _intervalMedium) {
+        _currentInterval = _intervalFast;
+        _speedLabel = 'F';
+      } else if (_currentInterval == _intervalFast) {
+        _currentInterval = _intervalSlow;
+        _speedLabel = 'S';
+      } else {
+        _currentInterval = _intervalMedium;
+        _speedLabel = 'M';
+      }
+    });
+    if (_urFragments.length > 1) _startAnimation();
+  }
+
+  Widget _buildQRControls() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            '${_currentFragment + 1}/${_urFragments.length}',
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontSize: 13,
+              color: Colors.white70,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        GestureDetector(
+          onTap: _cycleSpeed,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  LucideIcons.gauge,
+                  color: Colors.white70,
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '${L10n.of(context)!.speed} $_speedLabel',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 13,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _confirmReclaim() async {
+    final l10n = L10n.of(context)!;
+    final confirmed = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => BottomSheetContainer(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const BottomSheetHandle(),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(LucideIcons.undo2,
+                  color: AppColors.warning, size: 32),
+            ),
+            const SizedBox(height: AppDimensions.paddingMedium),
+            Text(
+              l10n.cancelSendConfirmTitle,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppDimensions.paddingSmall),
+            Text(
+              l10n.cancelSendConfirmBody,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 14,
+                color: AppColors.textSecondary.withValues(alpha: 0.8),
+                height: 1.4,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppDimensions.paddingLarge),
+            Row(
+              children: [
+                Expanded(
+                  child: SecondaryButton(
+                    text: l10n.cancel,
+                    onPressed: () => Navigator.pop(ctx, false),
+                    height: 52,
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.paddingMedium),
+                Expanded(
+                  child: PrimaryButton(
+                    text: l10n.cancelSend,
+                    onPressed: () => Navigator.pop(ctx, true),
+                    height: 52,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed == true && mounted) await _doReclaim();
+  }
+
+  Future<void> _doReclaim() async {
+    final l10n = L10n.of(context)!;
+    final walletProvider = context.read<WalletProvider>();
+    setState(() => _isReclaiming = true);
+    try {
+      final result = await walletProvider.reclaimPendingSend(widget.send);
+      if (!mounted) return;
+      if (result.count > BigInt.zero) {
+        final formatted =
+            UnitFormatter.formatBalance(result.amount, widget.send.unit);
+        final unitLabel = UnitFormatter.getUnitLabel(widget.send.unit);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.cancelSendSuccess(formatted, unitLabel)),
+            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.cancelSendAlreadyClaimed),
+            backgroundColor: AppColors.warning,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: AppColors.error,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isReclaiming = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = L10n.of(context)!;
+    final formattedAmount =
+        UnitFormatter.formatBalance(widget.send.amount, widget.send.unit);
+    final unitLabel = UnitFormatter.getUnitLabel(widget.send.unit);
+    final mintDisplay =
+        UnitFormatter.getMintDisplayName(widget.send.mintUrl);
+    final qrData = _urFragments.isNotEmpty
+        ? _urFragments[_currentFragment]
+        : widget.send.encoded;
+
+    return GradientBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                // 1. Título estado (mismo formato que la pantalla online)
+                Text(
+                  l10n.sentEcash.split('').join(' ').toUpperCase(),
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 2,
+                    color: Colors.white.withValues(alpha: 0.8),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // 2. QR
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: QrImageView(
+                    data: qrData,
+                    version: QrVersions.auto,
+                    size: 240,
+                    backgroundColor: Colors.white,
+                    errorCorrectionLevel: QrErrorCorrectLevel.L,
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+                // 3. Controles del QR (si es animado)
+                if (_urFragments.length > 1) ...[
+                  const SizedBox(height: 12),
+                  _buildQRControls(),
+                ],
+                const SizedBox(height: 32),
+                // 4. Monto grande
+                Text(
+                  formattedAmount,
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // 5. Lista de detalles (mismo formato que la pantalla online)
+                Column(
+                  children: [
+                    _MinimalDetailRow(
+                      icon: LucideIcons.coins,
+                      label: l10n.unit,
+                      value: unitLabel,
+                    ),
+                    _MinimalDetailRow(
+                      icon: LucideIcons.landmark,
+                      label: l10n.mint,
+                      value: mintDisplay,
+                    ),
+                    _MinimalDetailRow(
+                      icon: LucideIcons.clock,
+                      label: l10n.status,
+                      value: l10n.pending,
+                      valueColor: AppColors.warning,
+                    ),
+                    if (widget.send.memo != null &&
+                        widget.send.memo!.isNotEmpty)
+                      _MinimalDetailRow(
+                        icon: LucideIcons.messageSquare,
+                        label: l10n.memo,
+                        value: widget.send.memo!,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Clipboard.setData(
+                          ClipboardData(text: widget.send.encoded));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.tokenCopied),
+                          backgroundColor: AppColors.success,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      l10n.copyButton,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _isReclaiming ? null : _confirmReclaim,
+                    icon: _isReclaiming
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white70),
+                            ),
+                          )
+                        : const Icon(LucideIcons.undo2,
+                            size: 18, color: Colors.white70),
+                    label: Text(
+                      l10n.cancelSend,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white70,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.2)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

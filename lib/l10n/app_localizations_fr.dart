@@ -220,6 +220,34 @@ class L10nFr extends L10n {
   String get emptyClipboard => 'Presse-papiers vide';
 
   @override
+  String get cancelSend => 'Annuler l\'envoi';
+
+  @override
+  String get cancelSendConfirmTitle => 'Annuler cet envoi ?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      'Ne fonctionne que si le destinataire n\'a pas encore réclamé le token. S\'il l\'a déjà fait, l\'envoi sera marqué comme terminé.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return 'Envoi annulé. Récupéré $amount $unit';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed =>
+      'Le destinataire a déjà réclamé le token';
+
+  @override
+  String get pendingOfflineSend => 'Envoi hors ligne en attente';
+
+  @override
+  String get pendingOfflineSendsHeader => 'Envois hors ligne non réclamés';
+
+  @override
+  String get pendingSendDetailTitle => 'Envoi en attente';
+
+  @override
   String get validToken => 'Token valide';
 
   @override

@@ -87,6 +87,20 @@
   "pasteTheCashuToken": "Вставьте Cashu токен:",
   "pasteFromClipboard": "Вставить из буфера обмена",
   "emptyClipboard": "Буфер обмена пуст",
+  "cancelSend": "Отменить отправку",
+  "cancelSendConfirmTitle": "Отменить эту отправку?",
+  "cancelSendConfirmBody": "Работает только если получатель еще не получил токен. Если уже получил, отправка будет помечена как завершенная.",
+  "cancelSendSuccess": "Отправка отменена. Восстановлено {amount} {unit}",
+  "@cancelSendSuccess": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "cancelSendAlreadyClaimed": "Получатель уже получил токен",
+  "pendingOfflineSend": "Ожидающая оффлайн-отправка",
+  "pendingOfflineSendsHeader": "Неполученные оффлайн-отправки",
+  "pendingSendDetailTitle": "Ожидающая отправка",
   "validToken": "Токен действителен",
   "invalidToken": "Недействительный или повреждённый токен",
   "amount": "Сумма:",

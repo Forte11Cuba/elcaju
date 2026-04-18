@@ -217,6 +217,34 @@ class L10nIt extends L10n {
   String get emptyClipboard => 'Appunti vuoti';
 
   @override
+  String get cancelSend => 'Annulla invio';
+
+  @override
+  String get cancelSendConfirmTitle => 'Annullare questo invio?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      'Funziona solo se il destinatario non ha ancora riscattato il token. Se l\'ha già fatto, l\'invio sarà contrassegnato come completato.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return 'Invio annullato. Recuperati $amount $unit';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed =>
+      'Il destinatario ha già riscattato il token';
+
+  @override
+  String get pendingOfflineSend => 'Invio offline in sospeso';
+
+  @override
+  String get pendingOfflineSendsHeader => 'Invii offline non riscattati';
+
+  @override
+  String get pendingSendDetailTitle => 'Invio in sospeso';
+
+  @override
   String get validToken => 'Token valido';
 
   @override

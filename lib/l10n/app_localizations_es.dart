@@ -216,6 +216,33 @@ class L10nEs extends L10n {
   String get emptyClipboard => 'Portapapeles vacío';
 
   @override
+  String get cancelSend => 'Cancelar envío';
+
+  @override
+  String get cancelSendConfirmTitle => '¿Cancelar envío?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      'Solo funciona si el destinatario aún no reclamó el token. Si ya lo hizo, el envío se marcará como completado.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return 'Envío cancelado. Recuperaste $amount $unit';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed => 'El destinatario ya reclamó el token';
+
+  @override
+  String get pendingOfflineSend => 'Envío offline pendiente';
+
+  @override
+  String get pendingOfflineSendsHeader => 'Envíos offline no reclamados';
+
+  @override
+  String get pendingSendDetailTitle => 'Envío pendiente';
+
+  @override
   String get validToken => 'Token válido';
 
   @override

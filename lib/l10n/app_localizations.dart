@@ -511,6 +511,54 @@ abstract class L10n {
   /// **'Portapapeles vacío'**
   String get emptyClipboard;
 
+  /// No description provided for @cancelSend.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar envío'**
+  String get cancelSend;
+
+  /// No description provided for @cancelSendConfirmTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cancelar envío?'**
+  String get cancelSendConfirmTitle;
+
+  /// No description provided for @cancelSendConfirmBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo funciona si el destinatario aún no reclamó el token. Si ya lo hizo, el envío se marcará como completado.'**
+  String get cancelSendConfirmBody;
+
+  /// No description provided for @cancelSendSuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Envío cancelado. Recuperaste {amount} {unit}'**
+  String cancelSendSuccess(String amount, String unit);
+
+  /// No description provided for @cancelSendAlreadyClaimed.
+  ///
+  /// In es, this message translates to:
+  /// **'El destinatario ya reclamó el token'**
+  String get cancelSendAlreadyClaimed;
+
+  /// No description provided for @pendingOfflineSend.
+  ///
+  /// In es, this message translates to:
+  /// **'Envío offline pendiente'**
+  String get pendingOfflineSend;
+
+  /// No description provided for @pendingOfflineSendsHeader.
+  ///
+  /// In es, this message translates to:
+  /// **'Envíos offline no reclamados'**
+  String get pendingOfflineSendsHeader;
+
+  /// No description provided for @pendingSendDetailTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Envío pendiente'**
+  String get pendingSendDetailTitle;
+
   /// No description provided for @validToken.
   ///
   /// In es, this message translates to:

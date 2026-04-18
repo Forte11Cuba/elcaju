@@ -77,6 +77,20 @@
   "pasteTheCashuToken": "Paste the Cashu token:",
   "pasteFromClipboard": "Paste from clipboard",
   "emptyClipboard": "Clipboard is empty",
+  "cancelSend": "Cancel send",
+  "cancelSendConfirmTitle": "Cancel this send?",
+  "cancelSendConfirmBody": "Only works if the recipient has not claimed the token yet. If they already did, the send will be marked as completed.",
+  "cancelSendSuccess": "Send canceled. Recovered {amount} {unit}",
+  "@cancelSendSuccess": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "cancelSendAlreadyClaimed": "The recipient already claimed the token",
+  "pendingOfflineSend": "Pending offline send",
+  "pendingOfflineSendsHeader": "Unclaimed offline sends",
+  "pendingSendDetailTitle": "Pending send",
   "validToken": "Valid token",
   "invalidToken": "Invalid or malformed token",
   "amount": "Amount:",

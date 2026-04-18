@@ -87,6 +87,20 @@
   "pasteTheCashuToken": "Cole o token Cashu:",
   "pasteFromClipboard": "Colar da área de transferência",
   "emptyClipboard": "Área de transferência vazia",
+  "cancelSend": "Cancelar envio",
+  "cancelSendConfirmTitle": "Cancelar este envio?",
+  "cancelSendConfirmBody": "Só funciona se o destinatário ainda não resgatou o token. Se já resgatou, o envio será marcado como concluído.",
+  "cancelSendSuccess": "Envio cancelado. Recuperou {amount} {unit}",
+  "@cancelSendSuccess": {
+    "placeholders": {
+      "amount": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "cancelSendAlreadyClaimed": "O destinatário já resgatou o token",
+  "pendingOfflineSend": "Envio offline pendente",
+  "pendingOfflineSendsHeader": "Envios offline não resgatados",
+  "pendingSendDetailTitle": "Envio pendente",
   "validToken": "Token válido",
   "invalidToken": "Token inválido ou malformado",
   "amount": "Valor:",

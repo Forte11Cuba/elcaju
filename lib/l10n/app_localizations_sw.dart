@@ -216,6 +216,33 @@ class L10nSw extends L10n {
   String get emptyClipboard => 'Ubao wa kunakili ni tupu';
 
   @override
+  String get cancelSend => 'Ghairi kutuma';
+
+  @override
+  String get cancelSendConfirmTitle => 'Ghairi kutuma huku?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      'Hufanya kazi tu ikiwa mpokeaji hajatumia tokeni. Ikiwa tayari alitumia, kutuma kutaonyeshwa kama kumekamilika.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return 'Kutuma kumeghairiwa. Umerudisha $amount $unit';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed => 'Mpokeaji tayari alitumia tokeni';
+
+  @override
+  String get pendingOfflineSend => 'Kutuma nje ya mtandao kunasubiri';
+
+  @override
+  String get pendingOfflineSendsHeader => 'Kutuma nje ya mtandao bila kudaiwa';
+
+  @override
+  String get pendingSendDetailTitle => 'Kutuma kunakusubiri';
+
+  @override
   String get validToken => 'Tokeni halali';
 
   @override

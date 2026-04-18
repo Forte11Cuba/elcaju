@@ -216,6 +216,34 @@ class L10nEn extends L10n {
   String get emptyClipboard => 'Clipboard is empty';
 
   @override
+  String get cancelSend => 'Cancel send';
+
+  @override
+  String get cancelSendConfirmTitle => 'Cancel this send?';
+
+  @override
+  String get cancelSendConfirmBody =>
+      'Only works if the recipient has not claimed the token yet. If they already did, the send will be marked as completed.';
+
+  @override
+  String cancelSendSuccess(String amount, String unit) {
+    return 'Send canceled. Recovered $amount $unit';
+  }
+
+  @override
+  String get cancelSendAlreadyClaimed =>
+      'The recipient already claimed the token';
+
+  @override
+  String get pendingOfflineSend => 'Pending offline send';
+
+  @override
+  String get pendingOfflineSendsHeader => 'Unclaimed offline sends';
+
+  @override
+  String get pendingSendDetailTitle => 'Pending send';
+
+  @override
   String get validToken => 'Valid token';
 
   @override

@@ -15,6 +15,8 @@ import 'package:uuid/uuid.dart';
 import '../data/transaction_meta_storage.dart';
 import '../data/pending_token.dart';
 import '../data/pending_token_storage.dart';
+import '../data/pending_send.dart';
+import '../data/pending_send_storage.dart';
 import '../core/utils/keyset_debug.dart';
 import '../core/utils/p2pk_utils.dart';
 import '../widgets/effects/cashu_confetti.dart';
@@ -46,6 +48,9 @@ class WalletProvider extends ChangeNotifier {
 
   /// Storage para tokens pendientes de reclamar (Receive Later)
   final PendingTokenStorage _pendingTokenStorage = PendingTokenStorage();
+
+  /// Storage para envíos offline pendientes de ser reclamados por el receptor
+  final PendingSendStorage _pendingSendStorage = PendingSendStorage();
 
   /// Controller global de confetti para celebrar recepciones
   final CashuConfettiController confettiController = CashuConfettiController();
@@ -124,6 +129,78 @@ class WalletProvider extends ChangeNotifier {
 
   /// Stream de cambios en pending tokens
   Stream<void> get pendingTokenChanges => _pendingTokenStorage.changes;
+
+  // ============================================================
+  // PENDING SENDS GETTERS (envíos offline no reclamados)
+  // ============================================================
+
+  int get pendingSendCount => _pendingSendStorage.count;
+  bool get hasPendingSends => _pendingSendStorage.hasPendingSends;
+  Stream<void> get pendingSendChanges => _pendingSendStorage.changes;
+
+  List<PendingSend> listPendingSends() => _pendingSendStorage.listAll();
+
+  List<PendingSend> listPendingSendsByMintUnit(String mintUrl, String unit) =>
+      _pendingSendStorage.listByMintUnit(mintUrl, unit);
+
+  /// Persiste un envío offline pendiente para poder reclamarlo después.
+  /// Llamar desde el flujo de offline_send_screen después de crear el token.
+  Future<PendingSend> addPendingSend({
+    required String encoded,
+    required BigInt amount,
+    required String mintUrl,
+    required String unit,
+    required List<String> proofYs,
+    String? memo,
+  }) async {
+    final send = await _pendingSendStorage.add(
+      id: _uuid.v4(),
+      encoded: encoded,
+      amount: amount,
+      mintUrl: mintUrl,
+      unit: unit,
+      proofYs: proofYs,
+      memo: memo,
+    );
+    // El flujo offline modifica el DB directamente (markProofsPendingSpent),
+    // así que CDK no sabe que cambió. Forzamos refresh del stream de balance
+    // para que el home se actualice al instante.
+    try {
+      final wallet = await getWallet(mintUrl, unit);
+      await wallet.refreshBalance();
+    } catch (e) {
+      debugPrint('refreshBalance tras addPendingSend falló: $e');
+    }
+    notifyListeners();
+    return send;
+  }
+
+  /// Reclama las proofs de un envío offline pendiente. Verifica con el mint:
+  /// - Si están UNSPENT → revierte a Unspent local y borra el PendingSend.
+  /// - Si están SPENT (receptor ya reclamó) → borra el PendingSend igual
+  ///   (el envío se completó).
+  /// - Si algunas PENDING en el mint → deja el PendingSend para reintento.
+  Future<ReclaimResult> reclaimPendingSend(PendingSend send) async {
+    final wallet = await getWallet(send.mintUrl, send.unit);
+    final result = await wallet.reclaimProofsByYs(ys: send.proofYs);
+    // Solo removemos el registro si el mint confirmó que había proofs
+    // UNSPENT y las revertimos. Un count=0 es ambiguo: puede significar
+    // "receptor ya reclamó (SPENT)" o "receptor en medio del swap
+    // (PENDING)". En el caso PENDING, necesitamos conservar el record
+    // para poder reintentar después — borrar perdería el retry handle.
+    // Esto puede dejar records "fantasma" tras un SPENT real; se puede
+    // agregar dismissal manual como mejora futura.
+    if (result.count > BigInt.zero) {
+      await _pendingSendStorage.remove(send.id);
+    }
+    notifyListeners();
+    return result;
+  }
+
+  Future<void> removePendingSend(String id) async {
+    await _pendingSendStorage.remove(id);
+    notifyListeners();
+  }
 
   /// Lista de mints ordenados por balance.
   /// Cuba Bitcoin siempre primero, luego ordenados por: sats → usd → eur → otros.
@@ -332,6 +409,9 @@ class WalletProvider extends ChangeNotifier {
 
     // Inicializar storage de tokens pendientes
     await _pendingTokenStorage.init();
+
+    // Inicializar storage de envíos offline pendientes
+    await _pendingSendStorage.init();
 
     // Obtener directorio de documentos (path absoluto requerido)
     final dir = await getApplicationDocumentsDirectory();
@@ -1544,6 +1624,18 @@ class WalletProvider extends ChangeNotifier {
     return perUnit;
   }
 
+  /// Cancela un envío pendiente reclamando sus proofs.
+  /// Usa tx.ys para identificar las proofs exactas de esa transacción.
+  /// Solo revierte las que el mint confirma como no gastadas.
+  Future<ReclaimResult> reclaimTransaction(Transaction tx) async {
+    final wallet = await getWallet(tx.mintUrl, tx.unit);
+    final result = await wallet.reclaimProofsByYs(ys: tx.ys);
+    if (result.count > BigInt.zero) {
+      notifyListeners();
+    }
+    return result;
+  }
+
   /// Guarda metadata para una transacción de melt (Lightning withdrawal).
   Future<void> _saveMeltMetadata(Wallet wallet, String invoice) async {
     try {
@@ -1942,6 +2034,10 @@ class WalletProvider extends ChangeNotifier {
 
       // Limpiar metadata de transacciones
       await _txMetaStorage.clear();
+
+      // Limpiar envíos offline pendientes (storage separado, sobrevive al
+      // borrado del wallet.sqlite si no se limpia acá).
+      await _pendingSendStorage.clear();
 
       // Borrar archivo
       final dir = await getApplicationDocumentsDirectory();
