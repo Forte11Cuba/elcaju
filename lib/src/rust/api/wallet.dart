@@ -70,6 +70,11 @@ abstract class Wallet implements RustOpaqueInterface {
 
   Future<void> checkAllMintQuotes();
 
+  /// Ask the mint for the current state of a single quote by id and
+  /// return the refreshed MintQuote. Local store is updated as a side
+  /// effect inside CDK.
+  Future<MintQuote> checkMintQuoteStatus({required String quoteId});
+
   Future<void> checkPendingTransactions();
 
   /// Observe-only counterpart of `reclaim_proofs_by_ys`. Queries the mint
@@ -105,6 +110,10 @@ abstract class Wallet implements RustOpaqueInterface {
 
   Future<MintInfo?> getMint();
 
+  /// Return pending (unissued) mint quotes known to the local store,
+  /// filtered to this wallet's mint/unit.
+  Future<List<MintQuote>> getUnissuedMintQuotes();
+
   Future<bool> isTokenSpent({required Token token});
 
   Future<List<Transaction>> listTransactions({TransactionDirection? direction});
@@ -112,6 +121,12 @@ abstract class Wallet implements RustOpaqueInterface {
   Future<MeltQuote> meltQuote({required String request});
 
   Stream<MintQuote> mint({required BigInt amount, String? description});
+
+  /// Mint proofs for a paid quote and return an Issued MintQuote with
+  /// `transaction_id` and `token` populated — same shape the `mint()`
+  /// stream emits on Issued. Use this to recover metadata for quotes
+  /// that were paid while the app was killed.
+  Future<MintQuote> mintByQuoteId({required String quoteId});
 
   factory Wallet({
     required String mintUrl,

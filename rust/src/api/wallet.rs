@@ -411,6 +411,62 @@ impl Wallet {
         Ok(())
     }
 
+    /// Return pending (unissued) mint quotes known to the local store,
+    /// filtered to this wallet's mint/unit.
+    pub async fn get_unissued_mint_quotes(&self) -> Result<Vec<MintQuote>, Error> {
+        let quotes = self.inner.get_unissued_mint_quotes().await?;
+        Ok(quotes.into_iter().map(MintQuote::from).collect())
+    }
+
+    /// Ask the mint for the current state of a single quote by id and
+    /// return the refreshed MintQuote. Local store is updated as a side
+    /// effect inside CDK.
+    pub async fn check_mint_quote_status(&self, quote_id: String) -> Result<MintQuote, Error> {
+        let quote = self.inner.check_mint_quote_status(&quote_id).await?;
+        Ok(MintQuote::from(quote))
+    }
+
+    /// Mint proofs for a paid quote and return an Issued MintQuote with
+    /// `transaction_id` and `token` populated — same shape the `mint()`
+    /// stream emits on Issued. Use this to recover metadata for quotes
+    /// that were paid while the app was killed.
+    pub async fn mint_by_quote_id(&self, quote_id: String) -> Result<MintQuote, Error> {
+        let mint_url = self.mint_url()?;
+        let unit = self.unit();
+        let cdk_quote = self.inner.check_mint_quote_status(&quote_id).await?;
+        let expiry = cdk_quote.expiry;
+        let request = cdk_quote.request.clone();
+
+        let mint_proofs = self
+            .inner
+            .mint(&quote_id, SplitTarget::None, None)
+            .await?;
+
+        let tx_id = match TransactionId::try_from(mint_proofs.clone()) {
+            Ok(id) => Some(id.to_string()),
+            Err(e) => {
+                info!("Failed to compute mint tx ID: {e}");
+                None
+            }
+        };
+
+        let mint_amount = mint_proofs.total_amount().unwrap_or_default();
+        let token = Token::try_from(CdkToken::new(mint_url, mint_proofs, None, unit)).ok();
+
+        self.update_balance_streams().await;
+
+        Ok(MintQuote {
+            id: quote_id,
+            request,
+            amount: Some(mint_amount.into()),
+            expiry: Some(expiry),
+            state: CdkMintQuoteState::Issued.into(),
+            token,
+            error: None,
+            transaction_id: tx_id,
+        })
+    }
+
     // === Lightning Withdrawal (NUT-05) ===
 
     pub async fn melt_quote(&self, request: String) -> Result<MeltQuote, Error> {
