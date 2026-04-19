@@ -782,7 +782,6 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
   late final bool _isLightning;
   String? _tokenOrInvoice;
   late final bool _shouldShowQR;
-  bool _isLoadingPendingInvoice = false;
   bool _isReclaiming = false;
 
   @override
@@ -795,37 +794,12 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
     final meta = widget.walletProvider.getTransactionMeta(widget.transaction.id);
     _tokenOrInvoice = meta?.token ?? meta?.invoice;
 
-    // Si es Lightning incoming sin invoice, buscar en pending mint invoices
-    if (_tokenOrInvoice == null && _isLightning && _isIncoming) {
-      _loadPendingMintInvoice();
-    }
-
     // Mostrar QR para todo EXCEPTO Lightning saliente
     _shouldShowQR = !_isLightning || _isIncoming;
 
     // Inicializar QR dinámico si es token Cashu
     if (_tokenOrInvoice != null && !_isLightning && _shouldShowQR) {
       _encodeTokenToUR();
-    }
-  }
-
-  /// Busca el invoice en pending mint invoices si no hay metadata.
-  Future<void> _loadPendingMintInvoice() async {
-    setState(() => _isLoadingPendingInvoice = true);
-    String? invoice;
-    try {
-      invoice = await widget.walletProvider.findPendingMintInvoice(
-        widget.transaction.mintUrl,
-        widget.transaction.unit,
-      );
-    } catch (e, st) {
-      debugPrint('findPendingMintInvoice failed: $e\n$st');
-    }
-    if (mounted) {
-      setState(() {
-        _isLoadingPendingInvoice = false;
-        if (invoice != null) _tokenOrInvoice = invoice;
-      });
     }
   }
 
@@ -968,7 +942,7 @@ class _TransactionDetailScreenState extends State<_TransactionDetailScreen> {
                 ],
 
                 // Mensaje si no hay token/invoice (ocultar mientras carga)
-                if (_tokenOrInvoice == null && !_isLoadingPendingInvoice) ...[
+                if (_tokenOrInvoice == null) ...[
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(

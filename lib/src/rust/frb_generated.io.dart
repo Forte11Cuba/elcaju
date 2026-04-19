@@ -300,6 +300,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<MintMethodSettings> dco_decode_list_mint_method_settings(dynamic raw);
 
   @protected
+  List<MintQuote> dco_decode_list_mint_quote(dynamic raw);
+
+  @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
 
   @protected
@@ -705,6 +708,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<MintMethodSettings> sse_decode_list_mint_method_settings(
     SseDeserializer deserializer,
   );
+
+  @protected
+  List<MintQuote> sse_decode_list_mint_quote(SseDeserializer deserializer);
 
   @protected
   List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
@@ -1197,6 +1203,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_mint_method_settings(
     List<MintMethodSettings> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_mint_quote(
+    List<MintQuote> self,
     SseSerializer serializer,
   );
 
