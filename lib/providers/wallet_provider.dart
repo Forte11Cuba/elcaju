@@ -1836,6 +1836,13 @@ class WalletProvider extends ChangeNotifier {
   /// Llamar en background al iniciar la app.
   /// También vincula transacciones incoming sin metadata con invoices pendientes.
   Future<void> checkPendingTransactions() async {
+    // Recover paid-but-unissued quotes by quote_id FIRST, before the
+    // per-mint loop runs checkAllMintQuotes. CDK's mint_unissued_quotes
+    // issues proofs silently (drops amount_issued > 0 into the quote,
+    // excluding it from the unissued list), so if it ran first our
+    // recovery would find nothing and bolt11 metadata would be lost.
+    await _recoverPendingMintQuotes();
+
     // Iterar todos los mints y todas sus unidades, no solo los wallets
     // ya instanciados. initialize() solo precarga units.first por mint,
     // así que quotes/sagas/melts en otras unidades se perderían.
@@ -1845,7 +1852,9 @@ class WalletProvider extends ChangeNotifier {
           final wallet = await getWallet(entry.key, unit);
 
           try {
-            // Reclamar quotes pagados pero no emitidos (Lightning → proofs)
+            // Safety net: after our recovery pass, this should be a no-op
+            // for healthy cases. Still useful if _recoverPendingMintQuotes
+            // errored on a specific quote and CDK can retry issuance.
             await wallet.checkAllMintQuotes();
           } catch (e) {
             debugPrint('Check mint quotes failed: $e');
@@ -1877,9 +1886,6 @@ class WalletProvider extends ChangeNotifier {
         }
       }
     }
-
-    // Recover paid-but-unissued quotes by quote_id (exact, no heuristics)
-    await _recoverPendingMintQuotes();
 
     // Resume pending Nostr payment request if app was killed mid-wait
     await resumePendingNostrRequest();
