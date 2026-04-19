@@ -841,8 +841,7 @@ class _RequestScreenState extends State<RequestScreen> {
       _status = RequestStatus.received;
       _receivedAmount = amount;
     });
-    final walletProvider = context.read<WalletProvider>();
-    walletProvider.confettiController.fire();
+    // Confetti se dispara globalmente desde WalletProvider._saveMintMetadata
     // TODO: re-enable once CDK fixes NIP-17 (cashubtc/cdk#1807)
     // Only remove pending Nostr request if this screen created one.
     // Disabled while Nostr payment requests are disabled to avoid

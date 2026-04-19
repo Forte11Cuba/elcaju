@@ -1354,24 +1354,31 @@ class WalletProvider extends ChangeNotifier {
       amount: amount,
       description: description,
     ).listen(
-      (quote) async {
+      (quote) {
         // Guardar invoice temprano en SharedPreferences
         if (quote.state == MintQuoteState.unpaid) {
           invoiceBolt11 = quote.request;
           _savePendingMintInvoice(quote.id, quote.request, mintUrl, unit, amount);
         }
 
-        // Cuando se completa, guardar metadata, confetti, limpiar pending
-        if (quote.state == MintQuoteState.issued && invoiceBolt11 != null) {
-          final saved = await _saveMintMetadata(wallet, invoiceBolt11!, quote.transactionId);
-          // Only remove pending invoice if metadata was saved;
-          // otherwise _matchPendingMintInvoices can recover it on next startup
-          if (saved) _removePendingMintInvoice(quote.id);
-        }
-
-        // Reenviar a la UI (si sigue escuchando)
+        // Reenviar a la UI ANTES de cualquier await: Rust cierra el stream
+        // inmediatamente tras emitir Issued, y onDone corre durante el await
+        // de _saveMintMetadata, cerrando el controller antes de que el evento
+        // llegue al screen.
         if (!controller.isClosed) {
           controller.add(quote);
+        }
+
+        // Metadata async fire-and-forget (no bloquea el forward)
+        if (quote.state == MintQuoteState.issued && invoiceBolt11 != null) {
+          final invoice = invoiceBolt11!;
+          unawaited(
+            _saveMintMetadata(wallet, invoice, quote.transactionId).then((saved) {
+              // Only remove pending invoice if metadata was saved;
+              // otherwise _matchPendingMintInvoices can recover it on next startup
+              if (saved) _removePendingMintInvoice(quote.id);
+            }),
+          );
         }
       },
       onError: (error) {
