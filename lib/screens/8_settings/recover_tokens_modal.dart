@@ -69,7 +69,7 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  LucideIcons.refreshCw,
+                  LucideIcons.searchCode,
                   color: AppColors.primaryAction,
                   size: 32,
                 ),

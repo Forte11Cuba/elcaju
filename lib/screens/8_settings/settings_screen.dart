@@ -96,12 +96,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                     ),
                     _buildSettingTile(
-                      icon: LucideIcons.key,
-                      title: l10n.backupSeedPhrase,
-                      subtitle: l10n.viewRecoveryWords,
-                      onTap: () => _showBackupSeed(context, settingsProvider),
-                    ),
-                    _buildSettingTile(
                       icon: LucideIcons.landmark,
                       title: l10n.connectedMints,
                       subtitle: l10n.manageCashuMints,
@@ -126,6 +120,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             _togglePin(context, settingsProvider, value),
                         activeThumbColor: AppColors.primaryAction,
                       ),
+                    ),
+                    _buildSettingTile(
+                      icon: LucideIcons.key,
+                      title: l10n.backupSeedPhrase,
+                      subtitle: l10n.viewRecoveryWords,
+                      onTap: () => _showBackupSeed(context, settingsProvider),
                     ),
                     _buildSettingTile(
                       icon: LucideIcons.searchCode,
