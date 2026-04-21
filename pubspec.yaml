@@ -1,7 +1,7 @@
 name: elcaju
 description: "ElCaju - Tu wallet de ecash privado"
 publish_to: 'none'
-version: 0.2.0+3
+version: 0.3.0+4
 
 environment:
   sdk: ^3.11.0
