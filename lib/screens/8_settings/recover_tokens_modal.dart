@@ -677,15 +677,24 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
         setState(() {
           _isSuccess = true;
           final recoveredDetails = <String>[];
-          for (final entry in recoveredMap.entries) {
-            if (entry.value > BigInt.zero) {
-              final formatted = UnitFormatter.formatBalance(entry.value, entry.key);
-              final label = UnitFormatter.getUnitLabel(entry.key);
-              recoveredDetails.add('$formatted $label');
+          int mintsRecovered = 0;
+          
+          for (final mintEntry in recoveredMap.entries) {
+            final unitBalances = mintEntry.value;
+            bool hasRecovered = false;
+            for (final unitEntry in unitBalances.entries) {
+              if (unitEntry.value > BigInt.zero) {
+                final formatted = UnitFormatter.formatBalance(unitEntry.value, unitEntry.key);
+                final label = UnitFormatter.getUnitLabel(unitEntry.key);
+                recoveredDetails.add('$formatted $label');
+                hasRecovered = true;
+              }
             }
+            if (hasRecovered) mintsRecovered++;
           }
+          
           if (recoveredDetails.isNotEmpty) {
-            _result = l10n.recoveredTokens(recoveredDetails.join(", "), recoveredDetails.length);
+            _result = l10n.recoveredTokens(recoveredDetails.join(", "), mintsRecovered);
           } else {
             _result = l10n.noTokensForMnemonic;
           }

@@ -1946,8 +1946,8 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Restaura tokens usando otro mnemonic y los transfiere al wallet actual.
-  /// Retorna un mapa con la unidad como clave y el balance recuperado como valor.
-  Future<Map<String, BigInt>> restoreWithMnemonic(
+  /// Retorna un mapa con el mintUrl como clave y un mapa de unit->balance como valor.
+  Future<Map<String, Map<String, BigInt>>> restoreWithMnemonic(
     String mnemonic,
     List<String> mintUrls,
   ) async {
@@ -1955,7 +1955,7 @@ class WalletProvider extends ChangeNotifier {
       throw Exception('WalletProvider no inicializado');
     }
 
-    final recoveredByUnit = <String, BigInt>{};
+    final results = <String, Map<String, BigInt>>{};
 
     // Normalizar mnemonic
     final normalizedMnemonic =
@@ -1989,21 +1989,24 @@ class WalletProvider extends ChangeNotifier {
             await tempWallet.restore();
             final tempBalance = await tempWallet.balance();
 
-            if (tempBalance > BigInt.zero) {
-              // Enviar todo el balance
-              final prepared =
-                  await tempWallet.prepareSend(amount: tempBalance);
-              final result = await tempWallet.send(
-                send: prepared,
-                memo: 'Recuperación El Caju',
-                includeMemo: true,
-              );
+            // Inicializar el mapa de unidades para este mint si no existe
+              results[mintUrl] ??= {};
+              
+              if (tempBalance > BigInt.zero) {
+                // Enviar todo el balance
+                final prepared =
+                    await tempWallet.prepareSend(amount: tempBalance);
+                final result = await tempWallet.send(
+                  send: prepared,
+                  memo: 'Recuperación El Caju',
+                  includeMemo: true,
+                );
 
-              // Reclamar en nuestro wallet
-              final ourWallet = await getWallet(mintUrl, unit);
-              final received = await ourWallet.receive(token: result.token);
-              recoveredByUnit[unit] = (recoveredByUnit[unit] ?? BigInt.zero) + received;
-            }
+                // Reclamar en nuestro wallet
+                final ourWallet = await getWallet(mintUrl, unit);
+                final received = await ourWallet.receive(token: result.token);
+                results[mintUrl]![unit] = (results[mintUrl]![unit] ?? BigInt.zero) + received;
+              }
           } catch (e) {
             debugPrint('Error restaurando $mintUrl:$unit: $e');
           }
@@ -2023,7 +2026,7 @@ class WalletProvider extends ChangeNotifier {
     }
 
     notifyListeners();
-    return recoveredByUnit;
+    return results;
   }
 
   // ============================================================
