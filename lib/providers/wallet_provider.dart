@@ -1946,7 +1946,8 @@ class WalletProvider extends ChangeNotifier {
   }
 
   /// Restaura tokens usando otro mnemonic y los transfiere al wallet actual.
-  Future<BigInt> restoreWithMnemonic(
+  /// Retorna un mapa con la unidad como clave y el balance recuperado como valor.
+  Future<Map<String, BigInt>> restoreWithMnemonic(
     String mnemonic,
     List<String> mintUrls,
   ) async {
@@ -1954,7 +1955,7 @@ class WalletProvider extends ChangeNotifier {
       throw Exception('WalletProvider no inicializado');
     }
 
-    BigInt totalRecovered = BigInt.zero;
+    final recoveredByUnit = <String, BigInt>{};
 
     // Normalizar mnemonic
     final normalizedMnemonic =
@@ -2001,7 +2002,7 @@ class WalletProvider extends ChangeNotifier {
               // Reclamar en nuestro wallet
               final ourWallet = await getWallet(mintUrl, unit);
               final received = await ourWallet.receive(token: result.token);
-              totalRecovered += received;
+              recoveredByUnit[unit] = (recoveredByUnit[unit] ?? BigInt.zero) + received;
             }
           } catch (e) {
             debugPrint('Error restaurando $mintUrl:$unit: $e');
@@ -2022,7 +2023,7 @@ class WalletProvider extends ChangeNotifier {
     }
 
     notifyListeners();
-    return totalRecovered;
+    return recoveredByUnit;
   }
 
   // ============================================================
