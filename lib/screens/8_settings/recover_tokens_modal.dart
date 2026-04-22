@@ -668,7 +668,7 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
           return;
         }
 
-        final recovered = await walletProvider.restoreWithMnemonic(
+        final recoveredMap = await walletProvider.restoreWithMnemonic(
           mnemonic,
           mintUrls,
         );
@@ -676,12 +676,25 @@ class _RecoverTokensModalState extends State<RecoverTokensModal> {
         if (!mounted) return;
         setState(() {
           _isSuccess = true;
-          if (recovered > BigInt.zero) {
-            // Usamos la unidad activa como aproximación para el formato
-            final activeUnit = walletProvider.activeUnit;
-            final formatted = UnitFormatter.formatBalance(recovered, activeUnit);
-            final label = UnitFormatter.getUnitLabel(activeUnit);
-            _result = l10n.recoveredAndTransferred(formatted, label);
+          final recoveredDetails = <String>[];
+          int mintsRecovered = 0;
+          
+          for (final mintEntry in recoveredMap.entries) {
+            final unitBalances = mintEntry.value;
+            bool hasRecovered = false;
+            for (final unitEntry in unitBalances.entries) {
+              if (unitEntry.value > BigInt.zero) {
+                final formatted = UnitFormatter.formatBalance(unitEntry.value, unitEntry.key);
+                final label = UnitFormatter.getUnitLabel(unitEntry.key);
+                recoveredDetails.add('$formatted $label');
+                hasRecovered = true;
+              }
+            }
+            if (hasRecovered) mintsRecovered++;
+          }
+          
+          if (recoveredDetails.isNotEmpty) {
+            _result = l10n.recoveredTokens(recoveredDetails.join(", "), mintsRecovered);
           } else {
             _result = l10n.noTokensForMnemonic;
           }
